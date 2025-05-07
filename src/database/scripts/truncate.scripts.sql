@@ -1,0 +1,24 @@
+SET FOREIGN_KEY_CHECKS = 0;
+
+TRUNCATE TABLE ListingHostInfo;
+TRUNCATE TABLE Bookings;
+TRUNCATE TABLE BookingStatuses;
+TRUNCATE TABLE ListingPhotos;
+TRUNCATE TABLE PhotoTypes;
+TRUNCATE TABLE ListingUtilities;
+TRUNCATE TABLE ListingRestrictions;
+TRUNCATE TABLE ListingAvailability;
+TRUNCATE TABLE ListingAmenities;
+TRUNCATE TABLE ListingHouseRules;
+TRUNCATE TABLE ListingBedroomAmenities;
+TRUNCATE TABLE Listing;
+TRUNCATE TABLE Address;
+TRUNCATE TABLE Users;
+TRUNCATE TABLE HouseRules;
+TRUNCATE TABLE Amenities;
+TRUNCATE TABLE BedroomAmenities;
+TRUNCATE TABLE Utilities;
+TRUNCATE TABLE AmenitiesTypes;
+TRUNCATE TABLE Gender;
+
+SET FOREIGN_KEY_CHECKS = 1;
