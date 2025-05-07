@@ -22,7 +22,7 @@ app.use(express.json());
 
 app.use(express.urlencoded({ extended: true }));
 
-app.use(cors({ origin: [ 'http://localhost:3000', 'https://loca-sphere.vercel.app/'], credentials: true }));
+app.use(cors({ origin: [ 'http://localhost:3000', 'https://loca-sphere.vercel.app'], credentials: true }));
 
 app.use('/api', apiRouter);
 
