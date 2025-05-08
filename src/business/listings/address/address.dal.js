@@ -25,7 +25,8 @@ class AddressDal {
                 extraInfo: address.extraInfo,
                 monthlyRent: Number(address.monthlyRent),
                 currency: address.currency,
-                title: address.title
+                title: address.title,
+                isChecked: Boolean(address.isChecked)
             }
         })
     }

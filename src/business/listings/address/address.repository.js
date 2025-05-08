@@ -23,6 +23,7 @@ class AddressRepository {
                 l.monthlyRent,
                 l.title,
                 l.currency,
+                l.isChecked,
                 (6371 * acos(
                     cos(radians(?)) * cos(radians(latitude)) *
                     cos(radians(longitude) - radians(?)) +
