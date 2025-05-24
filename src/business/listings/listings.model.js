@@ -1,61 +1,108 @@
-const db = require('../../database/db.connection');
+const { Model } = require('objection');
+const UserModel = require('../users/users.model');
+const CurrencyModel = require('./currency/currency.model');
 
-class ListingsModel {
+class ListingsModel extends Model {
 
-    constructor(){
-
-        this._ListingtableName = 'Listing';
-        this._listingsTableColumns = null;
-        this._addressTableName = 'Address';
-        this._addressTableColumns = null
-
-        this._listingsMapTable = 'ListingBedroomAmenities';
-        this._listingsMapTableColumns = null
-
-        this._bedroomAmenitiesTable = 'BedroomAmenities';
-        this._bedroomAmenitiesTableColumns = null
-
-        this._listingTypesTable = 'ListingTypes';
-        this._listingTypesTableColumns = null
+    static get tableName() {
+        return 'Listing';
     }
 
-    async initColumns(){
-        this._listingsTableColumns = this.getColumnsForTable(this._ListingtableName);
-        // this._addressTableColumns = await this.getColumnsForTable(this._addressTableName);
-        // this._listingsMapTableColumns = await this.getColumnsForTable(this._listingsMapTable);
-        // this._bedroomAmenitiesTableColumns = await this.getColumnsForTable(this._bedroomAmenitiesTable);
-        // this._listingTypesTableColumns = await this.getColumnsForTable(this._listingTypesTable);
+    static get idColumn() {
+        return ListingsModel.Fields.ID;
     }
 
-    getColumnsForTable(tableName){
+    static get Fields() {
+        return {
+            ID: 'id',
+            USER_ID: 'userId',
+            TITLE: 'title',
+            MONTHLY_RENT: 'monthlyRent',
+            CURRENCY_ID: 'currencyId',
+            DESCRIPTION: 'description',
+            BEDROOMS: 'bedrooms',
+            BEDS: 'beds',
+            BATHROOMS: 'bathrooms',
+            ROOM_AREA_SQM: 'roomAreaSqM',
+            PLACE_AREA_SQM: 'placeAreaSqM',
+            MINIMUM_STAY_DAYS: 'minimumStayDays',
+            MAX_STAY_DAYS: 'maxStayDays',
+            LISTING_TYPE_ID: 'listingTypeId',
+            IS_CHECKED: 'isChecked',
+            CREATED_AT: 'createdAt',
+            UPDATED_AT: 'updatedAt'
+        };
+    };
 
-        const query = `SELECT column_name FROM information_schema.columns WHERE table_schema = 'loca_sphere' AND table_name = ?`;
+    static get jsonSchema() {
+
+        return {
+            type: 'object',
+            required: [
+                ListingsModel.Fields.USER_ID,
+                ListingsModel.Fields.TITLE,
+                ListingsModel.Fields.MONTHLY_RENT,
+                ListingsModel.Fields.LISTING_TYPE_ID
+            ],
+            properties: {
+                [ListingsModel.Fields.ID]: { type: 'string', maxLength: 21 },
+                [ListingsModel.Fields.USER_ID]: { type: 'string', maxLength: 21 },
+                [ListingsModel.Fields.TITLE]: { type: 'string', maxLength: 255 },
+                [ListingsModel.Fields.MONTHLY_RENT]: { type: 'number', minimum: 0, multipleOf: 0.01 },
+                [ListingsModel.Fields.CURRENCY_ID]: { type: 'number' },
+                [ListingsModel.Fields.DESCRIPTION]: { type: 'string', maxLength: 1000 },
+                [ListingsModel.Fields.BEDROOMS]: { type: 'integer', minimum: 0, maximum: 255 },
+                [ListingsModel.Fields.BEDS]: { type: 'integer', minimum: 0, maximum: 255 },
+                [ListingsModel.Fields.BATHROOMS]: { type: 'number', minimum: 0, maximum: 999.9, multipleOf: 0.1 },
+                [ListingsModel.Fields.ROOM_AREA_SQM]: { type: 'number', minimum: 0, maximum: 9999.99, multipleOf: 0.01 },
+                [ListingsModel.Fields.PLACE_AREA_SQM]: { type: 'number', minimum: 0, maximum: 9999.99, multipleOf: 0.01 },
+                [ListingsModel.Fields.MINIMUM_STAY_DAYS]: { type: 'integer', minimum: 0 },
+                [ListingsModel.Fields.MAX_STAY_DAYS]: { type: 'integer', minimum: 0 },
+                [ListingsModel.Fields.LISTING_TYPE_ID]: { type: 'integer' },
+                [ListingsModel.Fields.IS_CHECKED]: { type: 'boolean', default: false },
+                [ListingsModel.Fields.CREATED_AT]: { type: 'string', format: 'date-time' },
+                [ListingsModel.Fields.UPDATED_AT]: { type: 'string', format: 'date-time' }
+            }
+        };
+    };
+
+    static get relationMappings() {
+
+        const lm = `${ListingsModel.tableName}.${ListingsModel.Fields.USER_ID}`;
+        const u = `${UserModel.tableName}.${UserModel.Fields.ID}`;
+
+        const x = `${ListingsModel.tableName}.${ListingsModel.Fields.CURRENCY_ID}`;
+        const s = `${CurrencyModel.tableName}.${CurrencyModel.Fields.ID}`
     
-        db.execute(query, [tableName])
-        .then(([rows]) => {
+        return {
+            users: {
+                relation: Model.BelongsToOneRelation,
+                modelClass: UserModel,
+                join: {
+                    from: lm,
+                    to: u
+                }
+            },
+            listingType: {
+                relation: Model.BelongsToOneRelation,
+                modelClass: '',
+                join: {
+                    from:'',
+                    to:''
+                }
+            },
+            currency: {
+                relation: Model.BelongsToOneRelation,
+                modelClass: CurrencyModel,
+                join: {
+                    from: x,
+                    to: s
+                }
+            },
+        }
+    }
 
-            const set = new Set(rows.map(row => row.COLUMN_NAME));
     
-            return set;
-        })
-        .catch(error => {
-            console.error(error)
-        })
-
-    }
-
-    formatColumns(columns, abriviation, removeColumns){
-
-
-        columns.forEach((column) => {
-            console.log(column);
-           
-        })
-    }
-
 };
-
-new ListingsModel()
-
 
 module.exports = ListingsModel;

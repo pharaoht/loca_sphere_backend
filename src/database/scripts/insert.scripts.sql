@@ -11,6 +11,9 @@ INSERT INTO AmenitiesTypes (name) VALUES
 ('Bathroom'),
 ('Dining Room'),
 ('Balcony'),
+('Bedroom'),
+('Exterior'),
+('Floor Plan')
 ('Other');
 
 INSERT INTO Amenities (amenityName) VALUES
@@ -66,7 +69,7 @@ INSERT INTO Utilities (name) VALUES
 ('All bills included');
 
 INSERT INTO BookingStatuses (statusName) 
-VALUES ('pending'), ('confirmed'), ('cancelled');
+VALUES ('pending'), ('confirmed'), ('cancelled'), ('completed');
 
 INSERT INTO PhotoTypes (name) VALUES
 ('kitchen'),
@@ -79,13 +82,19 @@ INSERT INTO PhotoTypes (name) VALUES
 ('floor_plan'),
 ('other');
 
+INSERT INTO Gender (sex) VALUES
+('Mixed Gender'),
+('Males'),
+('Females');
+
+INSERT INTO Currencies (code, symbol) VALUES
+('USD', '$'),
+('EUR', '€'),
+('GBP', '£'),
+('JPY', '¥');
+
 INSERT INTO ListingTypes (name) VALUES 
 ('Apartment'),
 ('Studio'),
 ('Private Room'),
 ('Shared Room');
-
-INSERT INTO Gender (sex) VALUES
-('Mixed Gender'),
-('Males'),
-('Females');

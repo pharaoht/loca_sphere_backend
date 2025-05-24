@@ -39,7 +39,7 @@ class ListingsDal {
 
     formatListingHostDetails(listing){
 
-        if(listing.lenght < 1) return [];
+        if(listing.length < 1) return [];
 
         const dal = listing.map(itm => {
 
@@ -62,6 +62,30 @@ class ListingsDal {
         });
 
         return dal;
+    }
+
+    formatListingUtilities(utilities){
+
+        if(utilities.length === 0) return [];
+
+        const x = {
+            isWaterIncluded: false,
+            isElecIncluded: false,
+            isInternetIncluded: false,
+            isGasIncluded: false,
+            isAllincluded: false,
+            isCleaningIncluded: false,
+        }
+
+        utilities.forEach(element => {
+            
+            if(element.name === 'Water') x.isWaterIncluded = true;
+            if(element.name === 'Internet') x.isInternetIncluded = true;
+
+        });
+
+
+        return [x];
     }
 };
 

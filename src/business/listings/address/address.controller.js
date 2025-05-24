@@ -1,5 +1,5 @@
-const addressDal = require("./address.dal");
-const addressRepositoy = require("./address.repository");
+const AddressDal = require("./address.dal");
+const AddressRepository = require("./address.repository");
 
 async function httpgetAddressById(req, res) {
 
@@ -7,7 +7,7 @@ async function httpgetAddressById(req, res) {
 
         const { id } = req?.params;
 
-        const address = await addressRepositoy.getAddressById(id);
+        const address = await AddressRepository.getAddresById(id);
     
         if (!address) {   
                 
@@ -31,11 +31,11 @@ async function httpgetAddressesByCoordinatesRadius(req, res) {
         
         const { lat, long, radius } = req?.query;
 
-        const results = await addressRepositoy.getAddressesByCoordinatesRadius(lat, long, radius);
+        const results = await AddressRepository.getAddressByCoordinatesRadius(lat, long, radius);
 
         if (!results) return res.status(404).json({ error: 'Addresses not found' });
 
-        const dal = addressDal.fromDto(results);
+        const dal = AddressDal.fromDto(results);
         
         return res.status(200).json(dal);
 

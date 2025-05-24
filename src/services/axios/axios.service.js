@@ -7,7 +7,7 @@ class AxiosService {
 
     }
 
-    genRapidApiReqObj(cityName){
+    static genRapidApiReqObj(cityName){
 
         const options = {
             method: 'GET',
@@ -27,7 +27,7 @@ class AxiosService {
         return options
     }
 
-    async externalRequest(options){
+    static async externalRequest(options){
 
         try {
 
@@ -47,7 +47,4 @@ class AxiosService {
     }
 };
 
-
-const axiosService = new AxiosService();
-
-module.exports = axiosService;
+module.exports = AxiosService;

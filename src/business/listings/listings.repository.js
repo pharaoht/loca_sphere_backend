@@ -1,4 +1,5 @@
 const db = require('../../database/db.connection');
+const ListingsModel = require('./listings.model');
 const listingsModel = require('./listings.model');
 
 class ListingsRepository{
@@ -11,6 +12,8 @@ class ListingsRepository{
         this._listingTypesTable = 'ListingTypes';
         this._listingHostTable = 'ListingHostInfo';
         this._genderTable = 'Gender';
+        this._listingUtilTable = 'ListingUtilities';
+        this._UtilitiesTable = 'Utilities'
 
     }
 
@@ -78,6 +81,31 @@ class ListingsRepository{
         `;
 
         const [ result ] = await db.execute(query, [listingId]);
+
+        return result;
+    }
+
+    async getListingUtilities(listingId){
+
+        const query = `
+            SELECT *
+            FROM ${this._listingUtilTable} lu
+            INNER JOIN ${this._UtilitiesTable} u
+                ON u.id = lu.utilityId
+            WHERE listingId = ?
+        `;
+
+        const [ result ] = await db.execute(query, listingId);
+
+        return result;
+    }
+
+    async getListingById(listingId){
+
+        const result = await ListingsModel.query()
+        .where(ListingsModel.Fields.ID, listingId)
+        .withGraphFetched('[listingType, currency]')
+        .first();
 
         return result;
     }

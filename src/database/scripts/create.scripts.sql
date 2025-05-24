@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS Users (
-    id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    id CHAR(21) PRIMARY KEY,
     givenName VARCHAR(255) NOT NULL,
     surName VARCHAR(255) NOT NULL,
     secondSurName VARCHAR(255),
@@ -38,17 +38,26 @@ CREATE TABLE IF NOT EXISTS ListingTypes (
     name VARCHAR(100) UNIQUE NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS Currencies (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    code CHAR(3) NOT NULL UNIQUE,
+    symbol VARCHAR(10),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
 CREATE TABLE IF NOT EXISTS Listing (
-    id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
-    userId CHAR(36) NOT NULL,
+    id CHAR(21) PRIMARY KEY,
+    userId CHAR(21) NOT NULL,
     title VARCHAR(255) UNIQUE NOT NULL,
     monthlyRent DECIMAL(10,2) NOT NULL DEFAULT 0.00,
-    currency CHAR(3) DEFAULT 'EUR',
+    currencyId INT NOT NULL,
     description VARCHAR(1000),
     bedrooms TINYINT UNSIGNED DEFAULT 0,
     beds TINYINT UNSIGNED DEFAULT 1,
     bathrooms DECIMAL(3,1) UNSIGNED DEFAULT 0.0,
-    areaSqM DECIMAL(6,2) UNSIGNED DEFAULT 0.00,
+    roomAreaSqM DECIMAL(6,2) UNSIGNED DEFAULT 0.00,
+    placeAreaSqM DECIMAL(6,2) UNSIGNED DEFAULT 0.00,
     minimumStayDays INT UNSIGNED DEFAULT 0,
     maxStayDays INT UNSIGNED DEFAULT 0,
     listingTypeId INT NOT NULL,
@@ -56,12 +65,13 @@ CREATE TABLE IF NOT EXISTS Listing (
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (userId) REFERENCES Users(id) ON DELETE CASCADE,
-    FOREIGN KEY (listingTypeId) REFERENCES ListingTypes(id) ON DELETE CASCADE
+    FOREIGN KEY (listingTypeId) REFERENCES ListingTypes(id) ON DELETE CASCADE,
+    FOREIGN KEY (currencyId) REFERENCES Currencies(id)
 );
 
 CREATE TABLE IF NOT EXISTS Address (
-    id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
-    listingId CHAR(36) UNIQUE NOT NULL,
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    listingId CHAR(21) UNIQUE NOT NULL,
     streetAddress VARCHAR(255),
     houseNumber VARCHAR(50),
     postalCode VARCHAR(20) NOT NULL,
@@ -77,7 +87,7 @@ CREATE TABLE IF NOT EXISTS Address (
 
 CREATE TABLE IF NOT EXISTS ListingBedroomAmenities (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    listingId CHAR(36) NOT NULL,
+    listingId CHAR(21) NOT NULL,
     bedroomAmenityId INT NOT NULL,
 
     FOREIGN KEY (listingId) REFERENCES Listing(id) ON DELETE CASCADE,
@@ -85,17 +95,17 @@ CREATE TABLE IF NOT EXISTS ListingBedroomAmenities (
 );
 
 CREATE TABLE IF NOT EXISTS ListingHouseRules (
-    listingId CHAR(36) NOT NULL,
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    listingId CHAR(21) NOT NULL,
     ruleId TINYINT NOT NULL,
     isAllowed BOOLEAN NOT NULL,
-    PRIMARY KEY (listingId, ruleId),
     FOREIGN KEY (listingId) REFERENCES Listing(id) ON DELETE CASCADE,
     FOREIGN KEY (ruleId) REFERENCES HouseRules(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS ListingAmenities (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    listingId CHAR(36) NOT NULL,
+    listingId CHAR(21) NOT NULL,
     amenityTypeId TINYINT NOT NULL,
     roomNumber INT NULL,
     amenityId TINYINT NOT NULL,
@@ -106,8 +116,8 @@ CREATE TABLE IF NOT EXISTS ListingAmenities (
 );
 
 CREATE TABLE IF NOT EXISTS ListingAvailability (
-    id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
-    listingId CHAR(36) NOT NULL,
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    listingId CHAR(21) NOT NULL,
     startDate DATE NOT NULL,
     endDate DATE NOT NULL,
     isAvailable BOOLEAN DEFAULT TRUE,
@@ -115,17 +125,17 @@ CREATE TABLE IF NOT EXISTS ListingAvailability (
 );
 
 CREATE TABLE IF NOT EXISTS ListingRestrictions (
-    id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
-    listingId CHAR(36) NOT NULL,            
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    listingId CHAR(21) NOT NULL,            
     maxTenants TINYINT UNSIGNED NOT NULL,     
     extraCostPerTenant DECIMAL(10,2) DEFAULT 0.00, 
     FOREIGN KEY (listingId) REFERENCES Listing(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS ListingUtilities (
-    listingId CHAR(36) NOT NULL,
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    listingId CHAR(21) NOT NULL,
     utilityId INT NOT NULL,
-    PRIMARY KEY (listingId, utilityId),
     FOREIGN KEY (listingId) REFERENCES Listing(id) ON DELETE CASCADE,
     FOREIGN KEY (utilityId) REFERENCES Utilities(id) ON DELETE CASCADE
 );
@@ -137,14 +147,14 @@ CREATE TABLE IF NOT EXISTS PhotoTypes (
 
 
 CREATE TABLE IF NOT EXISTS ListingPhotos (
-    id CHAR(36) PRIMARY KEY DEFAULT (UUID()),   
-    listingId CHAR(36) NOT NULL,   
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    listingId CHAR(21) NOT NULL,   
     url VARCHAR(255) NOT NULL,  
     isPrimary BOOLEAN DEFAULT FALSE,
-    photoTypeId INT,
+    amenityTypeId TINYINT NOT NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (listingId) REFERENCES Listing(id) ON DELETE CASCADE,
-    FOREIGN KEY (photoTypeId) REFERENCES PhotoTypes(id) ON DELETE SET NULL
+    FOREIGN KEY (amenityTypeId) REFERENCES ListingAmenities(amenityTypeId) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS BookingStatuses (
@@ -153,9 +163,9 @@ CREATE TABLE IF NOT EXISTS BookingStatuses (
 );
 
 CREATE TABLE IF NOT EXISTS Bookings (
-    id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
-    listingId CHAR(36) NOT NULL,
-    userId CHAR(36) NOT NULL,
+    id CHAR(21) PRIMARY KEY,
+    listingId CHAR(21) NOT NULL,
+    userId CHAR(21) NOT NULL,
     startDate DATE NOT NULL,
     endDate DATE NOT NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -171,15 +181,18 @@ CREATE TABLE IF NOT EXISTS Gender (
 );
 
 CREATE TABLE IF NOT EXISTS ListingHostInfo (
-    id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
-    listingId CHAR(36) NOT NULL,
+    id CHAR(21) PRIMARY KEY,
+    listingId CHAR(21) NOT NULL,
     livesInProperty BOOLEAN DEFAULT FALSE,
-    hostGender ENUM('Male', 'Female', 'Other'),
+    hostGender  BOOLEAN DEFAULT FALSE,
     hostAgeRange ENUM('18-25 years', '26-30 years', '31-40 years', '41+ years'),
     livesWithFamily BOOLEAN DEFAULT FALSE,
     hasPets BOOLEAN DEFAULT FALSE,
+    isVerified BOOLEAN DEFAULT FALSE,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     genderAllowedId INT,
+    userId CHAR(21) NOT NULL,
     FOREIGN KEY (listingId) REFERENCES Listing(id) ON DELETE CASCADE,
-    FOREIGN KEY (genderAllowedId) REFERENCES Gender(id) ON DELETE CASCADE
+    FOREIGN KEY (genderAllowedId) REFERENCES Gender(id) ON DELETE CASCADE,
+    FOREIGN KEY (userId) REFERENCES Users(id) ON DELETE CASCADE
 );
