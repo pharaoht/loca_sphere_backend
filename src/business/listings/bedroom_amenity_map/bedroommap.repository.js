@@ -6,7 +6,8 @@ class BedroomAmenityRepository {
 
         const result = await BedroomAmenityMapModel.query()
         .where(BedroomAmenityMapModel.Fields.LISTING_ID, listId)
-        .withGraphFetched('bedroomAmenity')
+        .withGraphFetched('[bedroomAmenity, listing.[listingType]]')
+
 
         return result;
 
