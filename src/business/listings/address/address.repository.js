@@ -23,6 +23,7 @@ class AddressRepository {
             .joinRaw('JOIN "Currencies" as c ON c.id = l.currencyId')
             .select(
                 'a.*',
+                `l.${ListingsModel.Fields.ID}`,
                 `l.${ListingsModel.Fields.USER_ID}`,
                 `l.${ListingsModel.Fields.TITLE}`,
                 `l.${ListingsModel.Fields.MONTHLY_RENT}`,
