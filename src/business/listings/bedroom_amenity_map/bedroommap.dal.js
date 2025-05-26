@@ -18,6 +18,7 @@ class BedroomAmenityDal {
             listing: {
                 id: listing[0].listing.id,
                 beds: listing[0].listing.beds,
+                bedrooms: listing[0].listing.bedrooms,
                 isChecked: listing[0].listing.isChecked === 0 ? false : true,
                 listingType: listing[0].listing.listingType.name,
                 listingTypeId: listing[0].listing.listingTypeId
