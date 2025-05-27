@@ -39,72 +39,11 @@ class ListingsRepository{
 
     }
 
-    async getBedroomAmenitiesByListingId(listingId) {
-
-        const query = `
-            SELECT 
-                *,
-                l.id AS listId,
-                lba.id AS lbaId,
-                ba.id AS baId,
-                ba.name AS amenityName,
-                lt.name AS listingType,
-                lt.id AS listingTypeId
-            FROM ${this._tableName} AS l
-            INNER JOIN ${this._listingsMapTable} AS lba
-                ON lba.listingId = l.id
-            INNER JOIN ${this._bedroomAmenitiesTable} AS ba
-                ON lba.id = ba.id
-            INNER JOIN ${this._listingTypesTable} as lt
-				ON l.listingTypeId = lt.id
-            WHERE l.id = ?
-        `;
-
-        const [results] = await db.execute(query, [listingId]);
-
-        return results;
-    }
-
-    async getListingsHostDetails(listingId){
-
-        const query = `
-            SELECT *,
-                l.id as listingId,
-				lhi.id as hostingId,
-                g.id as genderId
-            FROM ${this._tableName} l
-            INNER JOIN ${this._listingHostTable} lhi
-                ON lhi.listingId = l.id
-            INNER JOIN ${this._genderTable} g
-				ON g.id = genderAllowedId
-            WHERE l.id = ?
-        `;
-
-        const [ result ] = await db.execute(query, [listingId]);
-
-        return result;
-    }
-
-    async getListingUtilities(listingId){
-
-        const query = `
-            SELECT *
-            FROM ${this._listingUtilTable} lu
-            INNER JOIN ${this._UtilitiesTable} u
-                ON u.id = lu.utilityId
-            WHERE listingId = ?
-        `;
-
-        const [ result ] = await db.execute(query, listingId);
-
-        return result;
-    }
-
     async getListingById(listingId){
 
         const result = await ListingsModel.query()
         .where(ListingsModel.Fields.ID, listingId)
-        .withGraphFetched('[listingType, currency]')
+        .withGraphFetched('[listingType, currency, address]')
         .first();
 
         return result;

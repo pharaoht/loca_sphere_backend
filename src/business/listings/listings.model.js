@@ -2,6 +2,7 @@ const { Model } = require('objection');
 const UserModel = require('../users/users.model');
 const CurrencyModel = require('./currency/currency.model');
 const ListingTypeModel = require('./listing_type/listingtype.model');
+const AddressModel = require('./address/address.model');
 
 class ListingsModel extends Model {
 
@@ -77,7 +78,7 @@ class ListingsModel extends Model {
     
         const z = `${ListingsModel.tableName}.${ListingsModel.Fields.LISTING_TYPE_ID}`;
         const zz = `${ListingTypeModel.tableName}.${ListingTypeModel.Fields.ID}`;
-    
+
         return {
             users: {
                 relation: Model.BelongsToOneRelation,
@@ -103,6 +104,14 @@ class ListingsModel extends Model {
                     to: s
                 }
             },
+            address: {
+                relation: Model.HasOneRelation,
+                modelClass: () => require('./address/address.model'),
+                join: {
+                    from: 'Listing.id',
+                    to: 'Address.listingId'
+                }
+            }
         }
     }
 
