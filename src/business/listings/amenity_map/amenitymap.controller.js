@@ -1,3 +1,4 @@
+const AmenityDal = require("./amenitymap.dal");
 const AmenityMapRepository = require("./amenitymap.repository");
 
 async function httpGetAmenityByListingId(req, res) {
@@ -11,8 +12,10 @@ async function httpGetAmenityByListingId(req, res) {
         if(!results) {
             return res.status(404).json({ error: 'Amenity not found' });
         }
+
+        const dal = AmenityDal.fromDto(results)
     
-        return res.status(200).json(results);
+        return res.status(200).json(dal);
     
     }
     catch(error) {
