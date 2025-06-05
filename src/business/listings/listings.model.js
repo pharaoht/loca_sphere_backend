@@ -1,8 +1,9 @@
+const moment = require('moment');
 const { Model } = require('objection');
+const HostModel = require('./host/host.model');
 const UserModel = require('../users/users.model');
 const CurrencyModel = require('./currency/currency.model');
 const ListingTypeModel = require('./listing_type/listingtype.model');
-const AddressModel = require('./address/address.model');
 
 class ListingsModel extends Model {
 
@@ -68,6 +69,16 @@ class ListingsModel extends Model {
         };
     };
 
+    $parseDatabaseJson(json){
+
+        json = super.$parseDatabaseJson(json);
+
+        json[ListingsModel.Fields.CREATED_AT] = moment(json[ListingsModel.Fields.CREATED_AT]).format('YYYY MMM DD');
+        json[ListingsModel.Fields.UPDATED_AT] = moment(json[ListingsModel.Fields.UPDATED_AT]).format('YYYY MMM DD');
+        
+        return json;
+    }
+
     static get relationMappings() {
 
         const lm = `${ListingsModel.tableName}.${ListingsModel.Fields.USER_ID}`;
@@ -78,6 +89,9 @@ class ListingsModel extends Model {
     
         const z = `${ListingsModel.tableName}.${ListingsModel.Fields.LISTING_TYPE_ID}`;
         const zz = `${ListingTypeModel.tableName}.${ListingTypeModel.Fields.ID}`;
+
+        const y = `${ListingsModel.tableName}.${ListingsModel.Fields.ID}`;
+        const yy = `${HostModel.tableName}.${HostModel.Fields.LISTING_ID}`;
 
         return {
             users: {
@@ -110,6 +124,14 @@ class ListingsModel extends Model {
                 join: {
                     from: 'Listing.id',
                     to: 'Address.listingId'
+                }
+            },
+            hostingDetails: {
+                relation: Model.BelongsToOneRelation,
+                modelClass: HostModel,
+                join: {
+                    from: y,
+                    to: yy
                 }
             }
         }

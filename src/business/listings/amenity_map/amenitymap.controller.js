@@ -9,7 +9,7 @@ async function httpGetAmenityByListingId(req, res) {
 
         const results = await AmenityMapRepository.repoGetAmenityByListingId(listId);
 
-        if(!results) {
+        if(results.length === 0) {
             return res.status(404).json({ error: 'Amenity not found' });
         }
 

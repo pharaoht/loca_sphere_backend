@@ -1,21 +1,8 @@
-const db = require('../../database/db.connection');
 const ListingsModel = require('./listings.model');
-const listingsModel = require('./listings.model');
 
 class ListingsRepository{
 
-    constructor(){
-  
-        this._tableName = 'Listing';
-        this._listingsMapTable = 'ListingBedroomAmenities';
-        this._bedroomAmenitiesTable = 'BedroomAmenities';
-        this._listingTypesTable = 'ListingTypes';
-        this._listingHostTable = 'ListingHostInfo';
-        this._genderTable = 'Gender';
-        this._listingUtilTable = 'ListingUtilities';
-        this._UtilitiesTable = 'Utilities'
-
-    }
+    constructor(){}
 
     async getAllListings({
         page = 1,
@@ -39,13 +26,23 @@ class ListingsRepository{
 
     }
 
-    async getListingById(listingId){
+    async repoGetListingById(listingId){
 
         const result = await ListingsModel.query()
         .where(ListingsModel.Fields.ID, listingId)
         .withGraphFetched('[listingType, currency, address]')
         .first();
 
+        return result;
+    }
+
+    async repoGetHostingDetailsByListingId(listingId){
+
+        const result = await ListingsModel.query()
+        .where(ListingsModel.Fields.ID, listingId)
+        .withGraphFetched('hostingDetails.genderMapping')
+        .first();
+        
         return result;
     }
 };

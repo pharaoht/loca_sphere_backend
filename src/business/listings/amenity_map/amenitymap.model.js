@@ -2,6 +2,7 @@ const { Model } = require("objection");
 const AmenityModel = require("../amenity/amenity.model");
 const ListingsModel = require("../listings.model");
 const AmenityTypeModel = require("../amenity_type/amenitytype.model");
+const ImagesModel = require("../../images/images.model");
 
 class AmenityMapModel extends Model {
 
@@ -61,6 +62,15 @@ class AmenityMapModel extends Model {
                 join: {
                     from: c,
                     to: cc
+                }
+            },
+
+            imagesMap: {
+                relation: Model.BelongsToOneRelation,
+                modelClass: ImagesModel,
+                join: {
+                    from:'',
+                    to: ''
                 }
             }
         }

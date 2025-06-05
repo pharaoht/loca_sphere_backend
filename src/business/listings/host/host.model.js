@@ -1,4 +1,6 @@
 const { Model } = require("objection");
+const GenderModel  = require("../gender/gender.model");
+const moment = require('moment');
 
 class HostModel extends Model {
 
@@ -28,8 +30,35 @@ class HostModel extends Model {
         }
     }
 
+    $parseDatabaseJson(json) {
+        
+        json = super.$parseDatabaseJson(json);
+        
+        json[HostModel.Fields.HAS_PETS] = json[HostModel.Fields.HAS_PETS] == 0 ? false : true;
+        json[HostModel.Fields.LIVES_IN_PROP] = json[HostModel.Fields.LIVES_IN_PROP] == 0 ? false : true;
+        json[HostModel.Fields.HOST_GENDER] = json[HostModel.Fields.HOST_GENDER] == 0 ? 'male' : 'female';
+        json[HostModel.Fields.LIVES_WITH_FAM] = json[HostModel.Fields.LIVES_WITH_FAM] == 0 ? false : true;
+        json[HostModel.Fields.IS_VERIFIED] = json[HostModel.Fields.IS_VERIFIED] == 0 ? false : true;
+        json[HostModel.Fields.CREATED_AT] = moment(json[HostModel.Fields.CREATED_AT]).format('YYYY MMM DD')
+        
+        return json;
+    }
+
     static get relationMappings(){
 
+        const x = `${HostModel.tableName}.${HostModel.Fields.GENDER_ALLOWED_ID}`;
+        const xx = `${GenderModel.tableName}.${GenderModel.Fields.ID}`;
+
+        return {
+            genderMapping: {
+                relation: Model.HasOneRelation,
+                modelClass: GenderModel,
+                join: {
+                    from: x,
+                    to: xx
+                }
+            }
+        }
     }
 };
 
