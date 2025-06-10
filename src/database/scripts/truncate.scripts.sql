@@ -4,8 +4,6 @@ TRUNCATE TABLE ListingHostInfo;
 TRUNCATE TABLE Bookings;
 TRUNCATE TABLE BookingStatuses;
 TRUNCATE TABLE ListingPhotos;
-TRUNCATE TABLE PhotoTypes;
-TRUNCATE TABLE ListingUtilities;
 TRUNCATE TABLE ListingRestrictions;
 TRUNCATE TABLE ListingAvailability;
 TRUNCATE TABLE ListingAmenities;
@@ -20,5 +18,8 @@ TRUNCATE TABLE BedroomAmenities;
 TRUNCATE TABLE Utilities;
 TRUNCATE TABLE AmenitiesTypes;
 TRUNCATE TABLE Gender;
+TRUNCATE TABLE  Currencies;
+TRUNCATE TABLE  ListingTypes;
+TRUNCATE TABLE HouseRules;
 
 SET FOREIGN_KEY_CHECKS = 1;

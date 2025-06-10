@@ -4,6 +4,7 @@ const HostModel = require('./host/host.model');
 const UserModel = require('../users/users.model');
 const CurrencyModel = require('./currency/currency.model');
 const ListingTypeModel = require('./listing_type/listingtype.model');
+const UtilityModel = require('./utility/utility.model');
 
 class ListingsModel extends Model {
 
@@ -75,6 +76,8 @@ class ListingsModel extends Model {
 
         json[ListingsModel.Fields.CREATED_AT] = moment(json[ListingsModel.Fields.CREATED_AT]).format('YYYY MMM DD');
         json[ListingsModel.Fields.UPDATED_AT] = moment(json[ListingsModel.Fields.UPDATED_AT]).format('YYYY MMM DD');
+        json[ListingsModel.Fields.ROOM_AREA_SQM] = parseFloat(json[ListingsModel.Fields.ROOM_AREA_SQM]);
+        json[ListingsModel.Fields.PLACE_AREA_SQM] = parseFloat(json[ListingsModel.Fields.PLACE_AREA_SQM]);
         
         return json;
     }
@@ -92,6 +95,10 @@ class ListingsModel extends Model {
 
         const y = `${ListingsModel.tableName}.${ListingsModel.Fields.ID}`;
         const yy = `${HostModel.tableName}.${HostModel.Fields.LISTING_ID}`;
+
+        const e = `${ListingsModel.tableName}.${ListingsModel.Fields.ID}`;
+        const ee = `${UtilityModel.tableName}.${UtilityModel.Fields.LISTING_ID}`;
+
 
         return {
             users: {
@@ -132,6 +139,14 @@ class ListingsModel extends Model {
                 join: {
                     from: y,
                     to: yy
+                }
+            },
+            utilityMap: {
+                relation: Model.BelongsToOneRelation,
+                modelClass: UtilityModel,
+                join: {
+                    from: e,
+                    to: ee
                 }
             }
         }

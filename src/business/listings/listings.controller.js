@@ -43,11 +43,31 @@ async function httpGetHostDetailsByListingId(req, res){
 
         return res.status(500).json({ error: 'Internal server error' });
     }
+};
+
+async function httpGetUtilitiesByListingId(req, res){
+
+    try{
+
+        const { listId } = req.params;
+
+        const result = await listingsRepository.repoGetUtilitiesByListingId(listId);
+
+
+        return res.status(200).json(result);
+    }
+    catch(error){
+
+        console.error(error);
+
+        return res.status(500).json({ error: 'Internal server error' });
+    }
 }
 
 
 module.exports = {
     httpGetListingById,
-    httpGetHostDetailsByListingId
+    httpGetHostDetailsByListingId,
+    httpGetUtilitiesByListingId
 };
 

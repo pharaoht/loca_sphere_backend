@@ -36,7 +36,7 @@ async function httpgetAddressesByCoordinatesRadius(req, res) {
         if (!results) return res.status(404).json({ error: 'Addresses not found' });
 
         const dal = AddressDal.fromDto(results);
-        
+ 
         return res.status(200).json(dal);
 
     } catch(error) {

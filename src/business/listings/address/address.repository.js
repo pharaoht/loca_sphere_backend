@@ -55,7 +55,7 @@ class AddressRepository {
             )
             .having('distance', '<', radius)
             .orderBy('distance')
-            .limit(20);
+            .limit(10);
 
         return results
     }

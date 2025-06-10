@@ -45,6 +45,15 @@ class ListingsRepository{
         
         return result;
     }
+
+    async repoGetUtilitiesByListingId(listId){
+
+        const result = await ListingsModel.query()
+        .findById(listId)
+        .withGraphFetched('utilityMap');
+
+        return result
+    }
 };
 
 const listingsRepository = new ListingsRepository();
