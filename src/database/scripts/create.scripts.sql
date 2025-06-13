@@ -187,6 +187,7 @@ CREATE TABLE IF NOT EXISTS ListingHostInfo (
     isVerified BOOLEAN DEFAULT FALSE,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     genderAllowedId INT,
+    peopleHosted INT DEFAULT 0,
     userId CHAR(21) NOT NULL,
     FOREIGN KEY (listingId) REFERENCES Listing(id) ON DELETE CASCADE,
     FOREIGN KEY (genderAllowedId) REFERENCES Gender(id) ON DELETE CASCADE,

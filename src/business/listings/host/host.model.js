@@ -26,6 +26,7 @@ class HostModel extends Model {
             IS_VERIFIED: 'isVerified',
             CREATED_AT: 'createdAt',
             GENDER_ALLOWED_ID: 'genderAllowedId',
+            PEOPLE_HOSTED: 'peopleHosted',
             USER_ID: 'userId'
         }
     }
