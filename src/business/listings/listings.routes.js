@@ -1,15 +1,15 @@
 const express = require('express');
 
-const { httpGetListingById, httpGetHostDetailsByListingId, httpGetUtilitiesByListingId } = require('./listings.controller');
+const { httpDynamicGetListingDetails } = require('./listings.controller');
+
+const addressRouter = require('./address/address.routes');
 
 const resource = '/listings';
 
 const listingsRouter = express.Router();
 
-listingsRouter.get(`${resource}/:listId`, httpGetListingById);
+listingsRouter.use(`${resource}/address`, addressRouter);
 
-listingsRouter.get(`${resource}/host-details/:listId`, httpGetHostDetailsByListingId);
-
-listingsRouter.get(`${resource}/utilities/:listId`, httpGetUtilitiesByListingId)
+listingsRouter.get(`${resource}/:listId`, httpDynamicGetListingDetails);
 
 module.exports = listingsRouter;

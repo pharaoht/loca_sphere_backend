@@ -25,13 +25,15 @@ class AmenityMapModel extends Model {
         }
     }
 
+    $parseDatabaseJson(json){
+
+        return json
+    }
+
     static get relationMappings(){
 
         const k =  `${AmenityMapModel.tableName}.${AmenityMapModel.Fields.AMENITY_ID}`;
         const l = `${AmenityModel.tableName}.${AmenityModel.Fields.ID}`;
-
-        const x = `${AmenityMapModel.tableName}.${AmenityMapModel.Fields.LISTING_ID}`;
-        const xx = `${ListingsModel.tableName}.${ListingsModel.Fields.ID}`;
 
         const c = `${AmenityMapModel.tableName}.${AmenityMapModel.Fields.AMENITY_TYPE_ID}`;
         const cc = `${AmenityTypeModel.tableName}.${AmenityTypeModel.Fields.ID}`;
@@ -44,15 +46,6 @@ class AmenityMapModel extends Model {
                 join: {
                     from: k,
                     to: l
-                }
-            },
-
-            listingMap: {
-                relation: Model.BelongsToOneRelation,
-                modelClass: ListingsModel,
-                join: {
-                    from: x,
-                    to: xx
                 }
             },
 

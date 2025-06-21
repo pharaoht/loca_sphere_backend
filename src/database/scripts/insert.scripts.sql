@@ -30,7 +30,6 @@ INSERT INTO Amenities (amenityName) VALUES
 ('Washing machine'),
 ('Dishes and cutlery'),
 ('Pots and pans'),
-('Balcony'),
 ('Toilet'),
 ('Sink'),
 ('Shower'),
@@ -39,10 +38,8 @@ INSERT INTO Amenities (amenityName) VALUES
 ('Coffee table'),
 ('TV'),
 ('Sofa bed'),
-('Dining room'),
 ('Chairs'),
 ('Table'),
-('Outdoor area'),
 ('Bed linen and towels'),
 ('Accessibility'),
 ('Air conditioning');

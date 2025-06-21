@@ -1,58 +1,31 @@
-const listingsDal = require("./listings.dal");
-const listingsRepository = require("./listings.repository");
+const ListingsRepository = require("./listings.repository");
+const ListingService = require("./listings.service");
 
-async function httpGetListingById(req, res){
+async function httpDynamicGetListingDetails(req, res){
+
+    /* 
+        ?includes=,,,,
+
+        Params:
+        address,
+        amenity,
+        images,
+        bedroomAmenity,
+        host,
+        hostRules,
+        utility,
+        currency,
+        listingType
+        
+    */
 
     try {
 
         const { listId } = req.params;
 
-        const result = await listingsRepository.repoGetListingById(listId);
+        const includeOptions = ListingService.MapParamsToGraph(req.query.includes);
 
-        if(result.length === 0){
-            return res.status(404).json({ error: 'Listing not found' });
-        }
-
-        return res.status(200).json(result)
-    }
-    catch(error){
-
-        console.error(error);
-
-        return res.status(500).json({ error: 'Internal server error' });
-    }
-};
-
-async function httpGetHostDetailsByListingId(req, res){
-
-    try{
-
-        const { listId } = req.params;
-
-        const result = await listingsRepository.repoGetHostingDetailsByListingId(listId);
-
-        if(result.length === 0){
-            return res.status(404).json({ error: 'Listing not found' });
-        }
-
-        return res.status(200).json(result);
-    }
-    catch(error){
-
-        console.error(error);
-
-        return res.status(500).json({ error: 'Internal server error' });
-    }
-};
-
-async function httpGetUtilitiesByListingId(req, res){
-
-    try{
-
-        const { listId } = req.params;
-
-        const result = await listingsRepository.repoGetUtilitiesByListingId(listId);
-
+        const [ result ] = await ListingsRepository.repoGetListingDeets(listId, includeOptions);
 
         return res.status(200).json(result);
     }
@@ -66,8 +39,6 @@ async function httpGetUtilitiesByListingId(req, res){
 
 
 module.exports = {
-    httpGetListingById,
-    httpGetHostDetailsByListingId,
-    httpGetUtilitiesByListingId
+    httpDynamicGetListingDetails
 };
 

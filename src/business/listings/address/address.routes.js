@@ -6,9 +6,9 @@ const resource = '/address';
 
 const addressRouter = express.Router();
 
-addressRouter.get(`${resource}/coordinates`, httpgetAddressesByCoordinatesRadius);
+addressRouter.get(`/coordinates`, httpgetAddressesByCoordinatesRadius);
 
-addressRouter.get(`${resource}/:id`, httpgetAddressById);
+addressRouter.get(`/:id`, httpgetAddressById);
 
 
 module.exports = addressRouter;

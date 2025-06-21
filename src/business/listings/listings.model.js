@@ -5,6 +5,9 @@ const UserModel = require('../users/users.model');
 const CurrencyModel = require('./currency/currency.model');
 const ListingTypeModel = require('./listing_type/listingtype.model');
 const UtilityModel = require('./utility/utility.model');
+const BedroomAmenityMapModel = require('./bedroom_amenity_map/bedroommap.model');
+const HouseRulesMap = require('./house_rules/houseRules.model');
+const AmenityMapModel = require('./amenity_map/amenitymap.model');
 
 class ListingsModel extends Model {
 
@@ -78,6 +81,7 @@ class ListingsModel extends Model {
         json[ListingsModel.Fields.UPDATED_AT] = moment(json[ListingsModel.Fields.UPDATED_AT]).format('YYYY MMM DD');
         json[ListingsModel.Fields.ROOM_AREA_SQM] = parseFloat(json[ListingsModel.Fields.ROOM_AREA_SQM]);
         json[ListingsModel.Fields.PLACE_AREA_SQM] = parseFloat(json[ListingsModel.Fields.PLACE_AREA_SQM]);
+        json[ListingsModel.Fields.IS_CHECKED] = !json[ListingsModel.Fields.IS_CHECKED] ? false : true 
         
         return json;
     }
@@ -96,13 +100,17 @@ class ListingsModel extends Model {
         const y = `${ListingsModel.tableName}.${ListingsModel.Fields.ID}`;
         const yy = `${HostModel.tableName}.${HostModel.Fields.LISTING_ID}`;
 
-        const e = `${ListingsModel.tableName}.${ListingsModel.Fields.ID}`;
         const ee = `${UtilityModel.tableName}.${UtilityModel.Fields.LISTING_ID}`;
 
+        const qq = `${BedroomAmenityMapModel.tableName}.${BedroomAmenityMapModel.Fields.LISTING_ID}`;
 
+        const rr = `${HouseRulesMap.tableName}.${HouseRulesMap.Fields.LISTING_ID}`;
+
+        const d = `${AmenityMapModel.tableName}.${AmenityMapModel.Fields.LISTING_ID}`;
+       
         return {
             users: {
-                relation: Model.BelongsToOneRelation,
+                relation: Model.HasOneRelation,
                 modelClass: UserModel,
                 join: {
                     from: lm,
@@ -110,7 +118,7 @@ class ListingsModel extends Model {
                 }
             },
             listingType: {
-                relation: Model.BelongsToOneRelation,
+                relation: Model.HasOneRelation,
                 modelClass: ListingTypeModel,
                 join: {
                     from: z,
@@ -118,7 +126,7 @@ class ListingsModel extends Model {
                 }
             },
             currency: {
-                relation: Model.BelongsToOneRelation,
+                relation: Model.HasOneRelation,
                 modelClass: CurrencyModel,
                 join: {
                     from: x,
@@ -134,7 +142,7 @@ class ListingsModel extends Model {
                 }
             },
             hostingDetails: {
-                relation: Model.BelongsToOneRelation,
+                relation: Model.HasOneRelation,
                 modelClass: HostModel,
                 join: {
                     from: y,
@@ -142,11 +150,35 @@ class ListingsModel extends Model {
                 }
             },
             utilityMap: {
-                relation: Model.BelongsToOneRelation,
+                relation: Model.HasManyRelation,
                 modelClass: UtilityModel,
                 join: {
-                    from: e,
+                    from: y,
                     to: ee
+                }
+            },
+            bedroomAmenityMap: {
+                relation: Model.HasManyRelation,
+                modelClass: BedroomAmenityMapModel,
+                join: {
+                    from: y,
+                    to: qq
+                }
+            },
+            hostRulesMap: {
+                relation: Model.HasManyRelation,
+                modelClass: HouseRulesMap,
+                join: {
+                    from: y,
+                    to: rr,
+                }
+            },
+            amenity: {
+                relation: Model.HasManyRelation,
+                modelClass: AmenityMapModel,
+                join: {
+                    from: y,
+                    to: d
                 }
             }
         }

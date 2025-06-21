@@ -14,13 +14,7 @@ const apiRouter = express.Router();
 
 const cityRouter = require('./business/cities/routes/cities.routes.js');
 
-const addressRouter = require('./business/listings/address/address.routes.js');
-
 const listingsRouter = require('./business/listings/listings.routes.js');
-
-const bedroomAmenityRouter = require('./business/listings/bedroom_amenity_map/bedroommap.routes.js');
-
-const amenityRouter = require('./business/listings/amenity_map/amenitymap.routes.js');
 
 app.set('trust proxy', 1);
 
@@ -35,12 +29,6 @@ app.use('/api', apiRouter);
 apiRouter.use(cityRouter);
 
 apiRouter.use(listingsRouter)
-
-apiRouter.use(addressRouter);
-
-apiRouter.use(bedroomAmenityRouter);
-
-apiRouter.use(amenityRouter)
 
 app.get('/' , (req, res) => {
 

@@ -35,21 +35,10 @@ class BedroomAmenityMapModel extends Model {
 
     static get relationMappings(){
 
-        const c = `${BedroomAmenityMapModel.tableName}.${BedroomAmenityMapModel.Fields.LISTING_ID}`;
-        const cc = `${ListingsModel.tableName}.${ListingsModel.Fields.ID}`;
-
         const x = `${BedroomAmenityMapModel.tableName}.${BedroomAmenityMapModel.Fields.BEDROOM_AMENITY_ID}`;
         const xx = `${BedroomAmenityModel.tableName}.${BedroomAmenityModel.Fields.ID}`;
 
         return {
-            listing: {
-                relation: Model.BelongsToOneRelation,
-                modelClass: ListingsModel,
-                join: {
-                    from: c,
-                    to: cc
-                }
-            },
 
             bedroomAmenity: {
                 relation: Model.BelongsToOneRelation,

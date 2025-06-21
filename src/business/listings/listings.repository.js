@@ -26,36 +26,20 @@ class ListingsRepository{
 
     }
 
-    async repoGetListingById(listingId){
+    static async repoGetListingDeets(listingId = '', options = '', filter = {}){
+
+        if(listingId === '') return [];
+
 
         const result = await ListingsModel.query()
-        .where(ListingsModel.Fields.ID, listingId)
-        .withGraphFetched('[listingType, currency, address]')
-        .first();
-
-        return result;
-    }
-
-    async repoGetHostingDetailsByListingId(listingId){
-
-        const result = await ListingsModel.query()
-        .where(ListingsModel.Fields.ID, listingId)
-        .withGraphFetched('hostingDetails.genderMapping')
-        .first();
-        
-        return result;
-    }
-
-    async repoGetUtilitiesByListingId(listId){
-
-        const result = await ListingsModel.query()
-        .findById(listId)
-        .withGraphFetched('utilityMap');
-
+            .where(ListingsModel.Fields.ID, listingId)
+            .withGraphFetched(`[${options}]`)
+    
         return result
+        
     }
+
 };
 
-const listingsRepository = new ListingsRepository();
 
-module.exports = listingsRepository;
+module.exports = ListingsRepository;

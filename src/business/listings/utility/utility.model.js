@@ -27,11 +27,12 @@ class UtilityModel extends Model {
 
         json = super.$parseDatabaseJson(json);
 
-        json[UtilityModel.Fields.WATER_INCLUDED] = UtilityModel.Fields.WATER_INCLUDED == 0 ? false : true;
-        json[UtilityModel.Fields.ELECTRIC_INCLUDED] = UtilityModel.Fields.ELECTRIC_INCLUDED == 0 ? false : true;
-        json[UtilityModel.Fields.GAS_INCLUDED] = UtilityModel.Fields.GAS_INCLUDED == 0 ? false : true;
-        json[UtilityModel.Fields.INTERNET_INCLUDED] = UtilityModel.Fields.INTERNET_INCLUDED == 0 ? false : true;
-        json[UtilityModel.Fields.CLEANING_INCLUDED] = UtilityModel.Fields.CLEANING_INCLUDED == 0 ? false : true;
+        json[UtilityModel.Fields.WATER_INCLUDED] = json[UtilityModel.Fields.WATER_INCLUDED] == 0 ? false : true;
+        json[UtilityModel.Fields.ELECTRIC_INCLUDED] = json[UtilityModel.Fields.ELECTRIC_INCLUDED] == 0 ? false : true;
+        json[UtilityModel.Fields.GAS_INCLUDED] = json[UtilityModel.Fields.GAS_INCLUDED] == 0 ? false : true;
+        json[UtilityModel.Fields.INTERNET_INCLUDED] = json[UtilityModel.Fields.INTERNET_INCLUDED] == 0 ? false : true;
+        json[UtilityModel.Fields.CLEANING_INCLUDED] = json[UtilityModel.Fields.CLEANING_INCLUDED] == 0 ? false : true;
+
 
         return json;
     }
