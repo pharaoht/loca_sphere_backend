@@ -2,6 +2,8 @@ const db = require('../../../database/db.connection');
 const AddressModel = require('./address.model');
 const ListingsModel = require('../listings.model');
 const CurrencyModel = require('../currency/currency.model');
+const HostModel = require('../host/host.model');
+const AmenityMapModel = require('../amenity_map/amenitymap.model');
 
 class AddressRepository {
 
@@ -15,12 +17,31 @@ class AddressRepository {
         return results;
     }
 
-    static async getAddressByCoordinatesRadius(latitude, longitude, radius = 15 * 1.60934){
+    static async getAddressByCoordinatesRadius(latitude = 0.0, longitude = 0.0, radius = 15 * 1.60934, filters = {}){
+
+        const cteQuery = ListingsModel.query()
+            .select('id')
+            .modify(qb => {
+
+                if (filters.amenities) {
+                    const amenityIds = String(filters.amenities).split(',').map(id => !isNaN(parseInt(id.trim(), 10)));
+                    qb.whereExists(
+                        ListingsModel.relatedQuery('amenity')
+                        .whereIn('amenityId', amenityIds)
+                    );
+                }
+
+            }
+        );
+
 
         const results = await AddressModel.query()
+            .with('filtered_listings', cteQuery) 
             .alias('a')
             .joinRelated('listing as l')
             .joinRaw('JOIN "Currencies" as c ON c.id = l.currencyId')
+            .joinRaw('JOIN "ListingHostInfo" as h ON h.listingId = l.id')
+            .whereIn('l.id', AddressModel.raw('SELECT id FROM filtered_listings')) 
             .select(
                 'a.*',
                 `l.${ListingsModel.Fields.ID}`,
@@ -41,7 +62,10 @@ class AddressRepository {
                 `l.${ListingsModel.Fields.UPDATED_AT}`,
                 `c.${CurrencyModel.Fields.SYMBOL}`,
                 `c.${CurrencyModel.Fields.CODE}`,
-                `c.${CurrencyModel.Fields.CREATED_AT}`
+                `h.${HostModel.Fields.LIVES_IN_PROP}`,
+                `h.${HostModel.Fields.IS_VERIFIED}`,
+                `h.${HostModel.Fields.GENDER_ALLOWED_ID}`,
+                // `amenity.${AmenityMapModel.Fields.AMENITY_ID}`,
             )
             .select(
                 AddressModel.raw(`
@@ -53,10 +77,35 @@ class AddressRepository {
                     `, [latitude, longitude, latitude]
                 )
             )
-            .having('distance', '<', radius)
-            .orderBy('distance')
-            .limit(10);
+            .modify((builder) => {
+                if(filters.minRent && !isNaN(Number(filters.minRent))) {
+                    builder.where(`l.${ListingsModel.Fields.MONTHLY_RENT}`, '>=', filters.minRent)
+                }
+                if (filters.maxRent && !isNaN(Number(filters.maxRent))) {
+			        builder.where(`l.${ListingsModel.Fields.MONTHLY_RENT}`, '<=', filters.maxRent);
+		        }
+                if(filters.bedrooms && !isNaN(Number(filters.bedrooms))) {
+                    builder.where(`l.${ListingsModel.Fields.BEDROOMS}`, '=', filters.bedrooms)
+                }
+                if(filters.bathrooms && !isNaN(Number(filters.bathrooms))) {
+                    builder.where(`l.${ListingsModel.Fields.BATHROOMS}`, '=', filters.bathrooms)
+                }
+                if(filters.listingType){
 
+                    const opts = String(filters.listingType).split(',').map(t => !isNaN(t.trim()));
+
+                    builder.whereIn(`l.${ListingsModel.Fields.LISTING_TYPE_ID}`, opts)
+                }
+                if(filters.isVerified && typeof filters.isVerified === 'boolean') {
+
+                    builder.where(`l.${ListingsModel.Fields.IS_CHECKED}`, '=', filters.isVerified)
+                }
+
+            })
+            .having('distance', '<', radius)
+            .orderBy(filters.orderBy || 'distance', filters.direction || 'asc')
+            .limit(10);
+    
         return results
     }
 

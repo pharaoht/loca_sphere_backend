@@ -16,14 +16,16 @@ async function httpDynamicGetListingDetails(req, res){
         utility,
         currency,
         listingType
-        
+
     */
 
     try {
 
         const { listId } = req.params;
 
-        const includeOptions = ListingService.MapParamsToGraph(req.query.includes);
+        const { includes } = req.query
+
+        const includeOptions = ListingService.MapParamsToGraph(includes);
 
         const [ result ] = await ListingsRepository.repoGetListingDeets(listId, includeOptions);
 

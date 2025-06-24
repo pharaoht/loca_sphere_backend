@@ -1,3 +1,4 @@
+const ListingService = require("../listings.service");
 const AddressDal = require("./address.dal");
 const AddressRepository = require("./address.repository");
 
@@ -31,7 +32,10 @@ async function httpgetAddressesByCoordinatesRadius(req, res) {
         
         const { lat, long, radius } = req?.query;
 
-        const results = await AddressRepository.getAddressByCoordinatesRadius(lat, long, radius);
+        //sanitize parameters
+        const santiParams = ListingService.santizeParams(req.query);
+
+        const results = await AddressRepository.getAddressByCoordinatesRadius(lat, long, radius, santiParams);
 
         if (!results) return res.status(404).json({ error: 'Addresses not found' });
 

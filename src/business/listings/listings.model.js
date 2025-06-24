@@ -86,6 +86,25 @@ class ListingsModel extends Model {
         return json;
     }
 
+    $formatJson(json) {
+    
+        const formattedJson = super.$formatJson(json);
+
+        if(formattedJson.hasOwnProperty('amenity')){
+
+            const uniqueAmenityTypes = new Set();
+
+            formattedJson.amenity.forEach(amenity => uniqueAmenityTypes.add(amenity.amenityTypeMap.name));
+
+            formattedJson.amenity = {
+                amenityTypes: Array.from(uniqueAmenityTypes),
+                amenities: formattedJson.amenity
+            }
+        }
+        
+        return formattedJson;
+    }
+
     static get relationMappings() {
 
         const lm = `${ListingsModel.tableName}.${ListingsModel.Fields.USER_ID}`;

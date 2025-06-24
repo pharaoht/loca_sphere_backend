@@ -13,7 +13,6 @@ INSERT INTO AmenitiesTypes (name) VALUES
 ('Balcony'),
 ('Bedroom'),
 ('Exterior'),
-('Floor Plan'),
 ('Other');
 
 INSERT INTO Amenities (amenityName) VALUES

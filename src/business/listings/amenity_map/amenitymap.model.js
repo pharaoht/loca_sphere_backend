@@ -29,6 +29,12 @@ class AmenityMapModel extends Model {
 
         return json
     }
+    
+    $formatJson(json) {
+        const formattedJson = super.$formatJson(json);
+
+        return formattedJson;
+    }
 
     static get relationMappings(){
 

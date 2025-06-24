@@ -30,12 +30,11 @@ class ListingsRepository{
 
         if(listingId === '') return [];
 
-
         const result = await ListingsModel.query()
             .where(ListingsModel.Fields.ID, listingId)
             .withGraphFetched(`[${options}]`)
     
-        return result
+        return result;
         
     }
 
