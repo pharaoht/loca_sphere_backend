@@ -19,6 +19,16 @@ class CurrencyModel extends Model {
             CREATED_AT: 'created_at'
         }
     }
+
+    $parseDatabaseJson(json){
+
+        json = super.$parseDatabaseJson(json);
+
+        delete json[CurrencyModel.Fields.CREATED_AT];
+
+        return json;
+
+    }
 };
 
 module.exports = CurrencyModel;

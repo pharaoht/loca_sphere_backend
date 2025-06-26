@@ -67,11 +67,14 @@ class AddressModel extends Model {
         }
     }
 
-    static get modifiers(){
+    $parseDatabaseJson(json){
 
-        return {
+        json = super.$parseDatabaseJson(json);
 
-        }
+        json[AddressModel.Fields.LATITUDE] = Number(json[AddressModel.Fields.LATITUDE]).toFixed(6) 
+        json[AddressModel.Fields.LONGITUDE] = Number(json[AddressModel.Fields.LONGITUDE]).toFixed(6) 
+
+        return json;
     }
 }
 

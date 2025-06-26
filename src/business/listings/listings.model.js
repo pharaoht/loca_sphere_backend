@@ -8,6 +8,7 @@ const UtilityModel = require('./utility/utility.model');
 const BedroomAmenityMapModel = require('./bedroom_amenity_map/bedroommap.model');
 const HouseRulesMap = require('./house_rules/houseRules.model');
 const AmenityMapModel = require('./amenity_map/amenitymap.model');
+const Utility = require('../../utility');
 
 class ListingsModel extends Model {
 
@@ -81,8 +82,9 @@ class ListingsModel extends Model {
         json[ListingsModel.Fields.UPDATED_AT] = moment(json[ListingsModel.Fields.UPDATED_AT]).format('YYYY MMM DD');
         json[ListingsModel.Fields.ROOM_AREA_SQM] = parseFloat(json[ListingsModel.Fields.ROOM_AREA_SQM]);
         json[ListingsModel.Fields.PLACE_AREA_SQM] = parseFloat(json[ListingsModel.Fields.PLACE_AREA_SQM]);
-        json[ListingsModel.Fields.IS_CHECKED] = !json[ListingsModel.Fields.IS_CHECKED] ? false : true 
-        
+        json[ListingsModel.Fields.IS_CHECKED] = !json[ListingsModel.Fields.IS_CHECKED] ? false : true;
+        json[ListingsModel.Fields.MONTHLY_RENT] = parseFloat(json[ListingsModel.Fields.MONTHLY_RENT]);
+
         return json;
     }
 
@@ -99,6 +101,15 @@ class ListingsModel extends Model {
             formattedJson.amenity = {
                 amenityTypes: Array.from(uniqueAmenityTypes),
                 amenities: formattedJson.amenity
+            }
+        }
+
+        if(formattedJson.hasOwnProperty('utilityMap')) {
+
+            formattedJson.utilityMap.securityDeposit = Math.floor(Utility.calculateSecurityDeposit(formattedJson.monthlyRent));
+
+            if(formattedJson.hasOwnProperty('currency')) {
+                formattedJson.utilityMap.currency = formattedJson.currency.symbol;
             }
         }
         
@@ -169,7 +180,7 @@ class ListingsModel extends Model {
                 }
             },
             utilityMap: {
-                relation: Model.HasManyRelation,
+                relation: Model.HasOneRelation,
                 modelClass: UtilityModel,
                 join: {
                     from: y,

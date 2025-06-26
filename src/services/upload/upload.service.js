@@ -13,7 +13,7 @@ class ImageUploadService {
 
     };
 
-    async deleteImage( imageUrl, ) {
+    static async deleteImage( imageUrl, ) {
 
         const publicId = imageUrl
 
@@ -21,7 +21,7 @@ class ImageUploadService {
 
             console.log('**deleting image**');
 
-            const result = await cloudinary.uploader.destroy(publicId);
+            await cloudinary.uploader.destroy(publicId);
 
             console.log('**image deletion successful**')
 
@@ -38,7 +38,7 @@ class ImageUploadService {
         }
     }
 
-    async uploadImage( imageUrl, folder = 'loca_sphere' ){
+    static async uploadImage( imageUrl, folder = 'loca_sphere' ){
 
         console.log('uploading image....');
     
@@ -68,7 +68,7 @@ class ImageUploadService {
         }
     }
 
-    transformImage(url){
+    static transformImage(url){
         const imgStr = cloudinary.url(url.split('/')[1], {
             transformation: [
                 {width: 500, crop: 'scale'},
@@ -81,8 +81,4 @@ class ImageUploadService {
     }
 };
 
-const initImageUploadService = () => {
-    return new ImageUploadService()
-}
-
-module.exports = initImageUploadService;
+module.exports = ImageUploadService;

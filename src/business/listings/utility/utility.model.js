@@ -32,10 +32,15 @@ class UtilityModel extends Model {
         json[UtilityModel.Fields.GAS_INCLUDED] = json[UtilityModel.Fields.GAS_INCLUDED] == 0 ? false : true;
         json[UtilityModel.Fields.INTERNET_INCLUDED] = json[UtilityModel.Fields.INTERNET_INCLUDED] == 0 ? false : true;
         json[UtilityModel.Fields.CLEANING_INCLUDED] = json[UtilityModel.Fields.CLEANING_INCLUDED] == 0 ? false : true;
+        json.allBillsIncluded = json[UtilityModel.Fields.WATER_INCLUDED] &&
+            json[UtilityModel.Fields.ELECTRIC_INCLUDED] &&
+            json[UtilityModel.Fields.GAS_INCLUDED] &&
+            json[UtilityModel.Fields.INTERNET_INCLUDED];
 
 
         return json;
     }
+
 
 }
 
