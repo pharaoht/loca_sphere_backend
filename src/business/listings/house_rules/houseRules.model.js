@@ -14,7 +14,8 @@ class HouseRules extends Model {
 
         return {
             ID: 'id',
-            NAME: 'ruleName'
+            NAME: 'ruleName',
+            ICON: 'icon',
         }
     }
 }
@@ -56,6 +57,27 @@ class HouseRulesMap extends Model {
                 }
             }
         }
+    }
+
+    $parseDatabaseJson(json){
+
+        json = super.$parseDatabaseJson(json);
+
+        json[HouseRulesMap.Fields.IS_ALLOWED] = json[HouseRulesMap.Fields.IS_ALLOWED] === 1 ? true : false;
+
+        return json
+    }
+
+    $formatJson(json) {
+
+        const formattedJson = super.$formatJson(json);
+
+        formattedJson.ruleName = json.houseRules ? json.houseRules.ruleName : null;
+        formattedJson.icon = json.houseRules ? json.houseRules.icon : null;
+        delete formattedJson.houseRules;
+        delete formattedJson.listingId;
+
+        return formattedJson
     }
 };
 

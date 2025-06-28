@@ -36,6 +36,7 @@ class ListingsModel extends Model {
             MINIMUM_STAY_DAYS: 'minimumStayDays',
             MAX_STAY_DAYS: 'maxStayDays',
             LISTING_TYPE_ID: 'listingTypeId',
+            PEOPLE_ALLOWED: 'peopleAllowed',
             IS_CHECKED: 'isChecked',
             CREATED_AT: 'createdAt',
             UPDATED_AT: 'updatedAt'
@@ -50,7 +51,8 @@ class ListingsModel extends Model {
                 ListingsModel.Fields.USER_ID,
                 ListingsModel.Fields.TITLE,
                 ListingsModel.Fields.MONTHLY_RENT,
-                ListingsModel.Fields.LISTING_TYPE_ID
+                ListingsModel.Fields.LISTING_TYPE_ID,
+                ListingsModel.Fields.PEOPLE_ALLOWED
             ],
             properties: {
                 [ListingsModel.Fields.ID]: { type: 'string', maxLength: 21 },
@@ -67,6 +69,7 @@ class ListingsModel extends Model {
                 [ListingsModel.Fields.MINIMUM_STAY_DAYS]: { type: 'integer', minimum: 0 },
                 [ListingsModel.Fields.MAX_STAY_DAYS]: { type: 'integer', minimum: 0 },
                 [ListingsModel.Fields.LISTING_TYPE_ID]: { type: 'integer' },
+                [ListingsModel.Fields.PEOPLE_ALLOWED]: { type: 'integer', minimum: 1, maximum: 255 },
                 [ListingsModel.Fields.IS_CHECKED]: { type: 'boolean', default: false },
                 [ListingsModel.Fields.CREATED_AT]: { type: 'string', format: 'date-time' },
                 [ListingsModel.Fields.UPDATED_AT]: { type: 'string', format: 'date-time' }

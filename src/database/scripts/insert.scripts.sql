@@ -1,9 +1,9 @@
 INSERT INTO HouseRules (ruleName) VALUES 
-('Smoking Allowed'),
-('Pets Allowed'),
-('Overnight Guests Allowed'),
-('City Hall Registration Supported'),
-('Couples Allowed');
+('Smoking Allowed', '/smoking.png'),
+('Pets Allowed', '/pets.png'),
+('Overnight Guests Allowed', '/guests.png'),
+('City Hall Registration Supported', '/registration.png'),
+('Couples Allowed', '/couples.png');
 
 INSERT INTO AmenitiesTypes (name) VALUES 
 ('Kitchen'),

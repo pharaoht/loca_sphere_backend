@@ -31,17 +31,29 @@ class AddressRepository {
                     );
                 }
 
-            }
-        );
+            });
+
+        const cteQueryTwo = ListingsModel.query()
+            .select('id')
+            .modify(qb => {
+
+                if(filters.brAmenities){
+                    const brAmenities = String(filters.brAmenities).split(',').map(id => !isNaN(parseInt(id.trim(), 10)));
+                    qb.whereExists(ListingsModel.relatedQuery('bedroomAmenityMap')
+                        .whereIn('bedroomAmenityId', brAmenities))
+                }
+            })
 
 
         const results = await AddressModel.query()
             .with('filtered_listings', cteQuery) 
+            .with('filtered_listings_two', cteQueryTwo)
             .alias('a')
             .joinRelated('listing as l')
             .joinRaw('JOIN "Currencies" as c ON c.id = l.currencyId')
             .joinRaw('JOIN "ListingHostInfo" as h ON h.listingId = l.id')
             .whereIn('l.id', AddressModel.raw('SELECT id FROM filtered_listings')) 
+            .whereIn('l.id', AddressModel.raw('SELECT id FROM filtered_listings_two'))
             .select(
                 'a.*',
                 `l.${ListingsModel.Fields.ID}`,
@@ -60,6 +72,7 @@ class AddressRepository {
                 `l.${ListingsModel.Fields.IS_CHECKED}`,
                 `l.${ListingsModel.Fields.CREATED_AT}`,
                 `l.${ListingsModel.Fields.UPDATED_AT}`,
+                `l.${ListingsModel.Fields.PEOPLE_ALLOWED}`,
                 `c.${CurrencyModel.Fields.SYMBOL}`,
                 `c.${CurrencyModel.Fields.CODE}`,
                 `h.${HostModel.Fields.LIVES_IN_PROP}`,
@@ -92,13 +105,16 @@ class AddressRepository {
                 }
                 if(filters.listingType){
 
-                    const opts = String(filters.listingType).split(',').map(t => !isNaN(t.trim()));
+                    const opts = String(filters.listingType).split(',').map(t => !isNaN(t) && t.trim());
 
                     builder.whereIn(`l.${ListingsModel.Fields.LISTING_TYPE_ID}`, opts)
                 }
                 if(filters.isVerified && typeof filters.isVerified === 'boolean') {
 
                     builder.where(`l.${ListingsModel.Fields.IS_CHECKED}`, '=', filters.isVerified)
+                }
+                if(filters.peopleAllowed){
+                    builder.where(`l.${ListingsModel.Fields.PEOPLE_ALLOWED}`, '=', filters.peopleAllowed)
                 }
 
             })

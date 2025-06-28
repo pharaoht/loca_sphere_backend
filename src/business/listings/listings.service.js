@@ -24,6 +24,8 @@ class ListingService {
             orderBy: ['distance', 'monthlyRent', ],
             direction: ['asc', 'desc'],
             bedrooms: Number,
+            bathrooms: Number,
+            peopleAllowed: Number,
             moveInDate: '',
             moveOutDate: '',
             placeType: '',

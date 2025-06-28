@@ -37,6 +37,7 @@ class AddressDal {
                     [ListingsModel.Fields.MINIMUM_STAY_DAYS]: address[ListingsModel.Fields.MINIMUM_STAY_DAYS],
                     [ListingsModel.Fields.MAX_STAY_DAYS]: address[ListingsModel.Fields.MAX_STAY_DAYS],
                     [ListingsModel.Fields.LISTING_TYPE_ID]: address[ListingsModel.Fields.LISTING_TYPE_ID],
+                    [ListingsModel.Fields.PEOPLE_ALLOWED]: address[ListingsModel.Fields.PEOPLE_ALLOWED],
                     [ListingsModel.Fields.IS_CHECKED]: !address[ListingsModel.Fields.IS_CHECKED] ? false : true,
                     [ListingsModel.Fields.CREATED_AT]: address[ListingsModel.Fields.CREATED_AT],
                     [ListingsModel.Fields.UPDATED_AT]: address[ListingsModel.Fields.UPDATED_AT],
