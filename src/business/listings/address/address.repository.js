@@ -114,13 +114,13 @@ class AddressRepository {
                     builder.where(`l.${ListingsModel.Fields.IS_CHECKED}`, '=', filters.isVerified)
                 }
                 if(filters.peopleAllowed){
-                    builder.where(`l.${ListingsModel.Fields.PEOPLE_ALLOWED}`, '=', filters.peopleAllowed)
+                    builder.where(`l.${ListingsModel.Fields.PEOPLE_ALLOWED}`, '>=', filters.peopleAllowed)
                 }
 
             })
             .having('distance', '<', radius)
             .orderBy(filters.orderBy || 'distance', filters.direction || 'asc')
-            .limit(10);
+            .limit(filters.limit || 25);
     
         return results
     }

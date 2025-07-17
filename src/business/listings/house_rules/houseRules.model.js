@@ -81,4 +81,7 @@ class HouseRulesMap extends Model {
     }
 };
 
-module.exports = HouseRulesMap;
+module.exports = {
+    HouseRulesMap,
+    HouseRules
+};

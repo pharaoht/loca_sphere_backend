@@ -1,4 +1,15 @@
-const { min } = require("moment");
+const AddressModel = require("./address/address.model");
+const AmenityModel = require("./amenity/amenity.model");
+const AmenityTypeModel = require("./amenity_type/amenitytype.model");
+const BedroomAmenityModel = require("./bedroom_amenity/bedroom.model");
+const CurrencyModel = require("./currency/currency.model");
+const GenderModel = require("./gender/gender.model");
+const HostModel = require("./host/host.model");
+const { HouseRules } = require("./house_rules/houseRules.model");
+const ListingTypeModel = require("./listing_type/listingtype.model");
+const ListingsModel = require("./listings.model");
+const UtilityModel = require("./utility/utility.model");
+const ListingBedroomAmenities = require('./bedroom_amenity_map/bedroommap.model');
 
 class ListingService {
 
@@ -13,8 +24,28 @@ class ListingService {
             bedroomAmenity: 'bedroomAmenityMap.bedroomAmenity',
             currency: 'currency',
             listingType: 'listingType',
-            hostRules: 'hostRulesMap.houseRules'
+            hostRules: 'hostRulesMap.houseRules',
+        }
+    }
 
+    static get ModelMap(){
+
+        return {
+            amenity: AmenityModel,
+            amenityType: AmenityTypeModel,
+            utility: UtilityModel,
+            bedroomAmenity: BedroomAmenityModel,
+            currency: CurrencyModel,
+            listingType: ListingTypeModel,
+            hostRules: HouseRules,
+            gender: GenderModel,
+            'step-1': ListingsModel,
+            'step-2': AddressModel,
+            'step-3': ListingsModel,
+            'step-4': HostModel,
+            'step-5': ListingBedroomAmenities,
+            'step-6':'',
+            'step-7': UtilityModel
         }
     }
 
@@ -44,6 +75,8 @@ class ListingService {
     static MapParamsToGraph(requestQuery = ''){
 
         if(requestQuery === '') return '';
+
+        if(requestQuery === 'all') return Object.values(ListingService.ParamMap).join(',').toString();
 
         const graphFetchString = requestQuery.split(',').map(str => {
 
@@ -93,6 +126,15 @@ class ListingService {
 
         return params
 
+    }
+
+    static getModelFromMap(param = ''){
+
+        if(!param) return undefined;
+
+        if(!ListingService.ModelMap.hasOwnProperty(param)) return undefined;
+
+        return ListingService.ModelMap[param];
     }
 };
 

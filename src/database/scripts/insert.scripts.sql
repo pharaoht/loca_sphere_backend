@@ -78,104 +78,115 @@ INSERT INTO ListingTypes (name) VALUES
 
 
 
--- Sample new IDs
-SET @userIdLondon5 = 'usrlnd005abc321def654';
-SET @listingIdLondon5 = 'lstlnd005def654abc321';
+-- New unique IDs
+SET @userIdLondon6 = 'usrlnd006abc987xyz321';
+SET @listingIdLondon6 = 'lstlnd006xyz321abc987';
 
--- Create a new user (host)
+-- Create new user (host)
 INSERT INTO Users (id, givenName, surName, secondSurName)
-VALUES (@userIdLondon5, 'Charlotte', 'Green', 'Morgan');
+VALUES (@userIdLondon6, 'Oliver', 'Smith', NULL);
 
 -- Create the listing
 INSERT INTO Listing (
-	id, userId, title, monthlyRent, currencyId, description,
-	bedrooms, beds, bathrooms, roomAreaSqM, placeAreaSqM,
-	minimumStayDays, maxStayDays, listingTypeId, isChecked
+  id, userId, title, monthlyRent, currencyId, description,
+  bedrooms, beds, bathrooms, roomAreaSqM, placeAreaSqM,
+  minimumStayDays, maxStayDays, listingTypeId, peopleAllowed, isChecked,
+  createdAt, updatedAt
 ) VALUES (
-	@listingIdLondon5, @userIdLondon5, 'Compact Soho Studio with Modern Amenities', 1750.00, 2,
-	'Cozy and fully equipped studio in vibrant Soho, perfect for professionals or students. Near Leicester Square & public transport.',
-	1, 1, 1.0, 20.00, 25.00,
-	30, 180, 2, TRUE
+  @listingIdLondon6, @userIdLondon6, 'Bright Camden Flat with Garden Access',
+  2200.00, 2,
+  'Spacious and well-lit flat in the heart of Camden. Quiet neighborhood with private garden access, ideal for young professionals or couples.',
+  2, 2, 1.5, 40.00, 60.00,
+  30, 180, 1, 2, TRUE,
+  CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
 );
 
--- Add address
+-- Address
 INSERT INTO Address (
-	listingId, streetAddress, houseNumber, postalCode, city,
-	stateOrProvince, countryCode, latitude, longitude
+  listingId, streetAddress, houseNumber, postalCode, city,
+  stateOrProvince, countryCode, latitude, longitude, extraInfo
 ) VALUES (
-	@listingIdLondon5, 'Wardour Street', '88C', 'W1F 0TR', 'London', 'Greater London', 'GB', 51.5136, -0.1330
+  @listingIdLondon6, 'Camden Road', '121B', 'NW1 9HA', 'London',
+  'Greater London', 'GB', 51.5433, -0.1428, 'Private garden access, ground floor'
 );
 
 -- House rules
 INSERT INTO ListingHouseRules (listingId, ruleId, isAllowed)
 VALUES 
-	(@listingIdLondon5, 1, FALSE),  -- Smoking Allowed
-	(@listingIdLondon5, 2, TRUE),   -- Pets Allowed
-	(@listingIdLondon5, 3, TRUE);   -- Overnight Guests Allowed
+  (@listingIdLondon6, 1, FALSE),  -- Smoking
+  (@listingIdLondon6, 2, TRUE),   -- Pets
+  (@listingIdLondon6, 3, TRUE),   -- Overnight guests
+  (@listingIdLondon6, 4, TRUE);   -- City Hall registration supported
 
 -- Amenities
 INSERT INTO ListingAmenities (listingId, amenityTypeId, roomNumber, amenityId)
 VALUES 
-	-- Kitchen
-	(@listingIdLondon5, 1, NULL, 6),   -- Fridge
-	(@listingIdLondon5, 1, NULL, 7),   -- Freezer
-	(@listingIdLondon5, 1, NULL, 8),   -- Stove
-	(@listingIdLondon5, 1, NULL, 9),   -- Oven
-	(@listingIdLondon5, 1, NULL, 10),  -- Microwave
-	(@listingIdLondon5, 1, NULL, 11),  -- Washing machine
-	(@listingIdLondon5, 1, NULL, 12),  -- Dishes and cutlery
-	(@listingIdLondon5, 1, NULL, 13),  -- Pots and pans
-	
-	-- Bathroom
-	(@listingIdLondon5, 3, NULL, 14),  -- Toilet
-	(@listingIdLondon5, 3, NULL, 15),  -- Sink
-	(@listingIdLondon5, 3, NULL, 16),  -- Shower
-
-	-- Living Area
-	(@listingIdLondon5, 2, NULL, 1),   -- Wi-Fi
-	(@listingIdLondon5, 2, NULL, 3),   -- Central heating
-	(@listingIdLondon5, 2, NULL, 20),  -- Coffee table
-	(@listingIdLondon5, 2, NULL, 21),  -- TV
-	(@listingIdLondon5, 2, NULL, 22),  -- Sofa bed
-
-	-- General
-	(@listingIdLondon5, 5, NULL, 13),  -- Balcony
-	(@listingIdLondon5, 8, NULL, 27);  -- Bed linen and towels
+  -- Kitchen
+  (@listingIdLondon6, 1, NULL, 6),  -- Fridge
+  (@listingIdLondon6, 1, NULL, 8),  -- Stove
+  (@listingIdLondon6, 1, NULL, 9),  -- Oven
+  (@listingIdLondon6, 1, NULL, 10), -- Microwave
+  (@listingIdLondon6, 1, NULL, 11), -- Washing machine
+  (@listingIdLondon6, 1, NULL, 13), -- Pots and pans
+  
+  -- Living Room
+  (@listingIdLondon6, 2, NULL, 1),  -- Wi-Fi
+  (@listingIdLondon6, 2, NULL, 3),  -- Central heating
+  (@listingIdLondon6, 2, NULL, 20), -- Coffee table
+  (@listingIdLondon6, 2, NULL, 21), -- TV
+  
+  -- Bathroom
+  (@listingIdLondon6, 3, NULL, 14), -- Toilet
+  (@listingIdLondon6, 3, NULL, 15), -- Sink
+  (@listingIdLondon6, 3, NULL, 16), -- Shower
+  
+  -- Balcony/Outdoor
+  (@listingIdLondon6, 5, NULL, 25), -- Air conditioning
+  (@listingIdLondon6, 5, NULL, 13); -- Balcony
 
 -- Bedroom amenities
 INSERT INTO ListingBedroomAmenities (listingId, bedroomAmenityId)
 VALUES 
-	(@listingIdLondon5, 1),  -- Wardrobe
-	(@listingIdLondon5, 2),  -- Desk/Table
-	(@listingIdLondon5, 3),  -- Chairs
-	(@listingIdLondon5, 5),  -- Window
-	(@listingIdLondon5, 7);  -- Double Bed
+  (@listingIdLondon6, 1),  -- Wardrobe
+  (@listingIdLondon6, 2),  -- Desk/Table
+  (@listingIdLondon6, 3),  -- Chairs
+  (@listingIdLondon6, 7);  -- Double Bed
 
 -- Utilities
-INSERT INTO Utility (listingId, waterIncluded, electricIncluded, gasIncluded, internetIncluded, cleaningIncluded, cleaningFee )
-VALUES 
-	(@listingIdLondon5, 1, 1, 1, 1, 1, null);
-
--- Restrictions
-INSERT INTO ListingRestrictions (listingId, maxTenants, extraCostPerTenant)
-VALUES 
-	(@listingIdLondon5, 1, 0.00);
-
--- Availability
-INSERT INTO ListingAvailability (listingId, startDate, endDate, isAvailable)
-VALUES 
-	(@listingIdLondon5, '2025-10-01', '2026-04-01', TRUE);
-
--- Host info
-INSERT INTO ListingHostInfo (
-	listingId, livesInProperty, hostGender, hostAgeRange,
-	livesWithFamily, hasPets, isVerified, genderAllowedId, userId
+INSERT INTO Utility (
+  listingId, waterIncluded, electricIncluded, gasIncluded,
+  internetIncluded, cleaningIncluded, cleaningFee
 ) VALUES (
-	@listingIdLondon5, FALSE, FALSE, '31-40 years',
-	FALSE, TRUE, TRUE, 1, @userIdLondon5
+  @listingIdLondon6, TRUE, TRUE, FALSE, TRUE, TRUE, 30
 );
 
--- Listing photo
-INSERT INTO ListingPhotos (listingId, url, isPrimary, amenityTypeId)
-VALUES 
-	(@listingIdLondon5, 'https://example.com/photos/compact-soho-studio.jpg', TRUE, 1);  -- Bedroom
+-- Restrictions
+INSERT INTO ListingRestrictions (
+  listingId, maxTenants, extraCostPerTenant
+) VALUES (
+  @listingIdLondon6, 2, 20.00
+);
+
+-- Availability
+INSERT INTO ListingAvailability (
+  listingId, startDate, endDate, isAvailable
+) VALUES (
+  @listingIdLondon6, '2025-09-01', '2026-03-01', TRUE
+);
+
+-- Host Info
+INSERT INTO ListingHostInfo (
+  listingId, livesInProperty, hostGender, hostAgeRange,
+  livesWithFamily, hasPets, isVerified,
+  genderAllowedId, peopleHosted, userId
+) VALUES (
+  @listingIdLondon6, FALSE, TRUE, '26-30 years',
+  FALSE, TRUE, TRUE, 1, 1, @userIdLondon6
+);
+
+-- Photos
+INSERT INTO ListingPhotos (
+  listingId, url, isPrimary, amenityTypeId
+) VALUES 
+  (@listingIdLondon6, 'https://example.com/photos/camden-flat-garden.jpg', TRUE, 5);
+

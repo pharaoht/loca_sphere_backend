@@ -8,7 +8,7 @@ async function httpQueryCities(req, res, next){
 
         const location = request?.location;
 
-        if(!location) throw new Error('Please provide a location.');
+        if(!location) return res.status(404).json('provide a location')
 
         const options = AxiosService.genRapidApiReqObj(location);
 

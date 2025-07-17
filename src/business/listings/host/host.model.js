@@ -34,7 +34,8 @@ class HostModel extends Model {
     $parseDatabaseJson(json) {
         
         json = super.$parseDatabaseJson(json);
-        
+    
+        json.hostGenderId = json[HostModel.Fields.HOST_GENDER];
         json[HostModel.Fields.HAS_PETS] = json[HostModel.Fields.HAS_PETS] == 0 ? false : true;
         json[HostModel.Fields.LIVES_IN_PROP] = json[HostModel.Fields.LIVES_IN_PROP] == 0 ? false : true;
         json[HostModel.Fields.HOST_GENDER] = json[HostModel.Fields.HOST_GENDER] == 0 ? 'Male' : 'Female';

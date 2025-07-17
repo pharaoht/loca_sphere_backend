@@ -33,15 +33,15 @@ class AddressModel extends Model {
             type: 'object',
             required: [AddressModel.Fields.LISTING_ID, AddressModel.Fields.POSTAL_CODE, AddressModel.Fields.COUNTRY_CODE ],
             properties: {
-                [AddressModel.Fields.ID]: { type: 'string', maxLength: 21 },
+                [AddressModel.Fields.ID]: { type: 'number', maxLength: 21 },
                 [AddressModel.Fields.STREET_ADDRESS]: { type: 'string', maxLength: 255 },
                 [AddressModel.Fields.HOUSE_NUMBER]: { type: 'string', maxLength: 50 },
                 [AddressModel.Fields.POSTAL_CODE]: { type: 'string', maxLength: 20 },
                 [AddressModel.Fields.CITY]: { type: 'string', maxLength: 100 },
                 [AddressModel.Fields.STATE_OR_PROVINCE]: { type: 'string', maxLength: 100 },
                 [AddressModel.Fields.COUNTRY_CODE]: { type: 'string', maxLength: 2 },
-                [AddressModel.Fields.LATITUDE]: { type: 'number', minimum: -90, maximum: 90, multipleOf: 1e-8 },
-                [AddressModel.Fields.LONGITUDE]: { type: 'number', minimum: -180, maximum: 180, multipleOf: 1e-8 },
+                [AddressModel.Fields.LATITUDE]: { type: 'number', minimum: -90, maximum: 90 },
+                [AddressModel.Fields.LONGITUDE]: { type: 'number', minimum: -180, maximum: 180 },
                 [AddressModel.Fields.EXTRA_INFO]: { type: 'string' },
             }
         };

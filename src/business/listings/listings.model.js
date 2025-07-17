@@ -1,14 +1,20 @@
 const moment = require('moment');
 const { Model } = require('objection');
+const Utility = require('../../utility');
 const HostModel = require('./host/host.model');
 const UserModel = require('../users/users.model');
-const CurrencyModel = require('./currency/currency.model');
-const ListingTypeModel = require('./listing_type/listingtype.model');
+const ImagesModel = require('../images/images.model');
 const UtilityModel = require('./utility/utility.model');
-const BedroomAmenityMapModel = require('./bedroom_amenity_map/bedroommap.model');
-const HouseRulesMap = require('./house_rules/houseRules.model');
+const CurrencyModel = require('./currency/currency.model');
+const { HouseRulesMap } = require('./house_rules/houseRules.model');
 const AmenityMapModel = require('./amenity_map/amenitymap.model');
-const Utility = require('../../utility');
+const ListingTypeModel = require('./listing_type/listingtype.model');
+const BedroomAmenityMapModel = require('./bedroom_amenity_map/bedroommap.model');
+
+const nanoid = async () => {
+  const { nanoid } = await import('nanoid');
+  return nanoid(19);
+};
 
 class ListingsModel extends Model {
 
@@ -38,6 +44,7 @@ class ListingsModel extends Model {
             LISTING_TYPE_ID: 'listingTypeId',
             PEOPLE_ALLOWED: 'peopleAllowed',
             IS_CHECKED: 'isChecked',
+            IS_ACTIVE: 'isActive',
             CREATED_AT: 'createdAt',
             UPDATED_AT: 'updatedAt'
         };
@@ -48,11 +55,10 @@ class ListingsModel extends Model {
         return {
             type: 'object',
             required: [
-                ListingsModel.Fields.USER_ID,
+                // ListingsModel.Fields.USER_ID,
                 ListingsModel.Fields.TITLE,
                 ListingsModel.Fields.MONTHLY_RENT,
                 ListingsModel.Fields.LISTING_TYPE_ID,
-                ListingsModel.Fields.PEOPLE_ALLOWED
             ],
             properties: {
                 [ListingsModel.Fields.ID]: { type: 'string', maxLength: 21 },
@@ -71,6 +77,7 @@ class ListingsModel extends Model {
                 [ListingsModel.Fields.LISTING_TYPE_ID]: { type: 'integer' },
                 [ListingsModel.Fields.PEOPLE_ALLOWED]: { type: 'integer', minimum: 1, maximum: 255 },
                 [ListingsModel.Fields.IS_CHECKED]: { type: 'boolean', default: false },
+                [ListingsModel.Fields.IS_ACTIVE]: { type: 'boolean', default: false },
                 [ListingsModel.Fields.CREATED_AT]: { type: 'string', format: 'date-time' },
                 [ListingsModel.Fields.UPDATED_AT]: { type: 'string', format: 'date-time' }
             }
@@ -86,6 +93,7 @@ class ListingsModel extends Model {
         json[ListingsModel.Fields.ROOM_AREA_SQM] = parseFloat(json[ListingsModel.Fields.ROOM_AREA_SQM]);
         json[ListingsModel.Fields.PLACE_AREA_SQM] = parseFloat(json[ListingsModel.Fields.PLACE_AREA_SQM]);
         json[ListingsModel.Fields.IS_CHECKED] = !json[ListingsModel.Fields.IS_CHECKED] ? false : true;
+        json[ListingsModel.Fields.IS_ACTIVE] = !json[ListingsModel.Fields.IS_ACTIVE] ? false : true;
         json[ListingsModel.Fields.MONTHLY_RENT] = parseFloat(json[ListingsModel.Fields.MONTHLY_RENT]);
 
         return json;
@@ -95,7 +103,7 @@ class ListingsModel extends Model {
     
         const formattedJson = super.$formatJson(json);
 
-        if(formattedJson.hasOwnProperty('amenity')){
+        if(formattedJson.hasOwnProperty('amenity') && formattedJson.amenity != null){
 
             const uniqueAmenityTypes = new Set();
 
@@ -107,7 +115,7 @@ class ListingsModel extends Model {
             }
         }
 
-        if(formattedJson.hasOwnProperty('utilityMap')) {
+        if(formattedJson.hasOwnProperty('utilityMap') && formattedJson.utilityMap != null) {
 
             formattedJson.utilityMap.securityDeposit = Math.floor(Utility.calculateSecurityDeposit(formattedJson.monthlyRent));
 
@@ -118,6 +126,16 @@ class ListingsModel extends Model {
         
         return formattedJson;
     }
+
+    async $beforeInsert(queryContext) {
+
+        await super.$beforeInsert(queryContext);
+        
+        this[ListingsModel.Fields.ID] = `ls${await nanoid()}`;
+        this[ListingsModel.Fields.USER_ID] = `usrlnd006abc987xyz321`;
+    }
+
+
 
     static get relationMappings() {
 
@@ -140,6 +158,8 @@ class ListingsModel extends Model {
         const rr = `${HouseRulesMap.tableName}.${HouseRulesMap.Fields.LISTING_ID}`;
 
         const d = `${AmenityMapModel.tableName}.${AmenityMapModel.Fields.LISTING_ID}`;
+
+        const q = `${ImagesModel.tableName}.${ImagesModel.Fields.LISTING_ID}`;
        
         return {
             users: {
@@ -212,6 +232,14 @@ class ListingsModel extends Model {
                 join: {
                     from: y,
                     to: d
+                }
+            },
+            images: {
+                relation: Model.HasManyRelation,
+                modelClass: ImagesModel,
+                join: { 
+                    from: y,
+                    to: q
                 }
             }
         }

@@ -3,8 +3,23 @@ require('dotenv').config();
 
 class AxiosService {
 
-    constructor(){
+    static genMapboxApiReqObj(query = '', type = 'suggest'){
+        //retrieve or suggest
+        if(query === '' || type == '') return {};
 
+        const url = type === 'retrieve' ? `${type}/${query}?` : `${type}?q=${query}`
+
+        const options = {
+            method: 'GET',
+            url: `https://api.mapbox.com/search/searchbox/v1/${url}`,
+            params: {
+                access_token: process.env.MAPBOX_ACCESS_TOKEN,
+                session_token: process.env.MAPBOX_SESSION_TOKEN,               
+                types: 'address'
+            }
+        }
+
+        return options;
     }
 
     static genRapidApiReqObj(cityName){

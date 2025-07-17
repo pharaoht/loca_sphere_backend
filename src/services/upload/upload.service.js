@@ -38,7 +38,7 @@ class ImageUploadService {
         }
     }
 
-    static async uploadImage( imageUrl, folder = 'loca_sphere' ){
+    static async uploadImage( imageUrl, folder = 'loca_sphere/listing_images' ){
 
         console.log('uploading image....');
     

@@ -1,3 +1,4 @@
+const AxiosService = require("../../../services/axios/axios.service");
 const ListingService = require("../listings.service");
 const AddressDal = require("./address.dal");
 const AddressRepository = require("./address.repository");
@@ -43,14 +44,37 @@ async function httpgetAddressesByCoordinatesRadius(req, res) {
  
         return res.status(200).json(dal);
 
-    } catch(error) {
+    } 
+    catch(error) {
+
+        console.error(error);
+
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+async function httpGeoCodingSearch(req, res){
+
+    try {
+
+        const { q, type } = req?.query;
+
+        const options = await AxiosService.genMapboxApiReqObj(q, type)
+
+        const response = await AxiosService.externalRequest(options);        
+       
+        return res.status(200).json(response);
+    }
+    catch(error) {
 
         console.error(error);
 
         return res.status(500).json({ error: 'Internal server error' });
     }
 }
+
 module.exports = {
     httpgetAddressById,
-    httpgetAddressesByCoordinatesRadius
+    httpgetAddressesByCoordinatesRadius,
+    httpGeoCodingSearch,
 };
