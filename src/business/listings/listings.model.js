@@ -3,7 +3,7 @@ const { Model } = require('objection');
 const Utility = require('../../utility');
 const HostModel = require('./host/host.model');
 const UserModel = require('../users/users.model');
-const ImagesModel = require('../images/images.model');
+const ImagesModel = require('./images/images.model');
 const UtilityModel = require('./utility/utility.model');
 const CurrencyModel = require('./currency/currency.model');
 const { HouseRulesMap } = require('./house_rules/houseRules.model');
@@ -132,7 +132,7 @@ class ListingsModel extends Model {
         await super.$beforeInsert(queryContext);
         
         this[ListingsModel.Fields.ID] = `ls${await nanoid()}`;
-        this[ListingsModel.Fields.USER_ID] = `usrlnd006abc987xyz321`;
+
     }
 
 

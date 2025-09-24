@@ -1,5 +1,10 @@
 const { Model } = require("objection");
 
+const nanoid = async () => {
+  const { nanoid } = await import('nanoid');
+  return nanoid(19);
+};
+
 class UserModel extends Model {
 
     static get tableName(){
@@ -7,16 +12,19 @@ class UserModel extends Model {
     }
 
     static get idColumn(){
-
+        return UserModel.Fields.ID
     }
 
     static get Fields(){
 
         return {
             ID: 'id',
+            GOOGLE_ID: 'googleId',
             GIVEN_NAME: 'givenName',
             SURNAME: 'surName ',
             SECOND_SURNAME: 'secondSurName',
+            EMAIL: 'email',
+            PFP: 'pfp',
             CREATED_AT: 'createdAt',
             UPDATED_AT: 'updatedAt'
         }
@@ -29,17 +37,37 @@ class UserModel extends Model {
             required: [
                 UserModel.Fields.GIVEN_NAME,
                 UserModel.Fields.SURNAME,
+                UserModel.Fields.GOOGLE_ID,
+                UserModel.Fields.EMAIL,
             ],
             properties: {
                 [UserModel.Fields.ID]: { type: 'string', maxLength: 21 },
+                [UserModel.Fields.GOOGLE_ID]: { type: 'string', maxLength: 255 },
                 [UserModel.Fields.GIVEN_NAME]: { type: 'string', maxLength: 255 },
                 [UserModel.Fields.SURNAME]: { type: 'string', maxLength: 255 },
                 [UserModel.Fields.SECOND_SURNAME]: { type: 'string', maxLength: 255 },
+                [UserModel.Fields.EMAIL]: { type: 'string', maxLength: 255, format: 'email' },
+                [UserModel.Fields.PFP]: { type: 'string', maxLength: 255 },
                 [UserModel.Fields.CREATED_AT]: { type: 'string', format: 'date-time' },
                 [UserModel.Fields.UPDATED_AT]: { type: 'string', format: 'date-time' },
             }
         }
     }
+
+    async $beforeInsert(queryContext){
+
+        await super.$beforeInsert(queryContext);
+
+        this[UserModel.Fields.ID] = `us${await nanoid()}`
+    }
+
+	$formatJson(json) {
+		json = super.$formatJson(json);
+        json.displayName = `${json.givenName} ${json.surName}`
+		delete json.email;
+		delete json.googleId;
+		return json;
+	}
 
     static get relationMappings(){
 

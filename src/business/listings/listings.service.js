@@ -5,11 +5,13 @@ const BedroomAmenityModel = require("./bedroom_amenity/bedroom.model");
 const CurrencyModel = require("./currency/currency.model");
 const GenderModel = require("./gender/gender.model");
 const HostModel = require("./host/host.model");
-const { HouseRules } = require("./house_rules/houseRules.model");
+const { HouseRules, HouseRulesMap } = require("./house_rules/houseRules.model");
 const ListingTypeModel = require("./listing_type/listingtype.model");
 const ListingsModel = require("./listings.model");
 const UtilityModel = require("./utility/utility.model");
 const ListingBedroomAmenities = require('./bedroom_amenity_map/bedroommap.model');
+const ImagesModel = require("./images/images.model");
+const AmenityMapModel = require("./amenity_map/amenitymap.model");
 
 class ListingService {
 
@@ -28,6 +30,23 @@ class ListingService {
         }
     }
 
+    static get FormModelMap(){
+
+        return {
+            'step-1': ListingsModel,
+            'step-2': AddressModel,
+            'step-3': ListingsModel,
+            'step-4': HostModel,
+            'step-5': ListingBedroomAmenities,
+            'step-6': AmenityMapModel,
+            'step-7': UtilityModel,
+            'step-8': HouseRulesMap,
+            'step-9':'',
+            'step-10':'',
+            'step-11': ImagesModel,
+        }
+    }
+
     static get ModelMap(){
 
         return {
@@ -37,15 +56,8 @@ class ListingService {
             bedroomAmenity: BedroomAmenityModel,
             currency: CurrencyModel,
             listingType: ListingTypeModel,
-            hostRules: HouseRules,
+            houseRules: HouseRules,
             gender: GenderModel,
-            'step-1': ListingsModel,
-            'step-2': AddressModel,
-            'step-3': ListingsModel,
-            'step-4': HostModel,
-            'step-5': ListingBedroomAmenities,
-            'step-6':'',
-            'step-7': UtilityModel
         }
     }
 
@@ -128,8 +140,16 @@ class ListingService {
 
     }
 
-    static getModelFromMap(param = ''){
+    static getModelFromFormStep(param = ''){
+        if(!param) return undefined;
 
+        if(!ListingService.FormModelMap.hasOwnProperty(param)) return undefined;
+
+        return ListingService.FormModelMap[param];
+    }
+
+    static getModelFromMap(param = ''){
+        
         if(!param) return undefined;
 
         if(!ListingService.ModelMap.hasOwnProperty(param)) return undefined;

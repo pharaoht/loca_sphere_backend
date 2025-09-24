@@ -2,7 +2,7 @@ const { Model } = require("objection");
 const AmenityModel = require("../amenity/amenity.model");
 const ListingsModel = require("../listings.model");
 const AmenityTypeModel = require("../amenity_type/amenitytype.model");
-const ImagesModel = require("../../images/images.model");
+const ImagesModel = require("../images/images.model");
 
 class AmenityMapModel extends Model {
 
@@ -34,6 +34,42 @@ class AmenityMapModel extends Model {
         const formattedJson = super.$formatJson(json);
 
         return formattedJson;
+    }
+
+    static async createRecord(data = [], ...args){
+
+        const listingAmenities = data.listingAmenities;
+
+        if(listingAmenities.length === 0) return [];
+
+        const ormModel = AmenityMapModel;
+
+        const toDelete = []
+
+        const toInsert = listingAmenities.filter((itm) => !itm.id && !itm.toDelete).map(itm => {
+            let listId = itm.listingId;
+            let amenityTypeId = +itm.amenityTypeId;
+            let roomNumber = itm.roomNumber;
+
+            return itm.amenity.map(item => {
+                return {
+                    [ormModel.Fields.LISTING_ID]: listId,
+                    [ormModel.Fields.AMENITY_TYPE_ID]: amenityTypeId,
+                    [ormModel.Fields.ROOM_NUM]: roomNumber ?? null,
+                    [ormModel.Fields.AMENITY_ID]: item.amenityId,
+                }
+            })
+
+        }).flat()
+
+        if(toDelete.length > 0){
+            await ormModel.query().delete().whereIn(ormModel.Fields.ID, toDelete);
+        }
+
+        if(toInsert.length > 0){
+            //check if exist
+            await ormModel.query().insertGraph(toInsert)
+        }
     }
 
     static get relationMappings(){

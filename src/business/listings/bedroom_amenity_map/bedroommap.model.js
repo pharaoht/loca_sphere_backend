@@ -33,6 +33,38 @@ class BedroomAmenityMapModel extends Model {
         };
     }
 
+    static async createRecord(data = [], ...agrs){
+
+        const amenities = data.amenities;
+
+        if(amenities.length === 0) return [];
+    
+        const ormModel = BedroomAmenityMapModel;
+
+        const toDelete = amenities.filter((itm) => itm.toDelete && itm.id).map(itm => itm.id);
+
+        const toInsert = amenities.filter((itm) => !itm.id && !itm.toDelete).map(itm => {
+            return {
+                bedroomAmenityId: itm.bedroomAmenityId,
+                listingId: itm.listingId
+            }
+        })
+
+        if(toDelete.length > 0){
+            
+            await ormModel.query().delete().whereIn(ormModel.Fields.ID, toDelete);
+        }
+
+        if(toInsert.length > 0){
+
+            await ormModel.query().insertGraph(toInsert);
+
+        }
+
+        return await ormModel.query().select('*').where(ormModel.Fields.LISTING_ID, amenities[0].listingId);
+
+    }
+
     static get relationMappings(){
 
         const x = `${BedroomAmenityMapModel.tableName}.${BedroomAmenityMapModel.Fields.BEDROOM_AMENITY_ID}`;

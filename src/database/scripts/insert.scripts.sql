@@ -1,4 +1,4 @@
-INSERT INTO HouseRules (ruleName) VALUES 
+INSERT INTO HouseRules (ruleName, icon) VALUES 
 ('Smoking Allowed', '/smoking.png'),
 ('Pets Allowed', '/pets.png'),
 ('Overnight Guests Allowed', '/guests.png'),

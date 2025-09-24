@@ -1,17 +1,13 @@
 const cloudinary = require('cloudinary').v2;
 require('dotenv').config();
 
+cloudinary.config({ 
+    cloud_name: process.env.CLOUDINARY_NAME, 
+    api_key: process.env.CLOUDINARY_API_KEY, 
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
 class ImageUploadService {
-
-    constructor(){
-
-        cloudinary.config({ 
-            cloud_name: process.env.CLOUDINARY_NAME, 
-            api_key: process.env.CLOUDINARY_API_KEY, 
-            api_secret: process.env.CLOUDINARY_API_SECRET
-        });
-
-    };
 
     static async deleteImage( imageUrl, ) {
 
@@ -38,19 +34,28 @@ class ImageUploadService {
         }
     }
 
-    static async uploadImage( imageUrl, folder = 'loca_sphere/listing_images' ){
+    static async uploadImage( imageUrl, folder){
 
         console.log('uploading image....');
+
+        if(!folder){
+
+            console.warn('no folder name provided... skipping upload');
+
+            return false;
+        }
     
         try {
+
+            let root = 'loca_sphere/';
 
             const uploadResult = await cloudinary.uploader.upload(
                 imageUrl,
                 {
-                    folder: folder,
+                    folder: root + folder,
                     resource_type: 'image',
                     transformation: [
-                        { aspect_ratio: '16:9', width: 540, crop: 'fill' },
+                        { aspect_ratio: '16:9', width: 1280, crop: 'fill' },
                         { fetch_format: 'auto', format: 'avif' }
                     ]
                 }

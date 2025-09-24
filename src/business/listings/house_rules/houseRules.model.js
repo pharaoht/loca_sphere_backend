@@ -18,6 +18,7 @@ class HouseRules extends Model {
             ICON: 'icon',
         }
     }
+
 }
 
 class HouseRulesMap extends Model {
@@ -59,11 +60,32 @@ class HouseRulesMap extends Model {
         }
     }
 
+    static async createRecord(data = [], ...args){
+        
+        const { houseRules } = data;
+
+        if(houseRules.length === 0) return []
+    
+        const model = HouseRulesMap;
+
+        const targetColumn = model.Fields.LISTING_ID;
+
+        if(houseRules.length == 0) return;
+
+        for(const itm of houseRules){
+
+            if(!itm.id) await model.query().insert(itm);
+            else await model.query().findById(itm.id).patch(itm);
+        };
+        
+        return await model.query()
+        .select('*')
+        .where(targetColumn, houseRules[0].listingId);
+    }
+
     $parseDatabaseJson(json){
 
         json = super.$parseDatabaseJson(json);
-
-        json[HouseRulesMap.Fields.IS_ALLOWED] = json[HouseRulesMap.Fields.IS_ALLOWED] === 1 ? true : false;
 
         return json
     }
@@ -72,13 +94,16 @@ class HouseRulesMap extends Model {
 
         const formattedJson = super.$formatJson(json);
 
-        formattedJson.ruleName = json.houseRules ? json.houseRules.ruleName : null;
-        formattedJson.icon = json.houseRules ? json.houseRules.icon : null;
-        delete formattedJson.houseRules;
-        delete formattedJson.listingId;
+        if(json?.houseRules) {
+            formattedJson.ruleName = json.houseRules.ruleName;
+            formattedJson.icon = json.houseRules.icon
+            delete formattedJson.houseRules;
+        }
 
         return formattedJson
     }
+
+
 };
 
 module.exports = {

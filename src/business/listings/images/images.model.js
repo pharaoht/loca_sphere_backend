@@ -1,4 +1,5 @@
 const { Model } = require("objection");
+const ImageUploadService = require("../../../services/upload/upload.service");
 
 class ImagesModel extends Model {
 
@@ -44,6 +45,36 @@ class ImagesModel extends Model {
 
     static get relationMappings(){
         
+    }
+
+    static async createRecord(data = [], filePaths){
+
+        let imageIds = [];
+        const model = ImagesModel;
+
+        //upload files to cloudinary
+        for(let path of filePaths){
+
+            const url = await ImageUploadService.uploadImage(path, 'listing_images');
+        
+            imageIds.push(url);
+        }
+
+        //save files to database
+        for(let i = 0; i < data.files.length; i++){
+
+            const file = data.files[i];
+        
+            const itm = {
+                [model.Fields.URL]: imageIds[i].url,
+                [model.Fields.LISTING_ID]: file.listingId,
+                [model.Fields.IS_PRIMARY]: Boolean(+file.isPrimary),
+                [model.Fields.AMENITY_TYPE_ID]: +file.tag
+            };
+           
+            await model.query().insert(itm);
+        }
+    
     }
 };
 

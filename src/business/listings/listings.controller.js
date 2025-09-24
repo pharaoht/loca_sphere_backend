@@ -1,3 +1,4 @@
+const Utility = require("../../utility");
 const ListingsDal = require("./listings.dal");
 const ListingsRepository = require("./listings.repository");
 const ListingService = require("./listings.service");
@@ -44,7 +45,7 @@ async function httpGetListingOptions(req, res){
     try {
 
         const { option } = req.params;
-
+ 
         const model = ListingService.getModelFromMap(option);
 
         if(!model) return res.status(404).json({ error: 'Not valid parameters' });
@@ -66,17 +67,32 @@ async function httpCreateListing(req, res){
 
     try {
 
+        let filepaths = [];
+
+        if(req.files) filepaths = req.files.map(file => file.path);
+
         const listingData = req.body;
 
-        const { stepNum } = req.params
+        const { stepNum } = req.params;
 
-        const model = ListingService.getModelFromMap(stepNum);
-    
-        const dal = ListingsDal.keyMap?.[stepNum]?.(listingData.amenities);
+        const model = ListingService.getModelFromFormStep(stepNum);
 
-        const results = await ListingsRepository.repoCreateListing(dal ?? listingData, model);
+        if(!model) return res.status(404).json({ error: 'Not valid parameters' });
 
-        return res.status(200).json(results);
+        const results = await ListingsRepository.repoCreateListing(listingData, model, filepaths);
+
+        if(filepaths.length > 0){
+
+            for(let path of filepaths){
+                Utility.deleteFileFromFs(path);
+            }
+        }
+
+        return res.status(200).json({
+            data: results,
+            statusCode: 200,
+            success: true
+        });
 
     }
     catch(error){
@@ -85,14 +101,18 @@ async function httpCreateListing(req, res){
 
         if(error.statusCode === 400){
 
-            return res.status(400).json({error: error})
+            return res.status(400).json({
+                error: error,
+                statusCode: 400,
+                success: false
+            })
         }
 
         return res.status(500).json(error);
     }
 }
 
-async function httpUpdateListing(req, res){
+async function httpGetListingsByUserId(req, res){
 
     try {
 
@@ -115,6 +135,6 @@ module.exports = {
     httpDynamicGetListingDetails,
     httpGetListingOptions,
     httpCreateListing,
-    httpUpdateListing
+    httpGetListingsByUserId
 };
 

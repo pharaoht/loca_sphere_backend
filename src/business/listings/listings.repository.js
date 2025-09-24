@@ -22,7 +22,7 @@ class ListingsRepository{
     static async repoGetOptions(model){
 
         const result = await model.query().select('*');
-
+        
         return result;
 
     }
@@ -30,34 +30,22 @@ class ListingsRepository{
     /**
      * @param {typeof import('objection').Model} model
     */
-    static async repoCreateListing(data = {}, model){
-
+    static async repoCreateListing(data = {}, model, filePath = ''){
+     
         try{
-            if(data.insertIds){
-                
-                if(Array.isArray(data.deleteIds) && data.deleteIds.length > 0){
-                    await model.query().delete().whereIn(model.Fields.ID, data.deleteIds);
-                } 
-                    
-                for(const itm of data.insertIds){
 
-                    const exists = await model.query().findOne(itm);
-
-                    if(!exists) await model.query().insert(itm);
-                    
-                }
-                
-                return true;
+            if(typeof model?.createRecord === 'function'){
+                const updatedRecord = await model.createRecord(data, filePath);
+                return updatedRecord;
             }
 
             if (!data.id) return await model.query().insert(data);
-
+            
             const existing = await model.query().findById(data.id);
 
             if (existing) return await model.query().patchAndFetchById(data.id, data);
 
-            else return await model.query().insert(data);
-        
+            else throw new Error(`Record with ID ${data.id} not found. Cannot Update`)
             
         }
         catch(error){
@@ -67,10 +55,6 @@ class ListingsRepository{
             throw error;
         }
     };
-
-    static async repoCheckIfListingExist(listingID){
-
-    }
 
     /**
      * @param {typeof import('objection').Model} model
