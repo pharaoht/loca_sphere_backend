@@ -4,6 +4,8 @@ const express = require('express');
 
 const pool = require('./database/db.connection');
 
+// const redis = require('./services/cache/redis.cache.js');
+
 const knex = require('./database/db.connect.js');
 
 const passport = require('./middleware/passport/passport.middleware.js');
@@ -38,7 +40,7 @@ apiRouter.use(listingsRouter);
 
 apiRouter.use(authRouter);
 
-apiRouter.use(usersRouter)
+apiRouter.use(usersRouter);
 
 app.get('/' , (req, res) => {
 

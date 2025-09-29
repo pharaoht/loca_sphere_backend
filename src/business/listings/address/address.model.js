@@ -1,6 +1,7 @@
 const { Model } = require('objection');
 const ListingsModel = require('../listings.model');
 const CurrencyModel = require('../currency/currency.model');
+const ImagesModel = require('../images/images.model');
 
 class AddressModel extends Model {
 
@@ -55,6 +56,9 @@ class AddressModel extends Model {
         const x = `${ListingsModel.tableName}.${ListingsModel.Fields.CURRENCY_ID}`;
         const xx = `${CurrencyModel.tableName}.${CurrencyModel.Fields.ID}`;
 
+    
+        const yy = `${ImagesModel.tableName}.${ImagesModel.Fields.LISTING_ID}`;
+
         return {
             listing: {
                 relation: Model.BelongsToOneRelation,
@@ -63,7 +67,7 @@ class AddressModel extends Model {
                     from: k,
                     to: l
                 }
-            }
+            },
         }
     }
 

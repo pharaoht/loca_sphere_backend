@@ -1,6 +1,7 @@
 const AddressModel = require('./address.model');
 const ListingsModel = require('../listings.model');
 const CurrencyModel = require('../currency/currency.model');
+const ImagesModel = require('../images/images.model');
 
 class AddressDal {
 
@@ -46,7 +47,8 @@ class AddressDal {
                         [CurrencyModel.Fields.CODE]: address[CurrencyModel.Fields.CODE],
                         [CurrencyModel.Fields.SYMBOL]: address[CurrencyModel.Fields.SYMBOL],
 
-                    }
+                    },
+                    images: address.listing.images
                 }
             }
         })

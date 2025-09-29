@@ -48,6 +48,7 @@ passport.use(new GoogleStrategy(
     verifyCallback
 ));
 
+//runs whenever auth middleware is called
 passport.use(new JWTStrategy(opts, async (jwtPayload, done) => {
 
     try {

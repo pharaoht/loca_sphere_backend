@@ -63,17 +63,33 @@ async function httpGetListingOptions(req, res){
     }
 }
 
-async function httpCreateListing(req, res){
+async function httpCreateListing(req, res){  
 
     try {
 
-        let filepaths = [];
-
-        if(req.files) filepaths = req.files.map(file => file.path);
+        const userId = req.user.id;
 
         const listingData = req.body;
 
         const { stepNum } = req.params;
+     
+        if(listingData.xxFormxx){
+
+            const listing = await ListingsRepository.repoGetListingById(listingData.xxFormxx);
+
+            if(listing.userId !== userId){
+                return res.status(401).json({ error: 'Unauthorized'})
+            }
+
+            delete listingData.xxFormxx;
+        }
+        else if(!listingData.xxFormxx && stepNum !== 'step-1'){
+            return res.status(404).json({ error: 'No listing id'});
+        }
+
+        let filepaths = [];
+
+        if(req.files) filepaths = req.files.map(file => file.path);
 
         const model = ListingService.getModelFromFormStep(stepNum);
 

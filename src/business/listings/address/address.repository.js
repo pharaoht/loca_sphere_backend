@@ -49,6 +49,7 @@ class AddressRepository {
             .with('filtered_listings', cteQuery) 
             .with('filtered_listings_two', cteQueryTwo)
             .alias('a')
+            .withGraphFetched('listing.images')
             .joinRelated('listing as l')
             .joinRaw('JOIN "Currencies" as c ON c.id = l.currencyId')
             .joinRaw('JOIN "ListingHostInfo" as h ON h.listingId = l.id')

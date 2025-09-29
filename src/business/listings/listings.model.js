@@ -69,7 +69,7 @@ class ListingsModel extends Model {
                 [ListingsModel.Fields.DESCRIPTION]: { type: 'string', maxLength: 1000 },
                 [ListingsModel.Fields.BEDROOMS]: { type: 'integer', minimum: 0, maximum: 255 },
                 [ListingsModel.Fields.BEDS]: { type: 'integer', minimum: 0, maximum: 255 },
-                [ListingsModel.Fields.BATHROOMS]: { type: 'number', minimum: 0, maximum: 999.9, multipleOf: 0.1 },
+                [ListingsModel.Fields.BATHROOMS]: { type: 'string', minimum: 0, maximum: 999.9, multipleOf: 0.1 },
                 [ListingsModel.Fields.ROOM_AREA_SQM]: { type: 'number', minimum: 0, maximum: 9999.99, multipleOf: 0.01 },
                 [ListingsModel.Fields.PLACE_AREA_SQM]: { type: 'number', minimum: 0, maximum: 9999.99, multipleOf: 0.01 },
                 [ListingsModel.Fields.MINIMUM_STAY_DAYS]: { type: 'integer', minimum: 0 },

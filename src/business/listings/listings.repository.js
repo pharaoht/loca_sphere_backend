@@ -56,14 +56,14 @@ class ListingsRepository{
         }
     };
 
-    /**
-     * @param {typeof import('objection').Model} model
-    */
-    static async repoUpdateListing(data = {}, model){
-        
-        const record = await model.query().patch(data);
 
-        return [];
+    static async repoGetListingById(listingId = undefined){
+
+        if(!listingId) return false;
+
+        const listing = await ListingsModel.query().findById(listingId);
+
+        return listing;
     }
 
 };

@@ -47,6 +47,16 @@ class ImagesModel extends Model {
         
     }
 
+    $parseDatabaseJson(json){
+
+        json = super.$parseDatabaseJson(json);
+
+        json[ImagesModel.Fields.IS_PRIMARY] = Boolean(+json[ImagesModel.Fields.IS_PRIMARY]);
+
+        return json
+
+    }
+
     static async createRecord(data = [], filePaths){
 
         let imageIds = [];
