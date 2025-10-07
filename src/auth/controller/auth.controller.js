@@ -1,3 +1,4 @@
+require('dotenv').config();
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const instance = require('../../services/cache/redis.cache');
@@ -40,8 +41,9 @@ async function httpOAuthCallback(req, res, next) {
 			maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
 		})
 		
-		// Send access token in response (client keeps in memory, not localStorage)
-		return res.redirect('http://localhost:3000/')
+		const redirect = process.env.NODE_ENV === 'dev' ? process.env.LOCAL_DOMAIN : process.env.PROD_DOMAIN;
+
+		return res.redirect(`${redirect}/`)
 
 	})(req, res, next);
 }

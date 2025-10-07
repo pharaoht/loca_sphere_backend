@@ -1,10 +1,12 @@
+require('dotenv').config();
+
 const path = require('path');
 
 const express = require('express');
 
 const pool = require('./database/db.connection');
 
-// const redis = require('./services/cache/redis.cache.js');
+const redis = require('./services/cache/redis.cache.js');
 
 const knex = require('./database/db.connect.js');
 
@@ -34,7 +36,7 @@ app.use(cookieParser())
 
 app.use(express.urlencoded({ extended: true }));
 
-app.use(cors({ origin: [ 'http://localhost:3000', 'https://loca-sphere.vercel.app'], credentials: true }));
+app.use(cors({ origin: [ process.env.LOCAL_DOMAIN, process.env.PROD_DOMAIN ], credentials: true }));
 
 app.use('/api', apiRouter);
 
