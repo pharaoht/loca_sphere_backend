@@ -20,6 +20,6 @@ listingsRouter.get(`${resource}/user-id/:userId`, httpGetListingsByUserId);
 
 listingsRouter.get(`${resource}/:listId`, httpDynamicGetListingDetails);
 
-listingsRouter.post(`${resource}/:stepNum`,  conditionalUpload, httpCreateListing);
+listingsRouter.post(`${resource}/:stepNum`, authenticateJWT, conditionalUpload, httpCreateListing);
 
 module.exports = listingsRouter;

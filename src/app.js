@@ -16,6 +16,8 @@ const cors = require('cors');
 
 const apiRouter = express.Router();
 
+const cookieParser = require('cookie-parser');
+
 const cityRouter = require('./business/cities/routes/cities.routes.js');
 
 const listingsRouter = require('./business/listings/listings.routes.js');
@@ -27,6 +29,8 @@ const usersRouter = require('./business/users/users.routes.js');
 app.set('trust proxy', 1);
 
 app.use(express.json());
+
+app.use(cookieParser())
 
 app.use(express.urlencoded({ extended: true }));
 

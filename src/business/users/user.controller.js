@@ -16,11 +16,11 @@ async function httpGetUserInfo(req, res, next) {
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        const user = UserModel.query().findById(decoded.id);
+        const user = await UserModel.query().findById(decoded.id);
 
         if (!user) return res.status(404).json({ error: "User not found" });
-
-		res.status(200).json({ user: user.toJSON() });
+        
+		res.status(200).json(user.toJSON());
     }
     catch(error){
 

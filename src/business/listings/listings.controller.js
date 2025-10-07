@@ -24,7 +24,7 @@ async function httpDynamicGetListingDetails(req, res){
 
         const { listId } = req.params;
 
-        const { includes } = req.query
+        const { includes } = req.query;
 
         const includeOptions = ListingService.MapParamsToGraph(includes);
 
@@ -72,19 +72,20 @@ async function httpCreateListing(req, res){
         const listingData = req.body;
 
         const { stepNum } = req.params;
-     
+
         if(listingData.xxFormxx){
 
             const listing = await ListingsRepository.repoGetListingById(listingData.xxFormxx);
 
             if(listing.userId !== userId){
-                return res.status(401).json({ error: 'Unauthorized'})
+            
+                return res.status(401).json({ message: 'Unauthorized to change this'})
             }
 
             delete listingData.xxFormxx;
         }
         else if(!listingData.xxFormxx && stepNum !== 'step-1'){
-            return res.status(404).json({ error: 'No listing id'});
+            return res.status(404).json({ message: 'No listing id'});
         }
 
         let filepaths = [];
@@ -93,7 +94,7 @@ async function httpCreateListing(req, res){
 
         const model = ListingService.getModelFromFormStep(stepNum);
 
-        if(!model) return res.status(404).json({ error: 'Not valid parameters' });
+        if(!model) return res.status(404).json({ message: 'Not valid parameters' });
 
         const results = await ListingsRepository.repoCreateListing(listingData, model, filepaths);
 
@@ -120,7 +121,8 @@ async function httpCreateListing(req, res){
             return res.status(400).json({
                 error: error,
                 statusCode: 400,
-                success: false
+                success: false,
+                message: 'Unknown error'
             })
         }
 

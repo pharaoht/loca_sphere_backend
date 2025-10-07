@@ -69,11 +69,11 @@ class RedisCacheService {
         }
     };
 
-    async set(key, value){
+    async set(key, value, options = {}){
 
         try {
 
-            await this.redisClient.set(key, JSON.stringify(value))
+            await this.redisClient.set(key, JSON.stringify(value), options)
         }
         catch(error){
 
