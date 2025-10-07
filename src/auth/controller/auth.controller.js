@@ -26,6 +26,8 @@ async function httpOAuthCallback(req, res, next) {
 	//session: false, means its stateless, not stored in db, change to redis?
 	passport.authenticate('google', { session: false }, (err, user) => {
 
+		const redirect = process.env.NODE_ENV === 'dev' ? process.env.LOCAL_DOMAIN : process.env.PROD_DOMAIN;
+
 		if (err || !user) {
 			return res.redirect('/api/auth/failure');
 		}
@@ -41,7 +43,7 @@ async function httpOAuthCallback(req, res, next) {
 			maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
 		})
 		
-		const redirect = process.env.NODE_ENV === 'dev' ? process.env.LOCAL_DOMAIN : process.env.PROD_DOMAIN;
+
 
 		return res.redirect(`${redirect}/`)
 
