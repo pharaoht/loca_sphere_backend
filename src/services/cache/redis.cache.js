@@ -15,7 +15,7 @@ class RedisCacheService {
             console.log('*** creating redis client ***');
 
             this.redisClient = redis.createClient({
-                url: ENVIRONMENT === 'production' ? DOMAIN : LOCALDOMAIN,
+                url: ENVIRONMENT === 'PROD' ? DOMAIN : LOCALDOMAIN,
                 socket: {
                     reconnectStrategy: function(retries) {
                         

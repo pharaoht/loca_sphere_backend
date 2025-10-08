@@ -24,7 +24,7 @@ async function httpOAuthCallback(req, res, next) {
 	const refreshToken = await nanoid();
 
 	//session: false, means its stateless, not stored in db, change to redis?
-	passport.authenticate('google', { session: false }, (err, user) => {
+	passport.authenticate('google', { session: false }, async (err, user) => {
 
 		const redirect = process.env.NODE_ENV === 'dev' ? process.env.LOCAL_DOMAIN : process.env.PROD_DOMAIN;
 
@@ -33,18 +33,16 @@ async function httpOAuthCallback(req, res, next) {
 		}
 
 		//save token in redis
-		instance.set(`refresh:${refreshToken}`, user.id, { EX: 7 * 24 * 60 * 60 * 1000  });
+		await instance.set(`refresh:${refreshToken}`, user.id, { EX: 7 * 24 * 60 * 60 * 1000  });
 
 		// //store refresh token in cookie
 		res.cookie('refresh_token', refreshToken, {
 			httpOnly: true,
-			secure: process.env.NODE_ENV === 'production',
+			secure: process.env.NODE_ENV === 'PROD',
 			sameSite: 'lax',
 			maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
 		})
 		
-
-
 		return res.redirect(`${redirect}/`)
 
 	})(req, res, next);
