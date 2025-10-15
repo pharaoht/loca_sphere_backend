@@ -1,8 +1,17 @@
 const Utility = require("../../utility");
-const ListingsDal = require("./listings.dal");
 const ListingsRepository = require("./listings.repository");
 const ListingService = require("./listings.service");
 
+/**
+ * @typedef {import('express').Request} Request
+ * @typedef {import('express').Response} Response
+ */
+
+
+/**
+ * @param {Request} req
+ * @param {Response} res
+ */
 async function httpDynamicGetListingDetails(req, res){
     /* 
         ?includes=,,,,
@@ -40,6 +49,10 @@ async function httpDynamicGetListingDetails(req, res){
     }
 }
 
+/**
+ * @param {Request} req
+ * @param {Response} res
+ */
 async function httpGetListingOptions(req, res){
 
     try {
@@ -63,6 +76,10 @@ async function httpGetListingOptions(req, res){
     }
 }
 
+/**
+ * @param {Request} req
+ * @param {Response} res
+ */
 async function httpCreateListing(req, res){  
 
     try {
@@ -130,6 +147,10 @@ async function httpCreateListing(req, res){
     }
 }
 
+/**
+ * @param {Request} req
+ * @param {Response} res
+ */
 async function httpGetListingsByUserId(req, res){
 
     try {
@@ -149,10 +170,43 @@ async function httpGetListingsByUserId(req, res){
     }
 }
 
+/**
+ * @param {Request} req
+ * @param {Response} res
+ */
+async function httpDeleteById(req, res) {
+    
+    try {
+
+        const { id, model, listingId } = req.params;
+        
+        const userId = req.user.id;
+
+        //get listing By id
+        //get userId
+        //check if ids match
+
+        //get model from map
+
+        //get repo method to delete id base on model
+
+        //return 
+        return res.status(204)
+
+    }
+    catch(error){
+        
+        console.error(error);
+
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
 module.exports = {
     httpDynamicGetListingDetails,
     httpGetListingOptions,
     httpCreateListing,
-    httpGetListingsByUserId
+    httpGetListingsByUserId,
+    httpDeleteById
 };
 

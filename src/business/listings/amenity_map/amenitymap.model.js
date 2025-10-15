@@ -49,7 +49,7 @@ class AmenityMapModel extends Model {
         const toInsert = listingAmenities.filter((itm) => !itm.id && !itm.toDelete).map(itm => {
             let listId = itm.listingId;
             let amenityTypeId = +itm.amenityTypeId;
-            let roomNumber = itm.roomNumber;
+            let roomNumber = +itm.roomNumber;
 
             return itm.amenity.map(item => {
                 return {

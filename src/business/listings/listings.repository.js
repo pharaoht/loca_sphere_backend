@@ -1,3 +1,4 @@
+const ImagesModel = require('./images/images.model');
 const ListingsModel = require('./listings.model');
 
 class ListingsRepository{
@@ -64,6 +65,22 @@ class ListingsRepository{
         const listing = await ListingsModel.query().findById(listingId);
 
         return listing;
+    }
+
+    /**
+     * @param {typeof import('objection').Model} model
+    */
+    static async repoDeleteById(model, id){
+
+        if(!id) return false;
+
+        const isDelete = await model.query().deleteById(id);
+
+        if(model.tableName === ImagesModel.tableName){
+            
+        }
+
+        return isDelete;
     }
 
 };

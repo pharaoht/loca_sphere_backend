@@ -1,6 +1,6 @@
 const express = require('express');
 
-const { httpDynamicGetListingDetails, httpGetListingOptions, httpCreateListing, httpGetListingsByUserId } = require('./listings.controller');
+const { httpDynamicGetListingDetails, httpGetListingOptions, httpCreateListing, httpGetListingsByUserId, httpDeleteById } = require('./listings.controller');
 
 const addressRouter = require('./address/address.routes');
 
@@ -21,5 +21,7 @@ listingsRouter.get(`${resource}/user-id/:userId`, httpGetListingsByUserId);
 listingsRouter.get(`${resource}/:listId`, httpDynamicGetListingDetails);
 
 listingsRouter.post(`${resource}/:stepNum`, authenticateJWT, conditionalUpload, httpCreateListing);
+
+listingsRouter.delete(`${resource}/:model/:listingId/:id`, authenticateJWT, httpDeleteById);
 
 module.exports = listingsRouter;
