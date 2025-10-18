@@ -10,7 +10,6 @@ const { HouseRulesMap } = require('./house_rules/houseRules.model');
 const AmenityMapModel = require('./amenity_map/amenitymap.model');
 const ListingTypeModel = require('./listing_type/listingtype.model');
 const BedroomAmenityMapModel = require('./bedroom_amenity_map/bedroommap.model');
-const AmenityTypeModel = require('./amenity_type/amenitytype.model');
 
 const nanoid = async () => {
   const { nanoid } = await import('nanoid');

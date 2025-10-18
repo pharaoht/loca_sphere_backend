@@ -58,6 +58,7 @@ class ListingService {
             listingType: ListingTypeModel,
             houseRules: HouseRules,
             gender: GenderModel,
+            images: ImagesModel
         }
     }
 
@@ -152,7 +153,7 @@ class ListingService {
         
         if(!param) return undefined;
 
-        if(!ListingService.ModelMap.hasOwnProperty(param)) return undefined;
+        if(!Object.hasOwn(ListingService.ModelMap, param)) return undefined;
 
         return ListingService.ModelMap[param];
     }

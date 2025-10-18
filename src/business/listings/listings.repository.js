@@ -7,7 +7,7 @@ class ListingsRepository{
 
     static async repoGetListingDeets(listingId = '', options = '',){
 
-        if(listingId === '') return [];
+        if(listingId === '') return false;
 
         const result = await ListingsModel.query()
             .where(ListingsModel.Fields.ID, listingId)
@@ -70,14 +70,17 @@ class ListingsRepository{
     /**
      * @param {typeof import('objection').Model} model
     */
-    static async repoDeleteById(model, id){
+    static async repoDeleteById(model, id = '', listingId = ''){
 
-        if(!id) return false;
+        if(!id || !listingId) return false;
 
-        const isDelete = await model.query().deleteById(id);
+        const isDelete = await model.query()
+        .delete()
+        .where('id', id)
+        .andWhere('listingId', listingId)
 
         if(model.tableName === ImagesModel.tableName){
-            
+            //delete image from cloudinary
         }
 
         return isDelete;

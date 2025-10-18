@@ -57,7 +57,7 @@ INSERT INTO BedroomAmenities (name, icon) VALUES
 ('Air conditioning', NULL);
 
 INSERT INTO BookingStatuses (statusName) 
-VALUES ('pending'), ('confirmed'), ('cancelled'), ('completed');
+VALUES ('pending'), ('confirmed'), ('cancelled'), ('completed'), ('declined'), ('created'), ('ongoing');
 
 INSERT INTO Gender (sex) VALUES
 ('Mixed Gender'),

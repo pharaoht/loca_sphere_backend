@@ -170,13 +170,16 @@ CREATE TABLE IF NOT EXISTS BookingStatuses (
 CREATE TABLE IF NOT EXISTS Bookings (
     id CHAR(21) PRIMARY KEY,
     listingId CHAR(21) NOT NULL,
-    userId CHAR(21) NOT NULL,
+    hostId CHAR(21) NOT NULL, --add
+    guestId CHAR(21) NOT NULL, --add
     startDate DATE NOT NULL,
     endDate DATE NOT NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     statusId TINYINT,
+    additionalInfo TEXT, 
     FOREIGN KEY (listingId) REFERENCES Listing(id) ON DELETE CASCADE,
-    FOREIGN KEY (userId) REFERENCES Users(id) ON DELETE CASCADE,
+    FOREIGN KEY (hostId) REFERENCES Users(id) ON DELETE CASCADE,
+    FOREIGN KEY (guestId) REFERENCES Users(id) ON DELETE CASCADE,
     FOREIGN KEY (statusId) REFERENCES BookingStatuses(id) ON DELETE SET NULL
 );
 

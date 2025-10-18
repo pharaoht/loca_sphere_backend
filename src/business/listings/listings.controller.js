@@ -39,6 +39,8 @@ async function httpDynamicGetListingDetails(req, res){
 
         const [ result ] = await ListingsRepository.repoGetListingDeets(listId, includeOptions);
 
+        if(!result) return res.status(404)
+
         return res.status(200).json(result);
     }
     catch(error){
@@ -178,20 +180,25 @@ async function httpDeleteById(req, res) {
     
     try {
 
-        const { id, model, listingId } = req.params;
+        const { id, type, listingId } = req.params;
         
         const userId = req.user.id;
 
-        //get listing By id
-        //get userId
-        //check if ids match
+        const listing = await ListingsRepository.repoGetListingById(listingId);
 
-        //get model from map
+        if(!listing) return res.status(404).json({ error: 'Not found'});
 
-        //get repo method to delete id base on model
+        if(listing.userId !== userId) return res.status(401).json({ error: 'Unauthorized' });
 
-        //return 
-        return res.status(204)
+        const model = ListingService.getModelFromMap(type);
+
+        if(!model) return res.status(404).json({ error: 'Not found'});
+
+        const isDelete = await ListingsRepository.repoDeleteById(model, id);
+
+        if(!isDelete) return res.status(400).json({ error: 'Unable to delete record' })
+
+        return res.status(204);
 
     }
     catch(error){
