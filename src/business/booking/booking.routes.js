@@ -1,6 +1,6 @@
 const express = require('express');
 
-const { httpCreateBooking } = require('./booking.controller');
+const { httpCreateBooking, httpUpdateBookingStatus, httpGetBookingById, httpDeleteBookingById } = require('./booking.controller');
 
 const authenticateJWT = require('../../middleware/authenticate/auth.middleware');
 
@@ -8,8 +8,12 @@ const resource = '/bookings';
 
 const bookingRouter = express.Router();
 
+bookingRouter.get(`${resource}/:id`, authenticateJWT, httpGetBookingById);
+
 bookingRouter.post(`${resource}/create`, authenticateJWT, httpCreateBooking);
 
-bookingRouter.post(`${resource}/update-status/:status`, authenticateJWT, '')
+bookingRouter.patch(`${resource}/update-status`, authenticateJWT, httpUpdateBookingStatus);
+
+bookingRouter.delete(`${resource}/:bkId`, httpDeleteBookingById)
 
 module.exports = bookingRouter;
