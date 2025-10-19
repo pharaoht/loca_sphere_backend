@@ -56,17 +56,16 @@ class BookingModel extends Model {
                 BookingModel.Fields.GUESTID, 
                 BookingModel.Fields.STARTDATE,
                 BookingModel.Fields.ENDDATE,
-                BookingModel.Fields.STATUSID
             ],
             properties: {
                 [BookingModel.Fields.ID]: { type: 'string', maxLength: 21 },
                 [BookingModel.Fields.LISTINGID]: { type: 'string', maxLength: 21 },
                 [BookingModel.Fields.HOSTID]: { type: 'string', maxLength: 21 },
                 [BookingModel.Fields.GUESTID]: { type: 'string', maxLength: 21 },
-                [BookingModel.Fields.STARTDATE]: { type: 'string', format: 'date-time' },
-                [BookingModel.Fields.ENDDATE]: { type: 'string', format: 'date-time' },
+                [BookingModel.Fields.STARTDATE]: { type: 'string', format: 'date' },
+                [BookingModel.Fields.ENDDATE]: { type: 'string', format: 'date' },
                 [BookingModel.Fields.CREATEDAT]: { type: 'string', format: 'date-time' },
-                [BookingModel.Fields.STATUSID]: { type: 'integer'},
+                [BookingModel.Fields.STATUSID]: { type: 'integer', default: 6 },
                 [BookingModel.Fields.ADDITIONALINFO]: { type: 'string', maxLength: 21 },
             },
         };
@@ -88,7 +87,7 @@ class BookingModel extends Model {
 
         await super.$beforeInsert(queryContext);
         
-        this[ListingsModel.Fields.ID] = `bk${await nanoid()}`;
+        this[BookingModel.Fields.ID] = `bk${await nanoid()}`;
 
     }
 

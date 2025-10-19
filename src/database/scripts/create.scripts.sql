@@ -175,7 +175,7 @@ CREATE TABLE IF NOT EXISTS Bookings (
     startDate DATE NOT NULL,
     endDate DATE NOT NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    statusId TINYINT,
+    statusId TINYINT DEFAULT 6,
     additionalInfo TEXT, 
     FOREIGN KEY (listingId) REFERENCES Listing(id) ON DELETE CASCADE,
     FOREIGN KEY (hostId) REFERENCES Users(id) ON DELETE CASCADE,

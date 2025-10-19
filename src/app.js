@@ -1,24 +1,30 @@
 require('dotenv').config();
 
+require('./database/db.connection');
+
+require('./services/cache/redis.cache.js');
+
+require('./database/db.connect.js');
+
+require('./middleware/passport/passport.middleware.js');
+
 const path = require('path');
 
 const express = require('express');
 
-const pool = require('./database/db.connection');
-
-const redis = require('./services/cache/redis.cache.js');
-
-const knex = require('./database/db.connect.js');
-
-const passport = require('./middleware/passport/passport.middleware.js');
-
-const app = express();
+const hpp = require('hpp');
 
 const cors = require('cors');
 
-const apiRouter = express.Router();
-
 const cookieParser = require('cookie-parser');
+
+const helmet = require('helmet');
+
+const rateLimit = require('express-rate-limit');
+
+const app = express();
+
+const apiRouter = express.Router();
 
 const cityRouter = require('./business/cities/routes/cities.routes.js');
 
@@ -28,11 +34,19 @@ const authRouter = require('./auth/routes/auth.routes.js');
 
 const usersRouter = require('./business/users/users.routes.js');
 
+const bookingRouter = require('./business/booking/booking.routes.js');
+
 app.set('trust proxy', 1);
+
+app.use(helmet());
+
+app.use(hpp());
+
+app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
 
 app.use(express.json());
 
-app.use(cookieParser())
+app.use(cookieParser());
 
 app.use(express.urlencoded({ extended: true }));
 
@@ -48,9 +62,8 @@ apiRouter.use(authRouter);
 
 apiRouter.use(usersRouter);
 
-app.get('/' , (req, res) => {
+apiRouter.use(bookingRouter);
 
-    res.sendFile(path.join(__dirname, 'templates', 'default.html'))
-});
+app.get('/' , (req, res) => res.sendFile(path.join(__dirname, 'templates', 'default.html')));
 
 module.exports = app;
