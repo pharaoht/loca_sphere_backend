@@ -25,6 +25,13 @@ class UserModel extends Model {
             SECOND_SURNAME: 'secondSurName',
             EMAIL: 'email',
             PFP: 'pfp',
+            GENDER: 'gender',
+            BIRTHDAY: 'birthday',
+            COUNTRYCODE: 'countryCode',
+            PHONENUMBER: 'phoneNumber',
+            NATIONALITY: 'nationality',
+            OCCUPATION: 'occupation',
+            PLACEOFWORK: 'placeOfWork',
             CREATED_AT: 'createdAt',
             UPDATED_AT: 'updatedAt'
         }
