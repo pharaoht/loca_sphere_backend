@@ -41,7 +41,7 @@ const opts = {
 
 passport.use(new GoogleStrategy(
     {
-        callbackURL: process.env.NODE_ENV === 'dev' ? 'http://localhost:8000/api/auth/google/callback' : `${process.env.BACKEND_DOMAIN}api/auth/google/callback'`,
+        callbackURL: process.env.NODE_ENV === 'dev' ? 'http://localhost:8000/api/auth/google/callback' : `${process.env.BACKEND_DOMAIN}api/auth/google/callback`,
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET, 
     },
