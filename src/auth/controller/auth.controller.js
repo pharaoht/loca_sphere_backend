@@ -39,7 +39,7 @@ async function httpOAuthCallback(req, res, next) {
 		res.cookie('refresh_token', refreshToken, {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === 'PROD',
-			sameSite: 'lax',
+			sameSite: 'none',
 			maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
 		})
 		
@@ -90,7 +90,7 @@ async function httpRefreshToken(req, res){
 		res.cookie('refresh_token', newRefreshToken, {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === 'production',
-			sameSite: 'lax',
+			sameSite: 'none',
 			maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
 		})
 
