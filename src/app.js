@@ -22,6 +22,8 @@ const helmet = require('helmet');
 
 const rateLimit = require('express-rate-limit');
 
+const errorHandler = require('./middleware/error/error.middleware.js');
+
 const app = express();
 
 const apiRouter = express.Router();
@@ -63,6 +65,8 @@ apiRouter.use(authRouter);
 apiRouter.use(usersRouter);
 
 apiRouter.use(bookingRouter);
+
+// app.use(errorHandler);
 
 app.get('/' , (req, res) => res.sendFile(path.join(__dirname, 'templates', 'default.html')));
 

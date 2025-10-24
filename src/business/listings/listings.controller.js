@@ -86,6 +86,8 @@ async function httpCreateListing(req, res){
 
     try {
 
+        console.log('**creating listing**');
+
         const userId = req.user.id;
 
         const listingData = req.body;
@@ -96,15 +98,38 @@ async function httpCreateListing(req, res){
 
             const listing = await ListingsRepository.repoGetListingById(listingData.xxFormxx);
 
+            console.log('** checking userId to listing **');
+
             if(listing.userId !== userId){
             
+                console.warn('** user wasnt authorized **');
+                
                 return res.status(401).json({ message: 'Unauthorized to change this'})
             }
 
             delete listingData.xxFormxx;
         }
+        else if(stepNum === 'step-11' && listingData?.files[0].xxFormxx){
+
+            const listing = await ListingsRepository.repoGetListingById(listingData?.files[0].xxFormxx);
+
+            if(listing.userId !== userId){
+            
+                return res.status(401).json({ 
+                    message: 'Unauthorized to change this',
+                    statusCode: 401,
+                    success: false,
+                })
+            }
+
+            delete listingData?.files[0].xxFormxx
+        }
         else if(!listingData.xxFormxx && stepNum !== 'step-1'){
-            return res.status(404).json({ message: 'No listing id'});
+            return res.status(404).json({ 
+                message: 'No listing id', 
+                statusCode: 404,
+                success: false
+            });
         }
 
         let filepaths = [];
@@ -133,7 +158,7 @@ async function httpCreateListing(req, res){
     }
     catch(error){
 
-        console.log(error);
+        console.error(error);
 
         if(error.statusCode === 400){
 
