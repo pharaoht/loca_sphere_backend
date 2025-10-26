@@ -10,7 +10,12 @@ async function httpGetUserInfo(req, res, next) {
 
         const authHeader = req?.headers?.authorization;
 
-	    if (!authHeader) return res.status(401).json({ error: "Missing token" });
+	    if (!authHeader){
+
+            console.warn('** auth header not set. User verification failed **');
+    
+            return res.status(401).json({ error: "Missing token" });
+        } 
 
         const token = authHeader.split(" ")[1];
 
@@ -18,7 +23,12 @@ async function httpGetUserInfo(req, res, next) {
 
         const user = await UserModel.query().findById(decoded.id);
 
-        if (!user) return res.status(404).json({ error: "User not found" });
+        if (!user){
+
+            console.warn('** User not found from token **');
+    
+            return res.status(404).json({ error: "User not found" });
+        } 
         
 		res.status(200).json(user.toJSON());
     }
