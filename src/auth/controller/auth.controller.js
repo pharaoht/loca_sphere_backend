@@ -59,6 +59,8 @@ async function httpLogout(req, res){
 
 async function httpOAuthFailure(req, res){
     
+	console.error('Authentication error');
+
     return res.json({'error': 'Something went wrong'})
 }
 
@@ -66,24 +68,35 @@ async function httpRefreshToken(req, res){
 
 	try {
 
+		console.log('** refresh endpoint init **');
+
 		const oldrefreshToken = req?.cookies?.refresh_token;
 
 		if(!oldrefreshToken) return res.sendStatus(401);
 
 		const userId = await instance.get(`refresh:${oldrefreshToken}`);
 
-		if(!userId) return res.sendStatus(403);
+		if(!userId){
+
+			console.warn('** Refresh token did not resolve to a valid user. **');
+	
+			return res.sendStatus(403);	
+		} 
 		
 		const newAccessToken = jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: '15m' });
 
 		const newRefreshToken = await nanoid();
 
+		console.log('** issuing new refresh token **');
+	
 		await instance.set(`refresh:${newRefreshToken}`,
 			userId,
 			//EX redis deletes this automatically
 			{ EX : 7 * 24 * 60 * 60 }
 		)
 
+		console.log('** removing old refresh token from redis **');
+	
 		await instance.clearOneCluster(`refresh:${oldrefreshToken}`)
 
 		//store refresh token in cookie
@@ -94,6 +107,8 @@ async function httpRefreshToken(req, res){
 			maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
 		})
 
+		console.log('** issuing success **');
+	
 		res.json({ accessToken: newAccessToken, statusCode: 200, success: true })
 	
 	}

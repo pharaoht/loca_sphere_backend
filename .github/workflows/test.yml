@@ -1,0 +1,61 @@
+name: Run Integration Tests
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    # This starts a MySQL container inside the CI runner
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: test_db
+          MYSQL_USER: test_user
+          MYSQL_PASSWORD: test_pass
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    # These env vars will be available to Node during tests
+    env:
+      NODE_ENV: test
+      DB_HOST: localhost
+      DB_PORT: 3306
+      DB_USER: test_user
+      DB_PASSWORD: test_pass
+      DB_NAME: test_db
+      TEST_DB_URL: mysql://test_user:test_pass@localhost:3306/test_db
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Optional: copy .env.test to .env if you use dotenv
+      - name: Copy .env.test
+        run: cp .env.test .env
+
+      # Run your database migrations and seed data
+      - name: Run migrations
+        run: npx knex migrate:latest --env test
+
+      - name: Run seeds
+        run: npx knex seed:run --env test
+
+      # Run your integration tests
+      - name: Run tests
+        run: npm test -- --runInBand
