@@ -75,7 +75,7 @@ async function httpRefreshToken(req, res){
 		if(!oldrefreshToken) return res.sendStatus(401);
 
 		const userId = await instance.get(`refresh:${oldrefreshToken}`);
-
+		console.log(oldrefreshToken)
 		if(!userId){
 
 			console.warn('** Refresh token did not resolve to a valid user. **');
