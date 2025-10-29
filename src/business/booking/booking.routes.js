@@ -14,6 +14,6 @@ bookingRouter.post(`${resource}/create`, authenticateJWT, httpCreateBooking);
 
 bookingRouter.patch(`${resource}/update-status`, authenticateJWT, httpUpdateBookingStatus);
 
-bookingRouter.delete(`${resource}/:bkId`, httpDeleteBookingById)
+bookingRouter.delete(`${resource}/:bkId`, authenticateJWT, httpDeleteBookingById)
 
 module.exports = bookingRouter;
