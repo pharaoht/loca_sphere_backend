@@ -38,9 +38,9 @@ async function httpOAuthCallback(req, res, next) {
 		// //store refresh token in cookie
 		res.cookie('refresh_token', refreshToken, {
 			httpOnly: true,
-			secure: process.env.NODE_ENV === 'PROD',
-			sameSite: 'none',
-			maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+			secure: process.env.NODE_ENV === 'production',
+			sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+			maxAge: 7 * 24 * 60 * 60 * 1000,
 		})
 		
 		return res.redirect(`${redirect}/`)
@@ -92,7 +92,7 @@ async function httpRefreshToken(req, res){
 		await instance.set(`refresh:${newRefreshToken}`,
 			userId,
 			//EX redis deletes this automatically
-			{ EX : 7 * 24 * 60 * 60 }
+			{ EX :7 * 24 * 60 * 60 * 1000 }
 		)
 
 		console.log('** removing old refresh token from redis **');
@@ -103,8 +103,8 @@ async function httpRefreshToken(req, res){
 		res.cookie('refresh_token', newRefreshToken, {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === 'production',
-			sameSite: 'none',
-			maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+			sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+			maxAge: 7 * 24 * 60 * 60 * 1000, 
 		})
 
 		console.log('** issuing success **');

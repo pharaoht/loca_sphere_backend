@@ -1,7 +1,5 @@
 require('dotenv').config();
 
-require('./database/db.connection');
-
 require('./services/cache/redis.cache.js');
 
 require('./database/db.connect.js');

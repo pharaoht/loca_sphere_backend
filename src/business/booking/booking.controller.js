@@ -1,5 +1,6 @@
 const BookingRepository = require("./booking.repository");
 const ListingsRepository = require("../listings/listings.repository");
+const { bookingEvents, EVENT_TYPES } = require("../../events/booking.events");
 
 async function httpCreateBooking(req, res){
 
@@ -27,6 +28,14 @@ async function httpCreateBooking(req, res){
         }
 
         //emit event
+        bookingEvents.emit(EVENT_TYPES.BOOKING.STATUS_UPDATED, 
+            { 
+                bookingId: success.id,
+                statusId: 6,
+                hostId: hostListing.userId,
+                guestId: userId
+            }
+        );
 
         return res.status(200).json({message: 'created'})
 
