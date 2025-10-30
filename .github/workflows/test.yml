@@ -7,9 +7,13 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      mysql:
-        image: mariadb:10.11   # ✅ Faster & lighter drop-in replacement for MySQL 8
+      mariadb:
+        image: mariadb:10.11
         env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: test_db
+          MYSQL_USER: test_user
+          MYSQL_PASSWORD: test_pass
           MARIADB_ROOT_PASSWORD: root
           MARIADB_DATABASE: test_db
           MARIADB_USER: test_user
@@ -24,12 +28,12 @@ jobs:
 
     env:
       NODE_ENV: test
-      DB_HOST: mysql                   # 👈 The service name is the hostname
+      DB_HOST: mariadb          # 👈 match the service key name
       DB_PORT: 3306
       DB_USER: test_user
       DB_PASSWORD: test_pass
       DB_NAME: test_db
-      TEST_DB_URL: mysql://test_user:test_pass@mysql:3306/test_db
+      TEST_DB_URL: mysql://test_user:test_pass@mariadb:3306/test_db
 
     steps:
       - name: Checkout code
@@ -46,24 +50,21 @@ jobs:
       - name: Copy .env.test
         run: cp .env.test .env
 
-      # ✅ Install MySQL client (works for MariaDB too)
       - name: Install MySQL client
         run: sudo apt-get update && sudo apt-get install -y mysql-client
 
-      # ✅ Wait for MariaDB to be ready (using root for initial health check)
       - name: Wait for MariaDB to be ready
         run: |
-          echo "⏳ Waiting for MariaDB to be ready (host: $DB_HOST)..."
-          for i in {1..100}; do
+          echo "⏳ Waiting for MariaDB (host: $DB_HOST)..."
+          for i in {1..20}; do
             if mysql -h"$DB_HOST" -uroot -proot -e "SELECT 1" > /dev/null 2>&1; then
               echo "✅ MariaDB is ready!"
-              # Give the network a few seconds to fully settle
               sleep 5
               break
             fi
-            echo "MariaDB not ready yet... retrying ($i/100)"
+            echo "MariaDB not ready yet... retrying ($i/20)"
             sleep 3
-            if [ $i -eq 100 ]; then
+            if [ $i -eq 20 ]; then
               echo "❌ MariaDB did not become ready in time."
               echo "🔍 Dumping container logs for debugging..."
               docker ps -a
@@ -72,7 +73,11 @@ jobs:
             fi
           done
 
-      # ✅ Retry migrations if connection races
+      - name: Debug DB users
+        run: |
+          echo "🧾 Checking existing users in MariaDB..."
+          mysql -h"$DB_HOST" -uroot -proot -e "SELECT User, Host FROM mysql.user;"
+
       - name: Run migrations (with retries)
         run: |
           for i in {1..5}; do
@@ -90,19 +95,8 @@ jobs:
             fi
           done
 
-      # 🧩 Optional: Debug DB connection
-      - name: Debug MariaDB connection
-        run: |
-          echo "Testing MariaDB connection to $DB_HOST using test_user..."
-          mysql -h"$DB_HOST" -u"$DB_USER" -p"$DB_PASSWORD" -e "SELECT VERSION();" "$DB_NAME" || true
-
-      # Run database migrations
-      - name: Run migrations
-        run: npx knex migrate:latest --env test
-
       - name: Run seeds
         run: npx knex seed:run --env test
 
-      # Run integration tests
       - name: Run tests
         run: npm test -- --runInBand
