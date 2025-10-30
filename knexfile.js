@@ -40,9 +40,9 @@ module.exports = {
   test: {
     client: 'mysql2',
     connection: {
-      host: DB_HOST || 'mariadb',
+      host: DB_HOST || 'mysql',
       user: DB_USER || 'test_user',
-      password: DB_PASSWORD || 'test_pass',
+      password: DB_PASSWORD || 'test_password',
       database: DB_NAME || 'test_db',
     },
     migrations: { tableName: 'knex_migrations' },
