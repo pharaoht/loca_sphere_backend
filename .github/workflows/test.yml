@@ -45,9 +45,6 @@ jobs:
             sleep 2
           done
 
-      - name: Debug DB users
-        run: mysql -h"$DB_HOST" -uroot -proot -e "SELECT user, host FROM mysql.user;"
-
       - name: Run migrations
         run: npx knex migrate:latest --env test
 
