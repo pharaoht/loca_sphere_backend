@@ -14,6 +14,7 @@ const {
   DB_PORT
 } = process.env;
 
+
 module.exports = {
   development: {
     client: 'mysql2',
@@ -40,7 +41,6 @@ module.exports = {
     client: 'mysql2',
     connection: {
       host: DB_HOST || 'mariadb',
-      port: DB_PORT || 3306,
       user: DB_USER || 'test_user',
       password: DB_PASSWORD || 'test_pass',
       database: DB_NAME || 'test_db',
