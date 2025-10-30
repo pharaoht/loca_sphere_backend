@@ -49,7 +49,7 @@ jobs:
       # ✅ Install MySQL client tools
       - name: Install MySQL client
         run: |
-          sudo /etc/init.d/mysql start
+          sudo systemctl start mysql.service
           mysql -e 'CREATE DATABASE test_db;' -uroot -proot
           mysql -e 'SHOW DATABASES;' -uroot -proot
 
