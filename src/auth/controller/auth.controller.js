@@ -38,8 +38,8 @@ async function httpOAuthCallback(req, res, next) {
 		// //store refresh token in cookie
 		res.cookie('refresh_token', refreshToken, {
 			httpOnly: true,
-			secure: process.env.NODE_ENV === 'production',
-			sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+			secure: process.env.NODE_ENV === 'PROD',
+			sameSite: process.env.NODE_ENV === 'PROD' ? 'none' : 'lax',
 			maxAge: 7 * 24 * 60 * 60 * 1000,
 		})
 		
@@ -102,8 +102,8 @@ async function httpRefreshToken(req, res){
 		//store refresh token in cookie
 		res.cookie('refresh_token', newRefreshToken, {
 			httpOnly: true,
-			secure: process.env.NODE_ENV === 'production',
-			sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+			secure: process.env.NODE_ENV === 'PROD',
+			sameSite: process.env.NODE_ENV === 'PROD' ? 'none' : 'lax',
 			maxAge: 7 * 24 * 60 * 60 * 1000, 
 		})
 
