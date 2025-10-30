@@ -6,6 +6,22 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+          image: mysql:8.0
+          env:
+            MYSQL_ROOT_PASSWORD: root_password
+            MYSQL_DATABASE: test_db
+            MYSQL_USER: test_user
+            MYSQL_PASSWORD: test_password
+          ports:
+            - 3306:3306
+          options: >-
+            --health-cmd="mysqladmin ping"
+            --health-interval=10s
+            --health-timeout=5s
+            --health-retries=3
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -18,19 +34,19 @@ jobs:
         with:
           node-version: 20
 
-      - name: up mysql and apache container runs
-        run: docker-compose up -d
-
       - name: Install dependencies
         run: npm ci
 
-      - name: Install MySQL client
-        run: sudo apt-get update && sudo apt-get install -y mysql-client
-
-      - name: Wait for MariaDB to be ready
-        uses: jakejarvis/wait-action@master
-        with: 
-          time: '30s'
+      - name: Wait for MySQL
+        run: |
+          for i in {1..15}; do
+            if mysqladmin ping -h"127.0.0.1" -P"3306" -u"test_user" -p"test_password" --silent; then
+              echo "MySQL is up"
+              break
+            fi
+            echo "Waiting for MySQL..."
+            sleep 2
+          done
 
       - name: Debug DB users
         run: mysql -h"$DB_HOST" -uroot -proot -e "SELECT user, host FROM mysql.user;"
