@@ -26,12 +26,12 @@ jobs:
     # These env vars will be available to Node during tests
     env:
       NODE_ENV: test
-      DB_HOST: localhost
+      DB_HOST: mysql
       DB_PORT: 3306
       DB_USER: test_user
       DB_PASSWORD: test_pass
       DB_NAME: test_db
-      TEST_DB_URL: mysql://test_user:test_pass@localhost:3306/test_db
+      TEST_DB_URL: mysql://test_user:test_pass@mysql:3306/test_db
 
     steps:
       - name: Checkout code
