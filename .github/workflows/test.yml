@@ -48,20 +48,23 @@ jobs:
 
       # ✅ Install MySQL client tools
       - name: Install MySQL client
-        run: sudo apt-get update && sudo apt-get install -y mysql-client
+        run: |
+          sudo /etc/init.d/mysql start
+          mysql -e 'CREATE DATABASE test_db;' -uroot -proot
+          mysql -e 'SHOW DATABASES;' -uroot -proot
 
       # ✅ Wait for MySQL service to be ready
       - name: Wait for MySQL to be ready
         run: |
           echo "⏳ Waiting for MySQL to be ready..."
-          for i in {1..40}; do
+          for i in {1..20}; do
             if mysql -h"$DB_HOST" -u"$DB_USER" -p"$DB_PASSWORD" -e "SELECT 1" "$DB_NAME" > /dev/null 2>&1; then
               echo "✅ MySQL is ready!"
               break
             fi
-            echo "MySQL not ready yet... retrying ($i/40)"
+            echo "MySQL not ready yet... retrying ($i/20)"
             sleep 3
-            if [ $i -eq 40 ]; then
+            if [ $i -eq 20 ]; then
               echo "❌ MySQL did not become ready in time. Exiting."
               exit 1
             fi
