@@ -6,37 +6,20 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    services:
-      mariadb:
-        image: mariadb:10.11
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: test_db
-          MYSQL_USER: test_user
-          MYSQL_PASSWORD: test_pass
-        options: >-
-          --health-cmd="mysqladmin ping -h localhost -uroot -proot"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=12
-
-    env:
-      NODE_ENV: test
-      DB_HOST: mariadb
-      DB_PORT: 3306
-      DB_USER: test_user
-      DB_PASSWORD: test_pass
-      DB_NAME: test_db
-      TEST_DB_URL: mysql://test_user:test_pass@mariadb:3306/test_db
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Build the docker image
+        run: docker-compose build
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
+
+      - name: up mysql and apache container runs
+        run: docker-compose up -d
 
       - name: Install dependencies
         run: npm ci
@@ -44,28 +27,10 @@ jobs:
       - name: Install MySQL client
         run: sudo apt-get update && sudo apt-get install -y mysql-client
 
-      - name: Copy .env.test
-        run: cp .env.test .env || echo "No .env.test file found, skipping..."
-
       - name: Wait for MariaDB to be ready
-        run: |
-          READY=false
-          for i in {1..10}; do
-            if mysql -h"$DB_HOST" -uroot -proot -e "SELECT 1" > /dev/null 2>&1; then
-              echo "MariaDB is ready"
-              READY=true
-              break
-            fi
-            echo "MariaDB not ready yet... retrying ($i/10)"
-            sleep 3
-          done
-
-          if [ "$READY" = false ]; then
-            echo "MariaDB did not become ready in time"
-            docker ps -a
-            docker logs $(docker ps -qf "ancestor=mariadb:10.11") || true
-            exit 1
-          fi
+        uses: jakejarvis/wait-action@master
+        with: 
+          time: '30s'
 
       - name: Debug DB users
         run: mysql -h"$DB_HOST" -uroot -proot -e "SELECT user, host FROM mysql.user;"
