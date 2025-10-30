@@ -40,7 +40,7 @@ module.exports = {
   test: {
     client: 'mysql2',
     connection: {
-      host: DB_HOST || 'mysql',
+      host: DB_HOST || '127.0.0.1',
       user: DB_USER || 'test_user',
       password: DB_PASSWORD || 'test_password',
       database: DB_NAME || 'test_db',
