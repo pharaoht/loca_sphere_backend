@@ -1,51 +1,67 @@
+// Load environment variables from .env
 require('dotenv').config();
 
-const HOST = process.env.HOST;
-const USER = process.env.USER;
-const DATABASENAME = process.env.DATABASENAME;
-const DATABASEPASSWORD = process.env.DATABASEPASSWORD;
+// Common DB environment variables
+const {
+  HOST,
+  USER,
+  DATABASENAME,
+  DATABASEPASSWORD,
+  DB_HOST,
+  DB_USER,
+  DB_PASSWORD,
+  DB_NAME,
+  DB_PORT
+} = process.env;
 
-// knexfile.js
 module.exports = {
-
-    development: {
-        client: 'mysql2',
-        connection: {
-            host: HOST,
-            user: USER,
-            password: DATABASEPASSWORD,
-            database: DATABASENAME,
-            port: 25371
-        },
-        migrations: { tableName: 'knex_migrations' },
-        seeds: { directory: './seeds' },
+  development: {
+    client: 'mysql2',
+    connection: {
+      host: HOST || '127.0.0.1',
+      user: USER || 'root',
+      password: DATABASEPASSWORD || '',
+      database: DATABASENAME || 'my_local_db',
+      port: 25371,
     },
-
+    migrations: { tableName: 'knex_migrations' },
+    seeds: { directory: './seeds' },
     pool: {
-        min: 2,
-        max: 10,
-        afterCreate: (conn, done) => {
-            console.info('✅ New MySQL connection created');
-            done(null, conn);
-        }
+      min: 2,
+      max: 10,
+      afterCreate: (conn, done) => {
+        console.info('✅ New MySQL connection created (development)');
+        done(null, conn);
+      },
     },
+  },
 
-	test: {
-		client: 'mysql2',
-		connection: {
-			host: process.env.TEST_DB_HOST || '127.0.0.1',
-			user: process.env.TEST_DB_USER || 'root',
-			password: process.env.TEST_DB_PASS || '',
-			database: process.env.TEST_DB_NAME || 'my_test_db',
-		},
-		migrations: { tableName: 'knex_migrations' },
-		seeds: { directory: './seeds' },
-	},
+  test: {
+    client: 'mysql2',
+    connection: {
+      host: DB_HOST || '127.0.0.1',
+      port: DB_PORT || 3306,
+      user: DB_USER || 'test_user',
+      password: DB_PASSWORD || 'test_pass',
+      database: DB_NAME || 'test_db',
+    },
+    migrations: { tableName: 'knex_migrations' },
+    seeds: { directory: './seeds' },
+    pool: {
+      min: 2,
+      max: 10,
+      afterCreate: (conn, done) => {
+        console.info('🧪 New MySQL connection created (test)');
+        done(null, conn);
+      },
+    },
+  },
 
-	// production: {
-	// 	client: 'mysql2',
-	// 	connection: process.env.DATABASE_URL,
-	// 	migrations: { tableName: 'knex_migrations' },
-	// 	seeds: { directory: './seeds' },
-	// },
+  // Uncomment when you set up production
+  // production: {
+  //   client: 'mysql2',
+  //   connection: process.env.DATABASE_URL,
+  //   migrations: { tableName: 'knex_migrations' },
+  //   seeds: { directory: './seeds' },
+  // },
 };
