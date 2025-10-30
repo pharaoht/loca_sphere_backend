@@ -6,7 +6,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    # This starts a MySQL container inside the CI runner
     services:
       mysql:
         image: mysql:8
@@ -23,7 +22,6 @@ jobs:
           --health-timeout=5s
           --health-retries=3
 
-    # These env vars will be available to Node during tests
     env:
       NODE_ENV: test
       DB_HOST: mysql
@@ -49,7 +47,20 @@ jobs:
       - name: Copy .env.test
         run: cp .env.test .env
 
-      # Run your database migrations and seed data
+      # ✅ Wait until MySQL is ready before running migrations
+      - name: Wait for MySQL to be ready
+        run: |
+          echo "⏳ Waiting for MySQL to be ready..."
+          for i in {1..20}; do
+            if mysqladmin ping -h"$DB_HOST" -u"$DB_USER" -p"$DB_PASSWORD" --silent; then
+              echo "✅ MySQL is ready!"
+              break
+            fi
+            echo "MySQL not ready yet... retrying ($i/20)"
+            sleep 3
+          done
+
+      # Run your database migrations
       - name: Run migrations
         run: npx knex migrate:latest --env test
 
