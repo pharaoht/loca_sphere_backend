@@ -44,6 +44,7 @@ module.exports = {
       user: DB_USER || 'test_user',
       password: DB_PASSWORD || 'test_password',
       database: DB_NAME || 'test_db',
+      port: DB_PORT || 3306
     },
     migrations: { tableName: 'knex_migrations' },
     seeds: { directory: './seeds' },
