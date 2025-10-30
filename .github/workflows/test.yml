@@ -57,6 +57,8 @@ jobs:
           for i in {1..100}; do
             if mysql -h"$DB_HOST" -uroot -proot -e "SELECT 1" > /dev/null 2>&1; then
               echo "✅ MariaDB is ready!"
+              # Give the network a few seconds to fully settle
+              sleep 5
               break
             fi
             echo "MariaDB not ready yet... retrying ($i/100)"
@@ -66,6 +68,24 @@ jobs:
               echo "🔍 Dumping container logs for debugging..."
               docker ps -a
               docker logs $(docker ps -qf "ancestor=mariadb:10.11") || true
+              exit 1
+            fi
+          done
+
+      # ✅ Retry migrations if connection races
+      - name: Run migrations (with retries)
+        run: |
+          for i in {1..5}; do
+            echo "Running migrations (attempt $i)..."
+            if npx knex migrate:latest --env test; then
+              echo "✅ Migrations succeeded!"
+              break
+            else
+              echo "⚠️ Migrations failed. Retrying in 5s..."
+              sleep 5
+            fi
+            if [ $i -eq 5 ]; then
+              echo "❌ Migrations failed after 5 attempts."
               exit 1
             fi
           done
