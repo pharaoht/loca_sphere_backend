@@ -1,8 +1,8 @@
-import { EventEmitter } from 'events';
+const EventEmitter = require('events');
 
-export const bookingEvents = new EventEmitter();
+const bookingEvents = new EventEmitter();
 
-export const EVENT_TYPES = {
+const EVENT_TYPES = {
     BOOKING: {
         STATUS_UPDATED: 'booking.statusUpdated',
         CREATED: 'booking.created',
@@ -14,3 +14,8 @@ export const EVENT_TYPES = {
         FAILED: 'payment.failed',
     },
 };
+
+module.exports = {
+    bookingEvents, 
+    EVENT_TYPES
+}
