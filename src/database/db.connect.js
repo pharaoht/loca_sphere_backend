@@ -16,9 +16,14 @@ const dbConfig = {
         min: 2,
         max: 10,
         afterCreate: (conn, done) => {
-                console.info('✅ New MySQL connection created');
-                done(null, conn);
+            console.info('✅ New MySQL connection created');
+            done(null, conn);
         },
+        create: (conn) => {
+            console.log('✅ Connection acquired');
+            return conn;
+        },
+        
     },
 };
 

@@ -24,10 +24,15 @@ class RedisCacheService {
 
             this.redisClient.on('error', (err) => {
                 this.isConnected = false;
-                console.error('Redis client error:', err);
+                console.error('❌ Redis client error:', err);
             });
 
-            this.redisClient.on('end', () => console.log('Redis connection closed'));
+            this.redisClient.on('connect', () => console.log('🔌 Redis TCP connected'));
+            this.redisClient.on('ready', () => console.log('✅ Redis ready to accept commands'));
+            this.redisClient.on('error', (err) => console.error('❌ Redis error', err));
+            this.redisClient.on('end', () => console.log('🧹 Redis connection closed'));
+            this.redisClient.on('reconnecting', () => console.log('🔄 Redis reconnecting'));
+            this.redisClient.on('warning', (msg) => console.warn('⚠ Redis warning', msg));
 
             RedisCacheService.instance = this;
         }
@@ -39,7 +44,7 @@ class RedisCacheService {
         if (!this.isConnected) {
             await this.redisClient.connect();
             this.isConnected = true;
-            console.log('*** redis instance created ***');
+            console.log('✅ Redis instance connected');
         }
     }
 
@@ -62,7 +67,7 @@ class RedisCacheService {
         }
         catch(error){
 
-            console.error('Error while getting key in redis:', error)
+            console.error('❌ Error while getting key in redis:', error)
         }
     };
 
@@ -74,7 +79,7 @@ class RedisCacheService {
         }
         catch(error){
 
-            console.error('Error while setting key/value in redis:', error)
+            console.error('❌ Error while setting key/value in redis:', error)
         };
     };
 
@@ -100,7 +105,7 @@ class RedisCacheService {
 
         } catch (error) {
     
-            console.error('Error clearing all keys in the cluster:', err);
+            console.error('❌ Error clearing all keys in the cluster:', err);
 
             throw err;
 
@@ -117,7 +122,7 @@ class RedisCacheService {
         }
         catch(error){
 
-            console.error('Error clearing key in the cluster:', error);
+            console.error('❌ Error clearing key in the cluster:', error);
 
             throw error;
         }
