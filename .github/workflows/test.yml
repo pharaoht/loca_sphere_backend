@@ -13,6 +13,11 @@ jobs:
       GOOGLE_REDIRECT_URI: ${{ secrets.GOOGLE_REDIRECT_URI }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       JWT_REFRESH: ${{ secrets.JWT_REFRESH }}
+      DATABASENAME: ${{ secrets.DATABASENAME }}
+      DATABASEPASSWORD: ${{ secrets.DATABASEPASSWORD }}
+      DATABASEPORT: ${{ secrets.DATABASEPORT }}
+      HOST: ${{ secrets.HOST }}
+      USER: ${{ secrets.USER }}
 
     services:
     
