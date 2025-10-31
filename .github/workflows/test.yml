@@ -6,7 +6,16 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      NODE_ENV: test
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      GOOGLE_REDIRECT_URI: ${{ secrets.GOOGLE_REDIRECT_URI }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      JWT_REFRESH: ${{ secrets.JWT_REFRESH }}
+
     services:
+    
       mysql:
           image: mysql:8.0
           env:
@@ -74,6 +83,6 @@ jobs:
         run: npx knex seed:run --env test
 
       - name: Run integration tests
-        run: npm test -- --runInBand
+        run: npm test
 
 
