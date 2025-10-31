@@ -3,7 +3,7 @@ const app = require('../../src/app');
 const redis = require('../../src/services/cache/redis.cache')
 const database = require('../../src/database/db.connect');
 
-describe('GET /api/address/coordinates', () => {
+describe('ADDRESS.CONTROLLER GET - /api/address/coordinates', () => {
 
     afterAll(async () => {
         if (redis && typeof redis.quit === 'function') {
@@ -15,7 +15,7 @@ describe('GET /api/address/coordinates', () => {
     it('', () => {})
 });
 
-describe('GET /api/address/geocoding', () => {
+describe('ADDRESS.CONTROLLER GET - /api/address/geocoding', () => {
     
     afterAll(async () => {
         if (redis && typeof redis.quit === 'function') {
@@ -27,7 +27,7 @@ describe('GET /api/address/geocoding', () => {
     it('', () => {})
 });
 
-describe('GET /api/address/:id', () => {
+describe('ADDRESS.CONTROLLER GET - /api/address/:id', () => {
     
     afterAll(async () => {
         if (redis && typeof redis.quit === 'function') {

@@ -3,7 +3,6 @@ const { Model } = require('objection');
 
 require('dotenv').config();
 
-console.log(process.env.DATABASEPORT )
 const dbConfig = {
     client: 'mysql2',
     connection: {

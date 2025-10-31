@@ -2,10 +2,6 @@ const redis = require('redis');
 
 require('dotenv').config();
 
-const ENVIRONMENT = process.env.NODE_ENV;
-const DOMAIN = process.env.REDIS_URL;
-const LOCALDOMAIN = 'redis://localhost:6379';
-
 class RedisCacheService {
 
     constructor() {
