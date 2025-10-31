@@ -1,7 +1,5 @@
 require('dotenv').config();
 
-require('./services/cache/redis.cache.js');
-
 require('./database/db.connect.js');
 
 require('./middleware/passport/passport.middleware.js');
