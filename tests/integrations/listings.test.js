@@ -31,3 +31,12 @@ describe('GET /api/listing/:listId', () => {
 
     })
 });
+
+describe('GET /api/listing/options/:option', () => {
+
+    it('should return 200 when given valid parameters', () => {
+
+    });
+
+    
+});
