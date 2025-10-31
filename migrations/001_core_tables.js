@@ -1,4 +1,4 @@
-export async function up(knex) {
+const up = async (knex) => {
 	await knex.schema
 		.createTable('Gender', (table) => {
 			table.increments('id').primary();
@@ -32,10 +32,15 @@ export async function up(knex) {
 		});
 }
 
-export async function down(knex) {
+const down = async (knex) => {
 	await knex.schema
 		.dropTableIfExists('Users')
 		.dropTableIfExists('Occupation')
 		.dropTableIfExists('Nationality')
 		.dropTableIfExists('Gender');
+}
+
+module.exports = {
+	up,
+	down
 }
