@@ -22,6 +22,7 @@ exports.seed = async function (knex) {
 	await knex('Utility').del();
 	await knex('ListingPhotos').del();
 	await knex('ListingHostInfo').del();
+	await knex('Occupation').del();
 
 	// Insert data
 	await knex('HouseRules').insert([
@@ -30,6 +31,17 @@ exports.seed = async function (knex) {
 		{ ruleName: 'Overnight Guests Allowed', icon: '/guests.png' },
 		{ ruleName: 'City Hall Registration Supported', icon: '/registration.png' },
 		{ ruleName: 'Couples Allowed', icon: '/couples.png' },
+	]);
+
+	await knex('Occupation').insert([
+		{ occupationName: 'Software Engineer' },
+		{ occupationName: 'Designer' },
+		{ occupationName: 'Teacher' },
+		{ occupationName: 'Doctor' },
+		{ occupationName: 'Lawyer' },
+		{ occupationName: 'Student' },
+		{ occupationName: 'Entrepreneur' },
+		{ occupationName: 'Freelancer' },
 	]);
 
 	await knex('AmenitiesTypes').insert([
