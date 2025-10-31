@@ -14,6 +14,17 @@ describe('GET /api/listing/:listId', () => {
     
     it('should return details when valid id is provided', async () => {
         
+        const listingId = 'lstlnd006xyz321abc987';
+
+        const res = await request(app)
+            .get(`/api/listings/${listingId}`)
+            .query({ includes: 'address' })
+
+
+        console.log('Response:', JSON.stringify(res.body, null, 2));
+
+        expect(res.statusCode).toBe(404);
+    
     })
 
     it('should return 404 when no id/invalid id is provided', async () => {
@@ -34,9 +45,52 @@ describe('GET /api/listing/:listId', () => {
 
 describe('GET /api/listing/options/:option', () => {
 
+    afterAll(async () => {
+        if (redis && typeof redis.quit === 'function') {
+            await redis.quit();
+            await database.close();
+        }
+    });
+
     it('should return 200 when given valid parameters', () => {
 
     });
 
-    
+
 });
+
+describe('GET /api/listing/user-id/:userId', () => {
+
+    afterAll(async () => {
+        if (redis && typeof redis.quit === 'function') {
+            await redis.quit();
+            await database.close();
+        }
+    });
+
+    it('', () => {})
+})
+
+describe('POST /api/listing/:stepNum', () => {
+
+    afterAll(async () => {
+        if (redis && typeof redis.quit === 'function') {
+            await redis.quit();
+            await database.close();
+        }
+    });
+
+    it('', () => {})
+});
+
+describe('DELETE /api/listing/:model/:listingId/:id', () => {
+
+    afterAll(async () => {
+        if (redis && typeof redis.quit === 'function') {
+            await redis.quit();
+            await database.close();
+        }
+    });
+
+    it('', () => {})
+})
