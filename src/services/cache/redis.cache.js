@@ -8,51 +8,53 @@ const LOCALDOMAIN = 'redis://localhost:6379';
 
 class RedisCacheService {
 
-    constructor(){
-        //singleton Design pattern to prevent multi-instances
-        if(!RedisCacheService.instance){
-
-            console.log('*** creating redis client ***');
-
+    constructor() {
+        if (!RedisCacheService.instance) {
             this.redisClient = redis.createClient({
-                url: ENVIRONMENT === 'PROD' ? DOMAIN : LOCALDOMAIN,
+                url: process.env.REDIS_URL || 'redis://localhost:6379',
                 socket: {
-                    reconnectStrategy: function(retries) {
-                        
-                        if (retries > 5) {
-                        
-                            console.log('Too many attempts to reconnect. Redis connection was terminated');
-                        
-                            return new Error('Too many retries.');
-        
-                        } 
-                        else return retries * 500;
-                    }
-                }
+                reconnectStrategy: (retries) => {
+                    if (retries > 5) return new Error('Too many retries.');
+                    return retries * 500;
+                },
+                },
             });
-        
+
+            this.isConnected = false;
+
             this.redisClient.on('error', (err) => {
-
                 this.isConnected = false;
-                
-                console.error('Redis client error:', err)
+                console.error('❌ Redis client error:', err);
             });
 
-            this.redisClient.on('end', () => console.error('Redis connection closed. Exiting.'));
-        
-            this.redisClient.connect().then(() => {
-        
-                this.isConnected = true;
-
-                console.log('*** redis instance created ***');
-
-            }).catch(console.error);
+            this.redisClient.on('connect', () => console.log('🔌 Redis TCP connected'));
+            this.redisClient.on('ready', () => console.log('✅ Redis ready to accept commands'));
+            this.redisClient.on('error', (err) => console.error('❌ Redis error', err));
+            this.redisClient.on('end', () => console.log('🧹 Redis connection closed'));
+            this.redisClient.on('reconnecting', () => console.log('🔄 Redis reconnecting'));
+            this.redisClient.on('warning', (msg) => console.warn('⚠ Redis warning', msg));
 
             RedisCacheService.instance = this;
-
         }
-
         return RedisCacheService.instance;
+    }
+
+    
+    async connect() {
+        if (!this.isConnected) {
+            await this.redisClient.connect();
+            this.isConnected = true;
+            console.log('✅ Redis instance connected');
+        }
+    }
+
+
+    async quit() {
+        if (this.isConnected) {
+            await this.redisClient.quit();
+            this.isConnected = false;
+            console.log('🧹 Redis connection closed');
+        }
     }
 
     async get(key){
@@ -65,7 +67,7 @@ class RedisCacheService {
         }
         catch(error){
 
-            console.error('Error while getting key in redis:', error)
+            console.error('❌ Error while getting key in redis:', error)
         }
     };
 
@@ -77,7 +79,7 @@ class RedisCacheService {
         }
         catch(error){
 
-            console.error('Error while setting key/value in redis:', error)
+            console.error('❌ Error while setting key/value in redis:', error)
         };
     };
 
@@ -103,7 +105,7 @@ class RedisCacheService {
 
         } catch (error) {
     
-            console.error('Error clearing all keys in the cluster:', err);
+            console.error('❌ Error clearing all keys in the cluster:', err);
 
             throw err;
 
@@ -120,7 +122,7 @@ class RedisCacheService {
         }
         catch(error){
 
-            console.error('Error clearing key in the cluster:', error);
+            console.error('❌ Error clearing key in the cluster:', error);
 
             throw error;
         }
@@ -128,6 +130,4 @@ class RedisCacheService {
 
 };
 
-const instance = new RedisCacheService();
-
-module.exports = instance;
+module.exports = new RedisCacheService();

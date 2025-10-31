@@ -1,15 +1,28 @@
+require('dotenv').config();
 const http = require('http');
-
 const app = require('./app');
+const redis = require('./services/cache/redis.cache');
+const databse = require('./database/db.connect')
 
-const PORT = 8000;
+const PORT = process.env.PORT || 8000;
 
-const server = http.createServer(app);
+(async () => {
 
-server.listen(PORT, () => {
+    try {
 
-    console.log('Server Ready and...');
+        await redis.connect();
+        await databse.connect();
 
-    console.log(`Listening on port ${PORT}...`);
+        const server = http.createServer(app);
 
-});
+        server.listen(PORT, () => {
+            console.log('✅ Server Ready and...');
+            console.log(`✅ Listening on port ${PORT}...`);
+        });
+
+    } catch (err) {
+        console.error('❌ Failed to start server:', err);
+        process.exit(1);
+    }
+    
+})();
