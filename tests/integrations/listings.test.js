@@ -5,6 +5,11 @@ const database = require('../../src/database/db.connect');
 
 describe('GET /api/listing/:listId', () => {
 
+    beforeAll(async () => {
+        await database.connect();   // <--- make sure knex is ready
+        await redis.connect?.();    // optional if redis has connect()
+    });
+
     afterAll(async () => {
         if (redis && typeof redis.quit === 'function') {
             await redis.quit();
@@ -45,6 +50,11 @@ describe('GET /api/listing/:listId', () => {
 
 describe('GET /api/listing/options/:option', () => {
 
+    beforeAll(async () => {
+        await database.connect();   // <--- make sure knex is ready
+        await redis.connect?.();    // optional if redis has connect()
+    });
+
     afterAll(async () => {
         if (redis && typeof redis.quit === 'function') {
             await redis.quit();
@@ -61,6 +71,11 @@ describe('GET /api/listing/options/:option', () => {
 
 describe('GET /api/listing/user-id/:userId', () => {
 
+    beforeAll(async () => {
+        await database.connect();
+        await redis.connect?.();   
+    });
+
     afterAll(async () => {
         if (redis && typeof redis.quit === 'function') {
             await redis.quit();
@@ -73,6 +88,11 @@ describe('GET /api/listing/user-id/:userId', () => {
 
 describe('POST /api/listing/:stepNum', () => {
 
+    beforeAll(async () => {
+        await database.connect(); 
+        await redis.connect?.();    
+    });
+
     afterAll(async () => {
         if (redis && typeof redis.quit === 'function') {
             await redis.quit();
@@ -84,6 +104,11 @@ describe('POST /api/listing/:stepNum', () => {
 });
 
 describe('DELETE /api/listing/:model/:listingId/:id', () => {
+
+    beforeAll(async () => {
+        await database.connect(); 
+        await redis.connect?.();    
+    });
 
     afterAll(async () => {
         if (redis && typeof redis.quit === 'function') {
