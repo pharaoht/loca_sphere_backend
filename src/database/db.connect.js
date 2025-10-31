@@ -10,7 +10,7 @@ const dbConfig = {
         user: process.env.USER,
         password: process.env.DATABASEPASSWORD,
         database: process.env.DATABASENAME,
-        port: 25371,
+        port: process.env.DATABASEPORT || 25371,
     },
     pool: {
         min: 2,

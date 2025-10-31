@@ -2,7 +2,7 @@ require('dotenv').config();
 const http = require('http');
 const app = require('./app');
 const redis = require('./services/cache/redis.cache');
-const databse = require('./database/db.connect')
+const database = require('./database/db.connect')
 
 const PORT = process.env.PORT || 8000;
 
@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 8000;
     try {
 
         await redis.connect();
-        await databse.connect();
+        await database.connect();
 
         const server = http.createServer(app);
 
