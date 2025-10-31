@@ -12,6 +12,8 @@ coverage/
 .env
 .env.local
 .env.*.local
+.env.test
+
 
 # VS Code settings
 .vscode/
