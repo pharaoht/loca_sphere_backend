@@ -1,4 +1,4 @@
-export async function up(knex) {
+const up = async (knex) => {
 	await knex.schema
 		.createTable('HouseRules', (t) => {
 			t.increments('id').primary();
@@ -77,7 +77,7 @@ export async function up(knex) {
 			t.increments('id').primary();
 			t.string('listingId', 21).notNullable()
 				.references('id').inTable('Listing').onDelete('CASCADE');
-			t.tinyint('ruleId').unsigned().notNullable()
+			t.integer('ruleId').unsigned().notNullable()
 				.references('id').inTable('HouseRules').onDelete('CASCADE');
 			t.boolean('isAllowed').notNullable();
 		})
@@ -85,10 +85,10 @@ export async function up(knex) {
 			t.increments('id').primary();
 			t.string('listingId', 21).notNullable()
 				.references('id').inTable('Listing').onDelete('CASCADE');
-			t.tinyint('amenityTypeId').unsigned().notNullable()
+			t.integer('amenityTypeId').unsigned().notNullable()
 				.references('id').inTable('AmenitiesTypes').onDelete('CASCADE');
 			t.integer('roomNumber');
-			t.tinyint('amenityId').unsigned().notNullable()
+			t.integer('amenityId').unsigned().notNullable()
 				.references('id').inTable('Amenities').onDelete('CASCADE');
 		})
 		.createTable('ListingAvailability', (t) => {
@@ -123,7 +123,7 @@ export async function up(knex) {
 				.references('id').inTable('Listing').onDelete('CASCADE');
 			t.string('url').notNullable();
 			t.boolean('isPrimary').defaultTo(false);
-			t.tinyint('amenityTypeId').unsigned().notNullable()
+			t.integer('amenityTypeId').unsigned().notNullable()
 				.references('id').inTable('AmenitiesTypes').onDelete('CASCADE');
 			t.timestamp('createdAt').defaultTo(knex.fn.now());
 		})
@@ -155,7 +155,7 @@ export async function up(knex) {
 		});
 }
 
-export async function down(knex) {
+const down = async (knex) => {
 	await knex.schema
 		.dropTableIfExists('Landlords')
 		.dropTableIfExists('ListingHostInfo')
@@ -174,4 +174,9 @@ export async function down(knex) {
 		.dropTableIfExists('AmenitiesTypes')
 		.dropTableIfExists('Amenities')
 		.dropTableIfExists('HouseRules');
+}
+
+module.exports = {
+	up,
+	down
 }

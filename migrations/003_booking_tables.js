@@ -1,4 +1,4 @@
-export async function up(knex) {
+const up = async (knex) => {
 	await knex.schema
 		.createTable('BookingStatuses', (t) => {
 			t.increments('id').primary();
@@ -15,14 +15,19 @@ export async function up(knex) {
 			t.date('startDate').notNullable();
 			t.date('endDate').notNullable();
 			t.timestamp('createdAt').defaultTo(knex.fn.now());
-			t.tinyint('statusId').unsigned().defaultTo(6)
+			t.integer('statusId').unsigned().defaultTo(6)
 				.references('id').inTable('BookingStatuses').onDelete('SET NULL');
 			t.text('additionalInfo');
 		});
 }
 
-export async function down(knex) {
+const down = async (knex) => {
 	await knex.schema
 		.dropTableIfExists('Bookings')
 		.dropTableIfExists('BookingStatuses');
+}
+
+module.exports = {
+	up,
+	down
 }
