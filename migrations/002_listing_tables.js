@@ -77,7 +77,7 @@ const up = async (knex) => {
 			t.increments('id').primary();
 			t.string('listingId', 21).notNullable()
 				.references('id').inTable('Listing').onDelete('CASCADE');
-			t.tinyint('ruleId').unsigned().notNullable()
+			t.integer('ruleId').unsigned().notNullable()
 				.references('id').inTable('HouseRules').onDelete('CASCADE');
 			t.boolean('isAllowed').notNullable();
 		})
@@ -85,10 +85,10 @@ const up = async (knex) => {
 			t.increments('id').primary();
 			t.string('listingId', 21).notNullable()
 				.references('id').inTable('Listing').onDelete('CASCADE');
-			t.tinyint('amenityTypeId').unsigned().notNullable()
+			t.integer('amenityTypeId').unsigned().notNullable()
 				.references('id').inTable('AmenitiesTypes').onDelete('CASCADE');
 			t.integer('roomNumber');
-			t.tinyint('amenityId').unsigned().notNullable()
+			t.integer('amenityId').unsigned().notNullable()
 				.references('id').inTable('Amenities').onDelete('CASCADE');
 		})
 		.createTable('ListingAvailability', (t) => {
@@ -123,7 +123,7 @@ const up = async (knex) => {
 				.references('id').inTable('Listing').onDelete('CASCADE');
 			t.string('url').notNullable();
 			t.boolean('isPrimary').defaultTo(false);
-			t.tinyint('amenityTypeId').unsigned().notNullable()
+			t.integer('amenityTypeId').unsigned().notNullable()
 				.references('id').inTable('AmenitiesTypes').onDelete('CASCADE');
 			t.timestamp('createdAt').defaultTo(knex.fn.now());
 		})
