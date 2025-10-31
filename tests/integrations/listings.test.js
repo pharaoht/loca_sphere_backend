@@ -4,7 +4,7 @@ const redis = require('../../src/services/cache/redis.cache')
 const database = require('../../src/database/db.connect');
 const listingRepo = require('../../src/business/listings/listings.repository');
 
-describe('LISTINGS.CONTROLLER GET - /api/listing/:listId', () => {
+describe('LISTINGS.CONTROLLER GET - /api/listings/:listId', () => {
 
     beforeAll(async () => {
         await database.connect();   // <--- make sure knex is ready
@@ -18,7 +18,7 @@ describe('LISTINGS.CONTROLLER GET - /api/listing/:listId', () => {
         }
     });
     
-    it('should return details when valid id is provided', async () => {
+    it('should return address, currency, and utilityMap when a valid listing ID is provided', async () => {
         
         const listingId = 'lstlnd006xyz321abc987';
 
@@ -60,7 +60,7 @@ describe('LISTINGS.CONTROLLER GET - /api/listing/:listId', () => {
     })
 });
 
-describe('LISTINGS.CONTROLLER GET - /api/listing/options/:option', () => {
+describe('LISTINGS.CONTROLLER GET - /api/listings/options/:option', () => {
 
     beforeAll(async () => {
         await database.connect();   // <--- make sure knex is ready
@@ -74,14 +74,47 @@ describe('LISTINGS.CONTROLLER GET - /api/listing/options/:option', () => {
         }
     });
 
-    it('should return 200 when given valid parameters', () => {
+    it('should return 200 when given VALID parameters', async () => {
+
+        const res = await request(app)
+            .get(`/api/listings/options/currency`)
+        
+        expect(res.body).toEqual(
+            expect.arrayContaining([
+                { id: 1, code: 'USD', symbol: '$' },
+                { id: 2, code: 'EUR', symbol: '€' },
+                { id: 3, code: 'GBP', symbol: '£' },
+                { id: 4, code: 'JPY', symbol: '¥' }
+            ])
+        );
+
+        expect(res.status).toBe(200);
 
     });
 
+    it('should return 404 when given INVALID parameters', async () => {
+
+        const res = await request(app)
+            .get('/api/listings/options/cookie')
+
+        expect(res.status).toBe(404)
+    });
+
+    it('should return 500 when unexpected error occurs', async () => {
+
+        jest.spyOn(listingRepo, 'repoGetOptions').mockImplementation(() => {
+            throw new Error('Simulated server error');
+        });
+
+        const res = await request(app)
+            .get(`/api/listings/options/currency`)
+
+        expect(res.statusCode).toBe(500);
+    })
 
 });
 
-describe('LISTINGS.CONTROLLER GET - /api/listing/user-id/:userId', () => {
+describe('LISTINGS.CONTROLLER GET - /api/listings/user-id/:userId', () => {
 
     beforeAll(async () => {
         await database.connect();
@@ -98,7 +131,7 @@ describe('LISTINGS.CONTROLLER GET - /api/listing/user-id/:userId', () => {
     it('', () => {})
 })
 
-describe('LISTINGS.CONTROLLER POST - /api/listing/:stepNum', () => {
+describe('LISTINGS.CONTROLLER POST - /api/listings/:stepNum', () => {
 
     beforeAll(async () => {
         await database.connect(); 
@@ -115,7 +148,7 @@ describe('LISTINGS.CONTROLLER POST - /api/listing/:stepNum', () => {
     it('', () => {})
 });
 
-describe('LISTINGS.CONTROLLER DELETE - /api/listing/:model/:listingId/:id', () => {
+describe('LISTINGS.CONTROLLER DELETE - /api/listings/:model/:listingId/:id', () => {
 
     beforeAll(async () => {
         await database.connect(); 
