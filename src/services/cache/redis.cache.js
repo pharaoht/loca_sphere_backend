@@ -13,10 +13,10 @@ class RedisCacheService {
             this.redisClient = redis.createClient({
                 url: process.env.REDIS_URL || 'redis://localhost:6379',
                 socket: {
-                reconnectStrategy: (retries) => {
-                    if (retries > 5) return new Error('Too many retries.');
-                    return retries * 500;
-                },
+                    reconnectStrategy: (retries) => {
+                        if (retries > 5) return new Error('Too many retries.');
+                        return retries * 500;
+                    },
                 },
             });
 

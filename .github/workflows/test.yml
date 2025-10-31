@@ -54,6 +54,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Print DATABASEPORT
+        run: echo "DATABASEPORT=${DATABASEPORT}"
+
       - name: Wait for MySQL
         run: |
           for i in {1..15}; do
