@@ -22,6 +22,17 @@ jobs:
             --health-timeout=5s
             --health-retries=3
 
+      redis:
+          image: redis:7-alpine
+          ports:
+            - 6379:6379
+          options: >-
+            --health-cmd="redis-cli ping"
+            --health-interval=10s
+            --health-timeout=5s
+            --health-retries=3
+
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -45,6 +56,17 @@ jobs:
             sleep 2
           done
 
+      - name: Wait for Redis
+        run: |
+          for i in {1..15}; do
+            if redis-cli -h 127.0.0.1 -p 6379 ping | grep -q PONG; then
+              echo "Redis is up"
+              break
+            fi
+            echo "Waiting for Redis..."
+            sleep 2
+          done
+
       - name: Run migrations
         run: npx knex migrate:latest --env test
 
@@ -53,4 +75,5 @@ jobs:
 
       - name: Run integration tests
         run: npm test -- --runInBand
+
 
