@@ -65,7 +65,7 @@ async function httpOAuthFailure(req, res){
 }
 
 async function httpRefreshToken(req, res){
-
+	console.log('***** endpoint token')
 	try {
 
 		console.log('** refresh endpoint init **');
