@@ -71,7 +71,7 @@ class UserModel extends Model {
 	$formatJson(json) {
 		json = super.$formatJson(json);
         json.displayName = `${json.givenName} ${json.surName}`
-		delete json.email;
+		
 		delete json.googleId;
 		return json;
 	}
