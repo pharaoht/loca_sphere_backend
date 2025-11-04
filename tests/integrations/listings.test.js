@@ -10,13 +10,6 @@ describe('LISTINGS.CONTROLLER GET - /api/listings/:listId', () => {
         await database.connect();   // <--- make sure knex is ready
         await redis.connect?.();    // optional if redis has connect()
     });
-
-    afterAll(async () => {
-        if (redis && typeof redis.quit === 'function') {
-            await redis.quit();
-            await database.close();
-        }
-    });
     
     it('should return address, currency, and utilityMap when a valid listing ID is provided', async () => {
         
@@ -67,13 +60,6 @@ describe('LISTINGS.CONTROLLER GET - /api/listings/options/:option', () => {
         await redis.connect?.();    // optional if redis has connect()
     });
 
-    afterAll(async () => {
-        if (redis && typeof redis.quit === 'function') {
-            await redis.quit();
-            await database.close();
-        }
-    });
-
     it('should return 200 when given VALID parameters', async () => {
 
         const res = await request(app)
@@ -121,13 +107,6 @@ describe('LISTINGS.CONTROLLER GET - /api/listings/user-id/:userId', () => {
         await redis.connect?.();   
     });
 
-    afterAll(async () => {
-        if (redis && typeof redis.quit === 'function') {
-            await redis.quit();
-            await database.close();
-        }
-    });
-
     it('', () => {})
 })
 
@@ -136,13 +115,6 @@ describe('LISTINGS.CONTROLLER POST - /api/listings/:stepNum', () => {
     beforeAll(async () => {
         await database.connect(); 
         await redis.connect?.();    
-    });
-
-    afterAll(async () => {
-        if (redis && typeof redis.quit === 'function') {
-            await redis.quit();
-            await database.close();
-        }
     });
 
     it('', () => {})
@@ -155,12 +127,6 @@ describe('LISTINGS.CONTROLLER DELETE - /api/listings/:model/:listingId/:id', () 
         await redis.connect?.();    
     });
 
-    afterAll(async () => {
-        if (redis && typeof redis.quit === 'function') {
-            await redis.quit();
-            await database.close();
-        }
-    });
 
     it('', () => {})
 })

@@ -8,6 +8,7 @@ process.env.GOOGLE_REDIRECT_URI ||= 'http://localhost:3000/auth/google/callback'
 
 
 afterAll(async () => {
+  console.log('hiii')
   if (redis && typeof redis.quit === 'function') {
     await redis.quit();
     await database.close();
