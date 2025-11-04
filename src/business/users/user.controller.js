@@ -3,6 +3,7 @@ require('dotenv').config();
 const jwt = require('jsonwebtoken');
 
 const UserModel = require('../users/users.model');
+const UserRepository = require('./users.repository');
 
 async function httpGetUserInfo(req, res, next) {
     
@@ -21,7 +22,7 @@ async function httpGetUserInfo(req, res, next) {
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        const user = await UserModel.query().findById(decoded.id);
+        const user = await UserRepository.repoGetUserDetailsById(decoded.id);
 
         if (!user){
 
