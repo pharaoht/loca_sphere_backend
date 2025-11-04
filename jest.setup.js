@@ -7,11 +7,14 @@ process.env.GOOGLE_CLIENT_SECRET ||= 'fake-client-secret';
 process.env.GOOGLE_REDIRECT_URI ||= 'http://localhost:3000/auth/google/callback';
 
 
+beforeAll(async () => {
+    await database.connect();   // <--- make sure knex is ready
+    await redis.connect?.();    // optional if redis has connect()
+});
+
 afterAll(async () => {
-  console.log('hiii')
-  if (redis && typeof redis.quit === 'function') {
-    await redis.quit();
-    await database.close();
-    console.log('🧹 Redis connection closed after tests');
-  }
+    if (redis && typeof redis.quit === 'function') {
+        await redis.quit();
+        await database.close();
+    }
 });

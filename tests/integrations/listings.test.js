@@ -6,11 +6,6 @@ const listingRepo = require('../../src/business/listings/listings.repository');
 
 describe('LISTINGS.CONTROLLER GET - /api/listings/:listId', () => {
 
-    beforeAll(async () => {
-        await database.connect();   // <--- make sure knex is ready
-        await redis.connect?.();    // optional if redis has connect()
-    });
-    
     it('should return address, currency, and utilityMap when a valid listing ID is provided', async () => {
         
         const listingId = 'lstlnd006xyz321abc987';

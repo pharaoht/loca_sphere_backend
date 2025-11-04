@@ -23,10 +23,8 @@ class RedisCacheService {
                 console.error('❌ Redis client error:', err);
             });
 
-            this.redisClient.on('connect', () => console.log('🔌 Redis TCP connected'));
             this.redisClient.on('ready', () => console.log('✅ Redis ready to accept commands'));
             this.redisClient.on('error', (err) => console.error('❌ Redis error', err));
-            this.redisClient.on('end', () => console.log('🧹 Redis connection closed'));
             this.redisClient.on('reconnecting', () => console.log('🔄 Redis reconnecting'));
             this.redisClient.on('warning', (msg) => console.warn('⚠ Redis warning', msg));
 
