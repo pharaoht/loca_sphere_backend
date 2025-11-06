@@ -116,15 +116,6 @@ async function httpCheckAvailability(req, res){
 
         if(!listing) return res.status(404).json({ success: false, message: 'No listing by that Id' })
 
-        if(!Utility.utcTimeZoneCheck(moveIn) || !Utility.utcTimeZoneCheck(moveOut)){
-
-            const message = 'Invalid startDate. Use ISO 8601, e.g. 2025-11-04T00:00:00Z';
-
-            console.error(message);
-
-            return res.status(400).json({ success: false, message: message });
-        }
-
         if(!Utility.dateValidation(moveIn, moveOut)){
 
             console.error('Invalid dates')

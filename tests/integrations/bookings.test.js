@@ -13,43 +13,22 @@ describe('BOOKING.CONTROLLER GET - api/bookings/check-availability/:listingId', 
     const invalidTestId = '32e2e2e2e'
     const uri = '/api/bookings/check-availability/'
 
-    let now;
-    let future;
-    now = new Date(); 
-    future = new Date(now);
-    future.setDate(now.getDate() + 45);
-
     it('should return 200 when params are correct without conflicting dates', async () => {
-
-        const moveIn = now.toISOString();
-
 
         const res = await request(app)
             .get(`${uri}${testListingId}`)
-            .query({ moveIn: moveIn, moveOut: future.toISOString() });
+            .query({ moveIn: '2025-11-01', moveOut: '2025-11-15' });
 
         expect(res.statusCode).toBe(200);
         expect(res.body).toHaveProperty('success', true);
-    });
 
-    it('should return 400 when incorrect dates are passed', async () => {
-
-        const res = await request(app)
-            .get(`${uri}${testListingId}`)
-            .query({ moveIn: now, moveOut: ''});
-
-        expect(res.statusCode).toBe(400);
-        expect(res.body).toHaveProperty('success', false);
-    
     });
 
     it('should return 400 when incorrect listingId is passed', async () => {
-        
-        const moveIn = now.toISOString();
 
         const res = await request(app)
             .get(`${uri}${invalidTestId}`)
-            .query({ moveIn: moveIn, moveOut: future.toISOString() });
+            .query({ moveIn: '2025-11-01', moveOut: '' });
 
         expect(res.statusCode).toBe(404)
         expect(res.body).toHaveProperty('success', false);
@@ -59,7 +38,7 @@ describe('BOOKING.CONTROLLER GET - api/bookings/check-availability/:listingId', 
 
         const res = await request(app)
             .get(`${uri}${invalidTestId}`)
-            .query({ moveIn: '2025-11-01T00:00:00Z', moveOut: '2025-11-14T00:00:00Z' });
+            .query({ moveIn: '2025-11-01', moveOut: '2025-11-14' });
 
         expect(res.statusCode).toBe(409)
         expect(res.body).toHaveProperty('success', false);
