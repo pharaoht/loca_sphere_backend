@@ -1,4 +1,5 @@
 const fs = require('fs');
+const moment = require('moment');
 
 class Utility {
 
@@ -31,6 +32,18 @@ class Utility {
         return Number(price) * Number(percentage);
     }
 
+    static utcTimeZoneCheck(dateString = ''){
+
+        if(!dateString) return false;
+
+        const iso8601Regex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+\-]\d{2}:\d{2})$/;
+        console.log(!iso8601Regex.test(dateString), '*********')
+        if (!iso8601Regex.test(dateString)) return false;
+        
+        return true;
+
+    }
+
     static deleteFileFromFs(pathToFile){
         fs.unlink(pathToFile, (err) => {
 
@@ -45,6 +58,29 @@ class Utility {
             return true
         });
     };
+
+    static dateValidation(moveIn = '', moveOut = '',){
+
+        if(!moveIn || !moveOut){
+            throw new Error('params: moveIn, moveOut must be provided');
+        }
+
+        const formatMoveInDate = moment(moveIn)
+        const formatMoveOutDate = moment(moveOut);
+   
+        //check if dates are in the past
+        if(formatMoveInDate.isBefore(moment(), 'day') || formatMoveOutDate.isBefore(moment(), 'day')){
+
+            return false;
+        }
+        //check if moveIn is greater than moveOut
+        if(!formatMoveInDate.isBefore(formatMoveOutDate)){
+
+            return false;
+        }
+
+        return true;
+    }
 };
 
 module.exports = Utility;
