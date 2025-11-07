@@ -1,3 +1,5 @@
+const moment = require('moment');
+
 /**
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
@@ -398,6 +400,24 @@ exports.seed = async function (knex) {
 			createdAt: knex.fn.now(),
 			updatedAt: knex.fn.now(),
 		},
+		{
+			id: 'usrlnd006abc987xyz555',
+			googleId: 'google_123456744',
+			givenName: 'Jame',
+			surName: 'Doe',
+			secondSurName: 'Smith',
+			email: 'jane.doe@example.com',
+			pfp: 'https://example.com/avatar.png',
+			gender: 3,
+			birthday: '1995-06-11',
+			countryCode: '+1',
+			phoneNumber: '5557254162',
+			nationality: 1,
+			occupation: 2,
+			placeOfWork: 'Tech Corp',
+			createdAt: knex.fn.now(),
+			updatedAt: knex.fn.now(),
+		}
 	])
 
 	await knex('Listing').insert([
@@ -547,5 +567,19 @@ exports.seed = async function (knex) {
 			peopleHosted: 12,
 			userId: 'usrlnd006abc987xyz321',
 		}
+	])
+
+	await knex('Bookings').insert([
+		{
+			id: 'bktlnd006xyz555abc555',
+			listingId: 'lstlnd006xyz321abc987',
+			hostId: 'usrlnd006abc987xyz321',
+			guestId: 'usrlnd006abc987xyz555',
+			startDate: moment(new Date()).format('YYYY-MM-DD'),
+			endDate: moment(new Date()).add(13, 'days').format('YYYY-MM-DD'),
+			createdAt: knex.fn.now(),
+			statusId: 1,
+			additionalInfo: 'Test, test, testing'
+		},
 	])
 };

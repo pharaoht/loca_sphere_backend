@@ -3,8 +3,6 @@ const ListingsModel = require('./listings.model');
 
 class ListingsRepository{
 
-    constructor(){}
-
     static async repoGetListingDeets(listingId = '', options = '',){
 
         if(listingId === '') return false;

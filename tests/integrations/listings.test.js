@@ -3,12 +3,13 @@ const app = require('../../src/app');
 const redis = require('../../src/services/cache/redis.cache')
 const database = require('../../src/database/db.connect');
 const listingRepo = require('../../src/business/listings/listings.repository');
+const { TEST_LISTING_ID } = require('../constants/tests.constants');
 
 describe('LISTINGS.CONTROLLER GET - /api/listings/:listId', () => {
 
+    const listingId = TEST_LISTING_ID;
+    
     it('should return address, currency, and utilityMap when a valid listing ID is provided', async () => {
-        
-        const listingId = 'lstlnd006xyz321abc987';
 
         const res = await request(app)
             .get(`/api/listings/${listingId}`)

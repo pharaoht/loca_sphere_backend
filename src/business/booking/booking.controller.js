@@ -1,3 +1,4 @@
+const Utility = require('../../utility');
 const BookingRepository = require("./booking.repository");
 const ListingsRepository = require("../listings/listings.repository");
 const { bookingEvents, EVENT_TYPES } = require("../../events/booking.events");
@@ -14,7 +15,7 @@ async function httpCreateBooking(req, res){
 
         const hasConflict = await BookingRepository.repoDateConflictCheck(body.listingId, body.startDate, body.endDate);
 
-        if(hasConflict) return res.status(400).json({ message: 'conflicting date times' })
+        if(hasConflict) return res.status(400).json({ success: false, message: 'conflicting date times' })
         
         const hostListing = await ListingsRepository.repoGetListingById(body.listingId)
         
@@ -24,7 +25,7 @@ async function httpCreateBooking(req, res){
         const success = await BookingRepository.repoCreateBooking(req.body);
 
         if(!success){
-            return res.status(400)
+            return res.status(400).json({ success: false, message: 'Could not make booking request'})
         }
 
         //emit event
@@ -37,7 +38,7 @@ async function httpCreateBooking(req, res){
             }
         );
 
-        return res.status(200).json({message: 'created'})
+        return res.status(200).json({success: true, message: 'created'})
 
     } 
     catch (error) {
@@ -67,16 +68,16 @@ async function httpUpdateBookingStatus(req, res){
             await BookingRepository.repoUpdateBookingStatus(bookingDetails.id, body.statusId)
             //emit event
         }
-        else return res.status(404).json({ message: 'No authorized'})
+        else return res.status(404).json({ success: false, message: 'No authorized'})
 
-        return res.status(200).json({ message: 'Status updated'})
+        return res.status(200).json({ success: true, message: 'Status updated'})
 
     } 
     catch (error) {
 
         console.error(error);
 
-        return res.status(500).json({ error: error.message })
+        return res.status(500).json({ success: false, message: error.message })
     }
 };
 
@@ -100,9 +101,51 @@ async function httpDeleteBookingById(req, res){
     
 }
 
+/**
+ * @param {Request} req
+ * @param {Response} res
+ */
+async function httpCheckAvailability(req, res){
+
+    try {
+
+        const { listingId } = req.params;
+        const { moveIn, moveOut } = req.query;
+
+        const listing = await ListingsRepository.repoGetListingById(listingId);
+
+        if(!listing) return res.status(404).json({ success: false, message: 'No listing by that Id' })
+
+        if(!Utility.dateValidation(moveIn, moveOut)){
+
+            console.error('Invalid dates')
+
+            return res.status(400).json({ success: false, message: 'Bad request, Dates are in the past or not valid' })
+        }
+
+        const isConflict = await BookingRepository.repoDateConflictCheck(listingId, moveIn, moveOut);
+
+        if(isConflict){
+
+            console.warn('Date requested has conflicting times');
+
+            return res.status(409).json({ success: false, message: 'The request could not be completed due to a conflict with the current state of the target resource.'})
+        }
+
+        return res.status(200).json({ success: true, message: 'No conflict' });
+    }
+    catch(error){
+        
+        console.error(error);
+
+        return res.status(500).json({ success: false, error: 'Internal server error' });
+    }
+}
+
 module.exports = {
     httpCreateBooking,
     httpUpdateBookingStatus,
     httpGetBookingById,
-    httpDeleteBookingById
+    httpDeleteBookingById,
+    httpCheckAvailability
 }

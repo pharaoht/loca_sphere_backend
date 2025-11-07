@@ -1,4 +1,5 @@
 const fs = require('fs');
+const moment = require('moment');
 
 class Utility {
 
@@ -45,6 +46,29 @@ class Utility {
             return true
         });
     };
+
+    static dateValidation(moveIn = '', moveOut = '',){
+
+        if(!moveIn || !moveOut){
+            throw new Error('params: moveIn, moveOut must be provided');
+        }
+
+        const formatMoveInDate = moment(moveIn)
+        const formatMoveOutDate = moment(moveOut);
+   
+        //check if dates are in the past
+        if(formatMoveInDate.isBefore(moment(), 'day') || formatMoveOutDate.isBefore(moment(), 'day')){
+
+            return false;
+        }
+        //check if moveIn is greater than moveOut
+        if(!formatMoveInDate.isBefore(formatMoveOutDate)){
+
+            return false;
+        }
+
+        return true;
+    }
 };
 
 module.exports = Utility;
