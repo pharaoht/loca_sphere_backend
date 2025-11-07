@@ -1,5 +1,6 @@
 const request = require('supertest');
 const app = require('../../src/app');
+const moment = require('moment');
 const { TEST_LISTING_ID } = require('../constants/tests.constants');
 
 describe('BOOKING.CONTROLLER GET - /api/bookings/:id', () => {
@@ -15,9 +16,12 @@ describe('BOOKING.CONTROLLER GET - api/bookings/check-availability/:listingId', 
 
     it('should return 200 when params are correct without conflicting dates', async () => {
 
+        const moveIn = moment(new Date()).format('YYYY-MM-DD');
+        const moveOut = moment(new Date()).add(15, 'day').format('YYYY-MM-DD');
+
         const res = await request(app)
             .get(`${uri}${testListingId}`)
-            .query({ moveIn: '2025-11-01', moveOut: '2025-11-15' });
+            .query({ moveIn, moveOut });
 
         expect(res.statusCode).toBe(200);
         expect(res.body).toHaveProperty('success', true);
@@ -36,9 +40,12 @@ describe('BOOKING.CONTROLLER GET - api/bookings/check-availability/:listingId', 
 
     it('should return 409 when dates are conflicting', async () => {
 
+        const moveIn = moment(new Date()).add(1, 'day').format('YYYY-MM-DD');
+        const moveOut = moment(new Date()).add(11, 'day').format('YYYY-MM-DD');
+
         const res = await request(app)
-            .get(`${uri}${invalidTestId}`)
-            .query({ moveIn: '2025-11-01', moveOut: '2025-11-14' });
+            .get(`${uri}${testListingId}`)
+            .query({ moveIn, moveOut });
 
         expect(res.statusCode).toBe(409)
         expect(res.body).toHaveProperty('success', false);

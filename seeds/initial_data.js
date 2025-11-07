@@ -1,3 +1,5 @@
+const moment = require('moment');
+
 /**
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
@@ -573,8 +575,8 @@ exports.seed = async function (knex) {
 			listingId: 'lstlnd006xyz321abc987',
 			hostId: 'usrlnd006abc987xyz321',
 			guestId: 'usrlnd006abc987xyz555',
-			startDate: '2025-11-01',
-			endDate: '2025-11-15',
+			startDate: moment(new Date()).format('YYYY-MM-DD'),
+			endDate: moment(new Date()).add(13, 'days').format('YYYY-MM-DD'),
 			createdAt: knex.fn.now(),
 			statusId: 1,
 			additionalInfo: 'Test, test, testing'
