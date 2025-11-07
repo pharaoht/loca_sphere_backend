@@ -16,8 +16,8 @@ describe('BOOKING.CONTROLLER GET - api/bookings/check-availability/:listingId', 
 
     it('should return 200 when params are correct without conflicting dates', async () => {
 
-        const moveIn = moment(new Date()).format('YYYY-MM-DD');
-        const moveOut = moment(new Date()).add(15, 'day').format('YYYY-MM-DD');
+        const moveIn = moment(new Date()).add(12, 'day').format('YYYY-MM-DD');
+        const moveOut = moment(new Date()).add(34, 'day').format('YYYY-MM-DD');
 
         const res = await request(app)
             .get(`${uri}${testListingId}`)
