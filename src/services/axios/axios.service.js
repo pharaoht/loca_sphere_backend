@@ -31,7 +31,7 @@ class AxiosService {
                 types: 'CITY',
                 namePrefix: cityName,
                 sort: '-population',
-                countryIds: 'AL,AD,AM,AT,AZ,BY,BE,BA,BG,HR,CY,CZ,DK,EE,FI,FR,GE,DE,GR,HU,IS,IE,IT,KZ,XK,LV,LI,LT,LU,MT,MD,MC,ME,NL,MK,NO,PL,PT,RO,RU,SM,RS,SK,SI,ES,SE,CH,TR,UA,GB,VA,US'
+                countryIds: 'AL,AD,AM,AT,AZ,BY,BE,BA,BG,HR,CY,CZ,DK,EE,FI,FR,GE,DE,GR,HU,IS,IE,IT,KZ,LV,LI,LT,LU,MT,MD,MC,ME,NL,MK,NO,PL,PT,RO,RU,SM,RS,SK,SI,ES,SE,CH,TR,UA,GB,VA,US'
             },
             headers: {
               'x-rapidapi-key': process.env.RAPID_API_KEY,
@@ -44,21 +44,14 @@ class AxiosService {
 
     static async externalRequest(options){
 
-        try {
+        console.log('making external request...');
 
-            console.log('making external request...');
+        const response = await axios.request(options);
+        
+        if(response.status === 200) return response.data;
 
-            const response = await axios.request(options);
-            
-            if(response.status === 200) return response.data;
+        else throw new Error(`Unexpected response status: ${response.status}`);
 
-            else throw new Error(`Unexpected response status: ${response.status}`);
-
-        } catch (error) {
-
-            throw new Error(error.message)
-
-        }
     }
 };
 

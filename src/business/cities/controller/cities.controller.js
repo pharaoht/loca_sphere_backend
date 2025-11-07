@@ -18,9 +18,9 @@ async function httpQueryCities(req, res, next){
     }
     catch(error){
 
-        console.error(error);
+        console.error(error.response.data.errors);
 
-        return res.status(404).json({message: error.message})
+        return res.status(error.status).json({message: error.response.data.errors})
     }
 };
 
