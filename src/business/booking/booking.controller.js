@@ -138,7 +138,7 @@ async function httpCheckAvailability(req, res){
         
         console.error(error);
 
-        return res.status(500).json({ success: false, error: 'Internal server error' });
+        return res.status(500).json({ success: false, error: error || 'Internal server error' });
     }
 }
 

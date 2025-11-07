@@ -53,6 +53,14 @@ class Utility {
             throw new Error('params: moveIn, moveOut must be provided');
         }
 
+
+        const isMoveInValid = moment(moveIn, 'YYYY-MM-DD', true).isValid();
+        const isMoveOutValid = moment(moveOut, 'YYYY-MM-DD', true).isValid();
+
+        if(!isMoveInValid || !isMoveOutValid){
+            return false;
+        }
+
         const formatMoveInDate = moment(moveIn)
         const formatMoveOutDate = moment(moveOut);
    
