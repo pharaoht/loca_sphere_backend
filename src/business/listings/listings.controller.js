@@ -1,3 +1,4 @@
+const { successResponse } = require("../../responses/responses");
 const Utility = require("../../utility");
 const ListingsRepository = require("./listings.repository");
 const ListingService = require("./listings.service");
@@ -149,11 +150,7 @@ async function httpCreateListing(req, res){
             }
         }
 
-        return res.status(200).json({
-            data: results,
-            statusCode: 200,
-            success: true
-        });
+        return successResponse(res, results, `Step: ${stepNum} successful`, 200)
 
     }
     catch(error){
