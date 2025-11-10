@@ -10,6 +10,15 @@ class UserRepository {
 
         return data;
     }
+
+    static async repoUpdateUserDetails(userId = '', userData = {}){
+
+        if(!userId) return false;
+
+        const didUserUpdate = await UserModel.query().patchAndFetchById(userId, userData);
+
+        return didUserUpdate;
+    }
 };
 
 module.exports = UserRepository;
