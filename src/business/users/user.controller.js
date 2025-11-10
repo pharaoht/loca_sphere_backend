@@ -1,10 +1,18 @@
 require('dotenv').config();
-
 const jwt = require('jsonwebtoken');
-
-const UserModel = require('../users/users.model');
 const UserRepository = require('./users.repository');
+const { successResponse, errorResponse } = require('../../responses/responses');
 
+/**
+ * @typedef {import('express').Request} Request
+ * @typedef {import('express').Response} Response
+*/
+
+
+/**
+ * @param {Request} req
+ * @param {Response} res
+ */
 async function httpGetUserInfo(req, res, next) {
     
     try{
@@ -39,7 +47,39 @@ async function httpGetUserInfo(req, res, next) {
     }
 };
 
+/**
+ * @param {Request} req
+ * @param {Response} res
+ */
+async function httpPatchUserDetails(req, res, next){
+    //fields
+    //email, countryCode, phoneNumber, firstName, lastName, birthday, gender, nationalit, occupation, placeOfWork, message
+    try {
+
+        const userId = req.user.id;
+        const body = req.body;
+
+        const didUserUpdate = await UserRepository.repoUpdateUserDetails(userId, body);
+
+        if(!didUserUpdate){
+
+            console.error('could not update user');
+
+            return errorResponse(res, 'could not update user', 400);
+        }
+
+        return successResponse(res, didUserUpdate, 'update user successful', 200);
+    }
+    catch(error){
+
+        console.error(error);
+
+        return errorResponse(res, error, 500);
+    }
+}
+
 
 module.exports = {
-    httpGetUserInfo
+    httpGetUserInfo,
+    httpPatchUserDetails
 }
