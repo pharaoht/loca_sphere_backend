@@ -77,6 +77,13 @@ class RedisCacheService {
         };
     };
 
+    async doesExists(key = undefined){
+
+        if(!key) return false;
+
+        return Boolean(await this.redisClient.exists(key));
+    }
+
     async generateCacheKey(base, params){
 
         const str = Object.entries(params)

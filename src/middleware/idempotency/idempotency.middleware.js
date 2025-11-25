@@ -29,19 +29,21 @@ async function idempotencyMiddleware(req, res, next){
 
     if(cachedResponse){
         const message = 'Returning cached response for:';
-        console.log(message, redisKey);
         const parsed = JSON.parse(cachedResponse);
         return successResponse(res, parsed.body, message, parsed.status);
     };
 
     const originalJson = res.json.bind(res);
 
-    res.json = (body) => {
+    res.json = async (body) => {
+        
         const payload = { status: res.statusCode, body };
 
-        redisInstance.set(redisKey, JSON.stringify(payload), {
+        await redisInstance.set(redisKey, JSON.stringify(payload), {
             EX: 60 * 60 * 24
         })
+
+        res.setHeader('Idempotency-Key', redisKey);
 
         if (req.generatedIdemKey) {
             body.idempotencyKey = req.generatedIdemKey;

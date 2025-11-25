@@ -2,7 +2,7 @@ const AxiosService = require("../../../services/axios/axios.service");
 const ListingService = require("../listings.service");
 const AddressDal = require("./address.dal");
 const AddressRepository = require("./address.repository");
-const redisInstance = require('../../../services/cache/redis.cache');
+const RedisCacheService = require('../../../services/cache/redis.cache');
 
 async function httpgetAddressById(req, res) {
 
@@ -33,15 +33,16 @@ async function httpgetAddressesByCoordinatesRadius(req, res) {
     try {
         
         const { lat, long, radius } = req?.query;
-        // console.log(req.query)
-        //check if redis instance is available
-        // if(redisInstance.isConnected){
-        //     //check if redis has data already
-        //     const listings = await redisInstance.get(`listings:${lat},${long},${radius}`);
-        //     //if yes return data, 
-        //     if(listings.length > 0) return res.status(200).json(listings);
+
+        const cacheKey = `listings:${lat},${long},${radius}`;
+
+        if(RedisCacheService.isConnected && RedisCacheService.doesExists(cacheKey)){
             
-        // }
+            const listings = await RedisCacheService.get(cacheKey);
+
+            return res.status(200).json(listings);
+            
+        }
 
         //sanitize parameters
         const santiParams = ListingService.santizeParams(req.query);
@@ -52,10 +53,9 @@ async function httpgetAddressesByCoordinatesRadius(req, res) {
 
         const dal = AddressDal.fromDto(results);
 
-        //save dal data to redis
-        // if(redisInstance.isConnected){
-        //     await redisInstance.set(`listings:${lat},${long},${radius}`, dal, { EX : 7 * 24 * 60 * 60 });
-        // }
+        if(redisInstance.isConnected){
+            await RedisCacheService.set(cacheKey, dal, { EX : 7 * 24 * 60 * 60 });
+        }
  
         return res.status(200).json(dal);
 

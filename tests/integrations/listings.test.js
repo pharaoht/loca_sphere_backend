@@ -51,11 +51,6 @@ describe('LISTINGS.CONTROLLER GET - /api/listings/:listId', () => {
 
 describe('LISTINGS.CONTROLLER GET - /api/listings/options/:option', () => {
 
-    beforeAll(async () => {
-        await database.connect();   // <--- make sure knex is ready
-        await redis.connect?.();    // optional if redis has connect()
-    });
-
     it('should return 200 when given VALID parameters', async () => {
 
         const res = await request(app)
@@ -98,30 +93,15 @@ describe('LISTINGS.CONTROLLER GET - /api/listings/options/:option', () => {
 
 describe('LISTINGS.CONTROLLER GET - /api/listings/user-id/:userId', () => {
 
-    beforeAll(async () => {
-        await database.connect();
-        await redis.connect?.();   
-    });
-
     it('', () => {})
 })
 
 describe('LISTINGS.CONTROLLER POST - /api/listings/:stepNum', () => {
 
-    beforeAll(async () => {
-        await database.connect(); 
-        await redis.connect?.();    
-    });
-
     it('', () => {})
 });
 
 describe('LISTINGS.CONTROLLER DELETE - /api/listings/:model/:listingId/:id', () => {
-
-    beforeAll(async () => {
-        await database.connect(); 
-        await redis.connect?.();    
-    });
 
 
     it('', () => {})

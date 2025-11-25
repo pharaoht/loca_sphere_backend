@@ -2,6 +2,8 @@ require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const UserRepository = require('./users.repository');
 const { successResponse, errorResponse } = require('../../responses/responses');
+const UserService = require('./user.service');
+const RedisCacheService = require('../../services/cache/redis.cache');
 
 /**
  * @typedef {import('express').Request} Request
@@ -78,8 +80,52 @@ async function httpPatchUserDetails(req, res, next){
     }
 }
 
+/**
+ * @param {Request} req
+ * @param {Response} res
+*/
+async function httpGetUserOptions(req, res, next){
+
+    try {
+
+        const { option } = req.params;
+
+        const model = UserService.mapOptionsToModel(option);
+
+        if(!model) return errorResponse(res, 'no options found', 404);
+
+        const redisKey = `User:option:${option}`;
+
+        const doesExists = await RedisCacheService.doesExists(redisKey)
+
+        if(RedisCacheService.isConnected && doesExists ){
+
+            const cache = await RedisCacheService.get(redisKey);
+
+            return successResponse(res, cache, 'retrival of cached data', 200);
+        }
+
+        const results = await UserRepository.repoGetUserOptions(model);
+
+        if(RedisCacheService.isConnected && !doesExists){
+
+            await RedisCacheService.set(redisKey, results, { EX: 7 * 24 * 60 * 60 * 1000 });
+        }
+
+        return successResponse(res, results, 'success', 200)
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        return errorResponse(res, error, 500);
+    }
+}
+
 
 module.exports = {
     httpGetUserInfo,
-    httpPatchUserDetails
+    httpPatchUserDetails,
+    httpGetUserOptions
 }
