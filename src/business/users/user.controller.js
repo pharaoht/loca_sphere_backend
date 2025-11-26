@@ -96,7 +96,7 @@ async function httpGetUserOptions(req, res, next){
 
         const redisKey = `User:option:${option}`;
 
-        const doesExists = await RedisCacheService.doesExists(redisKey)
+        const doesExists = await RedisCacheService.doesExists(redisKey);
 
         if(RedisCacheService.isConnected && doesExists ){
 
