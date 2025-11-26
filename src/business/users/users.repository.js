@@ -19,6 +19,17 @@ class UserRepository {
 
         return didUserUpdate;
     }
+
+    /**
+     * @param {typeof import('objection').Model} model
+    */
+    static async repoGetUserOptions(model){
+
+        const data = await model.query().select('*');
+
+        return data;
+
+    }
 };
 
 module.exports = UserRepository;

@@ -7,6 +7,7 @@ const addressRouter = require('./address/address.routes');
 const conditionalUpload = require('../../middleware/multer/multer');
 
 const authenticateJWT = require('../../middleware/authenticate/auth.middleware');
+
 const { idempotencyMiddleware } = require('../../middleware/idempotency/idempotency.middleware');
 
 const resource = '/listings';

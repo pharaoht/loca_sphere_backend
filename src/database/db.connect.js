@@ -16,7 +16,7 @@ const dbConfig = {
         min: 2,
         max: 10,
         afterCreate: (conn, done) => {
-            console.info('✅ New MySQL connection created');
+
             done(null, conn);
         },
         create: (conn) => {
@@ -37,7 +37,6 @@ class Database {
 
             this.knex = Knex(dbConfig);
             Model.knex(this.knex);
-            console.log('✅ Database connected');
         }
         return this.knex;
     }
@@ -46,7 +45,6 @@ class Database {
         if (this.knex) {
             
             await this.knex.destroy();
-            console.log('🧹 Database connection closed');
             this.knex = null;
         }
     }

@@ -2,6 +2,7 @@ const { successResponse } = require("../../responses/responses");
 const Utility = require("../../utility");
 const ListingsRepository = require("./listings.repository");
 const ListingService = require("./listings.service");
+const RedisCacheService = require('../../services/cache/redis.cache');
 
 /**
  * @typedef {import('express').Request} Request
@@ -61,14 +62,27 @@ async function httpGetListingOptions(req, res){
     try {
 
         const { option } = req.params;
- 
+
         const model = ListingService.getModelFromMap(option);
 
         if(!model) return res.status(404).json({ error: 'Not valid parameters' });
 
+        const redisKey = `listings:options:${option}`;
+
+        const doesKeyExistInCache = await RedisCacheService.doesExists(redisKey);
+
+        if(doesKeyExistInCache){
+
+            const cacheData = await RedisCacheService.get(redisKey);
+
+            return successResponse(res, cacheData, 'retrieved cache data');
+        }
+
         const results = await ListingsRepository.repoGetOptions(model);
 
-        return res.status(200).json(results);
+        await RedisCacheService.set(redisKey, results, { EX: 7 * 24 * 60 * 60 * 1000 });
+
+        return successResponse(res, results, 'success');
 
     }
     catch(error){
