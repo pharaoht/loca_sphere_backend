@@ -23,7 +23,6 @@ class RedisCacheService {
                 console.error('❌ Redis client error:', err);
             });
 
-            this.redisClient.on('ready', () => console.log('✅ Redis ready to accept commands'));
             this.redisClient.on('error', (err) => console.error('❌ Redis error', err));
             this.redisClient.on('reconnecting', () => console.log('🔄 Redis reconnecting'));
             this.redisClient.on('warning', (msg) => console.warn('⚠ Redis warning', msg));
@@ -38,7 +37,6 @@ class RedisCacheService {
         if (!this.isConnected) {
             await this.redisClient.connect();
             this.isConnected = true;
-            console.log('✅ Redis instance connected');
         }
     }
 
@@ -47,7 +45,6 @@ class RedisCacheService {
         if (this.isConnected) {
             await this.redisClient.quit();
             this.isConnected = false;
-            console.log('🧹 Redis connection closed');
         }
     }
 

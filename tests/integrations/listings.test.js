@@ -1,7 +1,7 @@
 const request = require('supertest');
 const app = require('../../src/app');
-const redis = require('../../src/services/cache/redis.cache')
-const database = require('../../src/database/db.connect');
+const RedisCacheService = require('../../src/services/cache/redis.cache');
+const ListingsRepository = require('../../src/business/listings/listings.repository')
 const listingRepo = require('../../src/business/listings/listings.repository');
 const { TEST_LISTING_ID } = require('../constants/tests.constants');
 
@@ -56,7 +56,7 @@ describe('LISTINGS.CONTROLLER GET - /api/listings/options/:option', () => {
         const res = await request(app)
             .get(`/api/listings/options/currency`)
         
-        expect(res.body).toEqual(
+        expect(res.body.data).toEqual(
             expect.arrayContaining([
                 { id: 1, code: 'USD', symbol: '$' },
                 { id: 2, code: 'EUR', symbol: '€' },
@@ -79,12 +79,15 @@ describe('LISTINGS.CONTROLLER GET - /api/listings/options/:option', () => {
 
     it('should return 500 when unexpected error occurs', async () => {
 
-        jest.spyOn(listingRepo, 'repoGetOptions').mockImplementation(() => {
-            throw new Error('Simulated server error');
-        });
+        jest.spyOn(RedisCacheService, 'doesExists').mockResolvedValue(false);
+        jest.spyOn(RedisCacheService, 'get').mockResolvedValue(null);
+
+        jest.spyOn(ListingsRepository, 'repoGetOptions').mockRejectedValue(
+            new Error('Simulated server error')
+        );
 
         const res = await request(app)
-            .get(`/api/listings/options/currency`)
+            .get('/api/listings/options/currency');
 
         expect(res.statusCode).toBe(500);
     })
