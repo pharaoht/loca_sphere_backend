@@ -16,6 +16,8 @@ const PORT = process.env.PORT || 8000;
         const server = http.createServer(app);
 
         server.listen(PORT, () => {
+            if(redis.isConnected) console.log('✅ Redis Server connected...');
+            if(database.isConnected) console.log('✅ Database Server connected...');
             console.log('✅ Server Ready and...');
             console.log(`✅ Listening on port ${PORT}...`);
         });
