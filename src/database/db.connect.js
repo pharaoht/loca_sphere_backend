@@ -30,22 +30,23 @@ const dbConfig = {
 class Database {
     constructor() {
         this.knex = null;
+        this.isConnected = false
     }
 
     connect() {
         if (!this.knex) {
-
             this.knex = Knex(dbConfig);
             Model.knex(this.knex);
+            this.isConnected = true;
         }
         return this.knex;
     }
 
     async close() {
         if (this.knex) {
-            
             await this.knex.destroy();
             this.knex = null;
+            this.isConnected = false;
         }
     }
 }

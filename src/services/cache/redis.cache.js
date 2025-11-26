@@ -37,6 +37,7 @@ class RedisCacheService {
         if (!this.isConnected) {
             await this.redisClient.connect();
             this.isConnected = true;
+            return true
         }
     }
 
