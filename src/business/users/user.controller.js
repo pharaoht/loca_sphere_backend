@@ -25,9 +25,9 @@ async function httpGetUserInfo(req, res, next) {
 
             console.warn('** auth header not set. User verification failed **');
     
-            return errorResponse(res, 'Missing token', 401)
+            return res.status(401).json({ error: "Missing token" });
         } 
-        
+
         const token = authHeader.split(" ")[1];
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -37,7 +37,7 @@ async function httpGetUserInfo(req, res, next) {
         if (!user){
 
             console.warn('** User not found from token **');
-
+    
             return res.status(404).json({ error: "User not found" });
         } 
         
@@ -54,8 +54,7 @@ async function httpGetUserInfo(req, res, next) {
  * @param {Response} res
  */
 async function httpPatchUserDetails(req, res, next){
-    //fields
-    //email, countryCode, phoneNumber, firstName, lastName, birthday, gender, nationalit, occupation, placeOfWork, message
+
     try {
 
         const userId = req.user.id;
@@ -75,7 +74,7 @@ async function httpPatchUserDetails(req, res, next){
     catch(error){
 
         console.error(error);
-
+  
         return errorResponse(res, error, 500);
     }
 }

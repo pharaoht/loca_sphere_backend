@@ -71,7 +71,7 @@ async function httpRefreshToken(req, res){
 		console.log('** refresh endpoint init **');
 
 		const oldrefreshToken = req?.cookies?.refresh_token;
-
+		
 		if(!oldrefreshToken) return res.sendStatus(401);
 
 		const userId = await instance.get(`refresh:${oldrefreshToken}`);
@@ -129,6 +129,8 @@ async function httpRefreshToken(req, res){
 async function httpOwnership(req, res){
 	//todo, check if listing is already cached in redis
 	try {
+
+		console.log('** checking ownership **', req?.cookies?.refresh_token);
 
 		const currentRefreshToken = req?.cookies?.refresh_token;
 		

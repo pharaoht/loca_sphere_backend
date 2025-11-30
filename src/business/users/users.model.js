@@ -68,6 +68,20 @@ class UserModel extends Model {
         this[UserModel.Fields.ID] = `us${await nanoid()}`
     }
 
+    async $beforeUpdate(opt, queryContext){
+
+        await super.$beforeUpdate(queryContext);
+
+        delete this.viaEmail;
+        delete this.viaWhatsApp;
+        for(let key in this){
+            if(!this[key]){
+                delete this[key]
+            }
+        }
+
+    }
+
 	$formatJson(json) {
 		json = super.$formatJson(json);
         json.displayName = `${json.givenName} ${json.surName}`
