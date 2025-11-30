@@ -16,7 +16,7 @@ class UserRepository {
         if(!userId) return false;
 
         const didUserUpdate = await UserModel.query().patchAndFetchById(userId, userData);
-
+ 
         return didUserUpdate;
     }
 
