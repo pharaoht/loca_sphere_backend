@@ -41,6 +41,7 @@ async function httpOAuthCallback(req, res, next) {
 			secure: process.env.NODE_ENV === 'PROD',
 			sameSite: process.env.NODE_ENV === 'PROD' ? 'none' : 'lax',
 			maxAge: 7 * 24 * 60 * 60 * 1000,
+			domain: process.env.NODE_ENV === 'PROD' ? '.railway.app' : ''
 		})
 		
 		return res.redirect(`${redirect}/`)
@@ -105,6 +106,7 @@ async function httpRefreshToken(req, res){
 			secure: process.env.NODE_ENV === 'PROD',
 			sameSite: process.env.NODE_ENV === 'PROD' ? 'none' : 'lax',
 			maxAge: 7 * 24 * 60 * 60 * 1000, 
+			domain: process.env.NODE_ENV === 'PROD' ? '.railway.app' : ''
 		})
 
 		console.log('** issuing success **');
