@@ -51,7 +51,7 @@ app.use(cookieParser());
 
 app.use(express.urlencoded({ extended: true }));
 
-app.use(cors({ origin: [ process.env.LOCAL_DOMAIN, process.env.PROD_DOMAIN ], credentials: true }));
+app.use(cors({ origin: [ process.env.LOCAL_DOMAIN, process.env.PROD_DOMAIN, process.env.PROD_DOMAIN_2 ], credentials: true }));
 
 app.use('/api', apiRouter);
 
