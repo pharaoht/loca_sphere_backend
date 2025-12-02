@@ -11,9 +11,9 @@ class UserRepository {
         return data;
     }
 
-    static async repoUpdateUserDetails(userId = '', userData = {}){
+    static async repoUpdateUserDetails(userId = '', userData = undefined){
 
-        if(!userId) return false;
+        if(!userId || !userData) return false;
 
         const didUserUpdate = await UserModel.query().patchAndFetchById(userId, userData);
  

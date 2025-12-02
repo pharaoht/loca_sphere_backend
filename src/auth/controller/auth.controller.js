@@ -3,6 +3,7 @@ const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const instance = require('../../services/cache/redis.cache');
 const ListingsRepository = require('../../business/listings/listings.repository');
+const { successResponse, errorResponse } = require('../../responses/responses');
 
 const nanoid = async () => {
   const { nanoid } = await import('nanoid');
@@ -108,8 +109,8 @@ async function httpRefreshToken(req, res){
 		})
 
 		console.log('** issuing success **');
-	
-		res.json({ accessToken: newAccessToken, statusCode: 200, success: true })
+
+		return successResponse(res, { accessToken: newAccessToken }, 'successful auth', 200)
 	
 	}
 	catch(error){

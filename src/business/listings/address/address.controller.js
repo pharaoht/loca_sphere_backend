@@ -29,24 +29,11 @@ async function httpgetAddressById(req, res) {
 };
 
 async function httpgetAddressesByCoordinatesRadius(req, res) {
-
+    //todo for caching, create a helper function that can take all params and make a key
     try {
 
         const { lat, long, radius } = req?.query;
 
-        const cacheKey = `listings:${lat},${long},${radius}`;
-
-        const doesExist = await RedisCacheService.doesExists(cacheKey);
-
-        if(RedisCacheService.isConnected && doesExist){
-
-            const listings = await RedisCacheService.get(cacheKey);
-            
-            return res.status(200).json(listings);
-            
-        }
-
-        //sanitize parameters
         const santiParams = ListingService.santizeParams(req.query);
 
         const results = await AddressRepository.getAddressByCoordinatesRadius(lat, long, radius, santiParams);
@@ -55,10 +42,6 @@ async function httpgetAddressesByCoordinatesRadius(req, res) {
 
         const dal = AddressDal.fromDto(results);
 
-        if(RedisCacheService.isConnected && !doesExist){
-            await RedisCacheService.set(cacheKey, dal, { EX : 7 * 24 * 60 * 60 });
-        }
- 
         return res.status(200).json(dal);
 
     } 
