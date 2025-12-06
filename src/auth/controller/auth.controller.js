@@ -66,22 +66,22 @@ async function httpOAuthFailure(req, res){
 }
 
 async function httpRefreshToken(req, res){
-	console.log('***** endpoint token')
+
 	try {
 
 		console.log('** refresh endpoint init **');
 
 		const oldrefreshToken = req?.cookies?.refresh_token;
 		
-		if(!oldrefreshToken) return res.sendStatus(401);
-
+		if(!oldrefreshToken) return res.errorResponse(res, 'No token was provided', 401);
+		
 		const userId = await instance.get(`refresh:${oldrefreshToken}`);
 
 		if(!userId){
 
 			console.warn('** Refresh token did not resolve to a valid user. **');
-	
-			return res.sendStatus(403);	
+			
+			return errorResponse(res, 'not logged in or invalid request', 403)
 		} 
 		
 		const newAccessToken = jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: '15m' });
@@ -135,7 +135,7 @@ async function httpOwnership(req, res){
 
 		const currentRefreshToken = req?.cookies?.refresh_token;
 		
-		if(!currentRefreshToken) return res.status(401).json({ success: false, message: 'no refresh token found' });
+		if(!currentRefreshToken) return  errorResponse(res, 'no refresh token found', 401)
 
 		const { listingId } = req.params;
 

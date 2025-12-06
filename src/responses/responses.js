@@ -9,13 +9,14 @@ const successResponse = (res, data = null, message = 'Success', statusCode = 200
     });
 };
 
-const errorResponse = (res, message = 'Internal server error', statusCode = 500) => {
+const errorResponse = (res, message = 'Internal server error', statusCode = 500, data = {}) => {
 
     return res.status(statusCode).json({
         success: false,
         statusCode: statusCode,
         message: message,
-        error: true
+        error: true,
+        data: data
     });
 };
 
