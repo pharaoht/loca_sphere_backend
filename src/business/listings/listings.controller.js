@@ -41,7 +41,7 @@ async function httpDynamicGetListingDetails(req, res){
 
         const [ result ] = await ListingsRepository.repoGetListingDeets(listId, includeOptions);
 
-        if(!result) return errorResponse(res, 'Unable to process your request', 400)
+        if(!result) return errorResponse(res, 'Unable to process your request', 404)
 
         return successResponse(res, result, 'success', 200)
     }
@@ -49,7 +49,7 @@ async function httpDynamicGetListingDetails(req, res){
 
         console.error(error);
 
-        return errorResponse(res);
+        return errorResponse(res, 'Internal server error', 500, {});
     }
 }
 
@@ -89,7 +89,7 @@ async function httpGetListingOptions(req, res){
 
         console.error(error);
 
-        return res.status(500).json({ error: 'Internal server error' });
+        return errorResponse(res, 'Internal server error', 500, {});
     }
 }
 

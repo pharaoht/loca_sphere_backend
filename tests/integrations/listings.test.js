@@ -15,21 +15,21 @@ describe('LISTINGS.CONTROLLER GET - /api/listings/:listId', () => {
             .get(`/api/listings/${listingId}`)
             .query({ includes: 'address,currency,utility' })
 
-        expect(res.body).toHaveProperty('address');
-        expect(res.body).toHaveProperty('currency');
-        expect(res.body).toHaveProperty('utilityMap');
-        expect(res.statusCode).toBe(200);
+        expect(res.body.data).toHaveProperty('address');
+        expect(res.body.data).toHaveProperty('currency');
+        expect(res.body.data).toHaveProperty('utilityMap');
+        expect(res.body.statusCode).toBe(200);
     
     })
 
     it('should return 404 when no id/invalid id is provided', async () => {
-        jest.spyOn(console, 'error').mockImplementation(() => {});
+        // jest.spyOn(console, 'error').mockImplementation(() => {});
 
         const res = await request(app)
-            .get('/api/listing/invalid_id')
+            .get('/api/listings/invalid_id')
             .query({ includes: 'address'})
         
-        expect(res.statusCode).toBe(404)
+        expect(res.body.statusCode).toBe(404)
     })
 
     it('should return 500 when unexpected error happens', async () => {
@@ -44,7 +44,7 @@ describe('LISTINGS.CONTROLLER GET - /api/listings/:listId', () => {
             .get(`/api/listings/${listingId}`)
             .query({ includes: 'address,currency,utility' })
 
-        expect(res.statusCode).toBe(500);
+        expect(res.body.statusCode).toBe(500);
     
     })
 });
@@ -65,7 +65,7 @@ describe('LISTINGS.CONTROLLER GET - /api/listings/options/:option', () => {
             ])
         );
 
-        expect(res.status).toBe(200);
+        expect(res.body.statusCode).toBe(200);
 
     });
 
@@ -74,7 +74,7 @@ describe('LISTINGS.CONTROLLER GET - /api/listings/options/:option', () => {
         const res = await request(app)
             .get('/api/listings/options/cookie')
 
-        expect(res.status).toBe(404)
+        expect(res.body.statusCode).toBe(404)
     });
 
     it('should return 500 when unexpected error occurs', async () => {
@@ -89,7 +89,8 @@ describe('LISTINGS.CONTROLLER GET - /api/listings/options/:option', () => {
         const res = await request(app)
             .get('/api/listings/options/currency');
 
-        expect(res.statusCode).toBe(500);
+        console.log(res.body)
+        expect(res.body.statusCode).toBe(500);
     })
 
 });
