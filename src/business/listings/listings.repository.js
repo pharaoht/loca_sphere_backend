@@ -6,13 +6,12 @@ class ListingsRepository{
     static async repoGetListingDeets(listingId = '', options = '',){
 
         if(listingId === '') return false;
-
+    
         const result = await ListingsModel.query()
             .where(ListingsModel.Fields.ID, listingId)
             .withGraphFetched(`[${options}]`)
     
         return result;
-        
     }
 
     /**

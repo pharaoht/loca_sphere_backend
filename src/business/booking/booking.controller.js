@@ -2,6 +2,7 @@ const Utility = require('../../utility');
 const BookingRepository = require("./booking.repository");
 const ListingsRepository = require("../listings/listings.repository");
 const { bookingEvents, EVENT_TYPES } = require("../../events/booking.events");
+const { errorResponse, successResponse } = require('../../responses/responses');
 
 async function httpCreateBooking(req, res){
 
@@ -15,7 +16,7 @@ async function httpCreateBooking(req, res){
 
         const hasConflict = await BookingRepository.repoDateConflictCheck(body.listingId, body.startDate, body.endDate);
 
-        if(hasConflict) return res.status(400).json({ success: false, message: 'conflicting date times' })
+        if(hasConflict) return errorResponse(res, 'Conflicting date times with another booking.', 400);
         
         const hostListing = await ListingsRepository.repoGetListingById(body.listingId)
         
@@ -24,10 +25,8 @@ async function httpCreateBooking(req, res){
 
         const success = await BookingRepository.repoCreateBooking(req.body);
 
-        if(!success){
-            return res.status(400).json({ success: false, message: 'Could not make booking request'})
-        }
-
+        if(!success) return errorResponse(res, 'Could not complete your booking request. You were not charged.', 400)
+    
         //emit event
         bookingEvents.emit(EVENT_TYPES.BOOKING.STATUS_UPDATED, 
             { 
@@ -38,8 +37,7 @@ async function httpCreateBooking(req, res){
             }
         );
 
-        return res.status(200).json({success: true, message: 'created'})
-
+        return successResponse(res, null, 'Your booking request was sent to the landlord. You will be charged once its approved', 201)
     } 
     catch (error) {
 
@@ -139,6 +137,16 @@ async function httpCheckAvailability(req, res){
         console.error(error);
 
         return res.status(500).json({ success: false, error: error || 'Internal server error' });
+    }
+}
+
+async function httpGetAvailabilityForListing(req, res, next) {
+    
+    try {
+
+    }
+    catch(error){
+
     }
 }
 

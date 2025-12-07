@@ -1,4 +1,4 @@
-const { successResponse } = require("../../responses/responses");
+const { successResponse, errorResponse } = require("../../responses/responses");
 const Utility = require("../../utility");
 const ListingsRepository = require("./listings.repository");
 const ListingService = require("./listings.service");
@@ -41,15 +41,15 @@ async function httpDynamicGetListingDetails(req, res){
 
         const [ result ] = await ListingsRepository.repoGetListingDeets(listId, includeOptions);
 
-        if(!result) return res.status(404)
+        if(!result) return errorResponse(res, 'Unable to process your request', 404)
 
-        return res.status(200).json(result);
+        return successResponse(res, result, 'success', 200)
     }
     catch(error){
 
         console.error(error);
 
-        return res.status(500).json({ error: 'Internal server error' });
+        return errorResponse(res, 'Internal server error', 500, {});
     }
 }
 
@@ -65,7 +65,7 @@ async function httpGetListingOptions(req, res){
 
         const model = ListingService.getModelFromMap(option);
 
-        if(!model) return res.status(404).json({ error: 'Not valid parameters' });
+        if(!model) return errorResponse(res, 'Not a valid parameter', 404);
 
         const redisKey = `listings:options:${option}`;
 
@@ -89,7 +89,7 @@ async function httpGetListingOptions(req, res){
 
         console.error(error);
 
-        return res.status(500).json({ error: 'Internal server error' });
+        return errorResponse(res, 'Internal server error', 500, {});
     }
 }
 
