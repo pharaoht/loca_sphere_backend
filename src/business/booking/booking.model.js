@@ -1,4 +1,5 @@
 const { Model } = require("objection");
+const moment = require('moment');
 
 const nanoid = async () => {
   const { nanoid } = await import('nanoid');
@@ -89,6 +90,19 @@ class BookingModel extends Model {
         
         this[BookingModel.Fields.ID] = `bk${await nanoid()}`;
 
+    }
+
+    $parseDatabaseJson(json){
+
+        json = super.$parseDatabaseJson(json);
+
+        json[BookingModel.Fields.STARTDATE] = moment(json[BookingModel.Fields.STARTDATE]).format('YYYY-MM-DD');
+        json[BookingModel.Fields.ENDDATE] = moment(json[BookingModel.Fields.ENDDATE]).format('YYYY-MM-DD');
+        json[BookingModel.Fields.CREATEDAT] = moment(json[BookingModel.Fields.CREATEDAT]).format('YYYY-MM-DD');
+        json.startDateMiliSeconds = moment(json[BookingModel.Fields.STARTDATE]).valueOf();
+        json.endDateMiliSeconds = moment(json[BookingModel.Fields.ENDDATE]).valueOf();
+
+        return json;
     }
 
     $formatJson(json) {
