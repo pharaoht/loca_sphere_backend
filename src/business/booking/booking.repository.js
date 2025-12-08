@@ -52,6 +52,21 @@ class BookingRepository {
 
         return !!hasConflict;
     }
+
+    static async repoGetAvailabityByListingId(listingId = undefined){
+
+        if(!listingId) return false;
+
+        const currentYear = new Date().getUTCFullYear();
+
+        const yearStart = new Date(currentYear, 0, 1);
+ 
+        const bookings = await BookingModel.query()
+        .where(BookingModel.Fields.LISTINGID, listingId)
+        .where(BookingModel.Fields.STARTDATE, '>=', yearStart.toISOString())
+
+        return bookings;
+    }
 };
 
 module.exports = BookingRepository;

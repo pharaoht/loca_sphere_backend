@@ -66,16 +66,15 @@ async function httpUpdateBookingStatus(req, res){
             await BookingRepository.repoUpdateBookingStatus(bookingDetails.id, body.statusId)
             //emit event
         }
-        else return res.status(404).json({ success: false, message: 'No authorized'})
+        else return errorResponse(res, 'Not authorized', 404, {});
 
-        return res.status(200).json({ success: true, message: 'Status updated'})
-
+        return successResponse(res, {}, 'booking updated', 200)
     } 
     catch (error) {
 
         console.error(error);
 
-        return res.status(500).json({ success: false, message: error.message })
+        return errorResponse(res, error.message, 500, {})
     }
 };
 
@@ -144,9 +143,20 @@ async function httpGetAvailabilityForListing(req, res, next) {
     
     try {
 
+        //listid param
+        const { listingId } = req.params;
+
+        const results = await BookingRepository.repoGetAvailabityByListingId(listingId);
+
+        if(!results) return errorResponse(res, 'ListingId was not received', 400, {});
+
+        return successResponse(res, results, 'success', 200);
     }
     catch(error){
 
+        console.error(error);
+
+        return errorResponse(res, 'Internal server error', 500, {})
     }
 }
 
@@ -155,5 +165,6 @@ module.exports = {
     httpUpdateBookingStatus,
     httpGetBookingById,
     httpDeleteBookingById,
-    httpCheckAvailability
+    httpCheckAvailability,
+    httpGetAvailabilityForListing
 }
