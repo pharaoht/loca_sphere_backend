@@ -1,6 +1,7 @@
 const Utility = require('../../utility');
 const BookingRepository = require("./booking.repository");
 const ListingsRepository = require("../listings/listings.repository");
+const UserRepository = require('../users/users.repository');
 const { bookingEvents, EVENT_TYPES } = require("../../events/booking.events");
 const { errorResponse, successResponse } = require('../../responses/responses');
 
@@ -18,10 +19,17 @@ async function httpCreateBooking(req, res){
 
         if(hasConflict) return errorResponse(res, 'Conflicting date times with another booking.', 400);
         
-        const hostListing = await ListingsRepository.repoGetListingById(body.listingId)
+        const hostListing = await ListingsRepository.repoGetListingById(body.listingId);
         
         body.guestId = userId;
         body.hostId = hostListing.userId;
+
+        //check if payment details are complete
+        const isPaymentComplete = '';
+        //check if personal details are complete
+        const isProfileComplete = await UserRepository.repoIsUserProfileComplete(userId);
+
+        if(!isProfileComplete) return errorResponse(res, 'Your personal details arent complete. Please complete to request booking', 400);
 
         const success = await BookingRepository.repoCreateBooking(req.body);
 

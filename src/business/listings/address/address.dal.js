@@ -1,7 +1,7 @@
 const AddressModel = require('./address.model');
 const ListingsModel = require('../listings.model');
 const CurrencyModel = require('../currency/currency.model');
-const ImagesModel = require('../images/images.model');
+const moment = require('moment');
 
 class AddressDal {
 
@@ -42,6 +42,11 @@ class AddressDal {
                     [ListingsModel.Fields.IS_CHECKED]: !address[ListingsModel.Fields.IS_CHECKED] ? false : true,
                     [ListingsModel.Fields.CREATED_AT]: address[ListingsModel.Fields.CREATED_AT],
                     [ListingsModel.Fields.UPDATED_AT]: address[ListingsModel.Fields.UPDATED_AT],
+                    nextAvailableDate:{
+                        tz: address.nextAvailableDate,
+                        milliseconds: moment(address.nextAvailableDate).valueOf(),
+                        yymmdd: moment(address.nextAvailableDate).format('YYYY MMM DD')
+                    }, 
                     currency: {
                         [CurrencyModel.Fields.ID]: address[CurrencyModel.Fields.ID],
                         [CurrencyModel.Fields.CODE]: address[CurrencyModel.Fields.CODE],
