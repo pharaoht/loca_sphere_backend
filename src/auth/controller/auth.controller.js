@@ -73,7 +73,7 @@ async function httpRefreshToken(req, res){
 
 		const oldrefreshToken = req?.cookies?.refresh_token;
 		
-		if(!oldrefreshToken) return res.errorResponse(res, 'No token was provided', 401);
+		if(!oldrefreshToken) return errorResponse(res, 'No token was provided', 401);
 		
 		const userId = await instance.get(`refresh:${oldrefreshToken}`);
 

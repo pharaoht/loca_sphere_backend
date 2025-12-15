@@ -91,6 +91,27 @@ class AddressRepository {
                     `, [latitude, longitude, latitude]
                 )
             )
+            .select(
+                AddressModel.raw(`
+                    CASE
+                    WHEN EXISTS (
+                        SELECT 1
+                        FROM Bookings b
+                        WHERE b.listingId = l.id
+                        AND b.startDate <= CURRENT_DATE
+                        AND b.endDate >= CURRENT_DATE
+                    )
+                    THEN (
+                        SELECT DATE_ADD(MIN(b2.endDate), INTERVAL 1 DAY)
+                        FROM Bookings b2
+                        WHERE b2.listingId = l.id
+                        AND b2.startDate <= CURRENT_DATE
+                        AND b2.endDate >= CURRENT_DATE
+                    )
+                    ELSE CURRENT_DATE
+                    END AS nextAvailableDate
+                `)
+            )
             .modify((builder) => {
                 if(filters.minRent && !isNaN(Number(filters.minRent))) {
                     builder.where(`l.${ListingsModel.Fields.MONTHLY_RENT}`, '>=', filters.minRent)
@@ -117,6 +138,23 @@ class AddressRepository {
                 if(filters.peopleAllowed){
                     builder.where(`l.${ListingsModel.Fields.PEOPLE_ALLOWED}`, '>=', filters.peopleAllowed)
                 }
+                if(filters.suitablefor){
+
+                    const opts = String(filters.suitablefor).split(',').map(t => !isNaN(t) && t.trim());
+
+                }
+                if (filters.moveIn && filters.moveOut) {
+                    builder.whereNotExists(
+                        AddressModel.raw(`
+                            SELECT 1
+                            FROM "Bookings" b
+                            WHERE b."listingId" = l.id
+                            AND b."startDate" <= ?
+                            AND b."endDate" >= ?
+                        `, [filters.moveIn, filters.moveOut])
+                    );
+                }
+
 
             })
             .having('distance', '<', radius)

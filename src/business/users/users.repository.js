@@ -30,6 +30,17 @@ class UserRepository {
         return data;
 
     }
+
+    static async repoIsUserProfileComplete(userId = undefined){
+
+        if(!userId) return false;
+        //get user from id
+        const userDetails = await UserModel.query().findById(userId);
+
+        console.log(userDetails)
+        //check if all user.fields are not null
+        //profile complete
+    }
 };
 
 module.exports = UserRepository;
