@@ -29,18 +29,34 @@ async function httpgetAddressById(req, res) {
 };
 
 async function httpgetAddressesByCoordinatesRadius(req, res) {
-    //todo for caching, create a helper function that can take all params and make a key
+
     try {
 
         const { lat, long, radius } = req?.query;
 
         const santiParams = ListingService.santizeParams(req.query);
 
+        const cacheKey = AddressDal.buildAddressCoorCacheKey({ lat, long, radius, santiParams });
+
+        if(RedisCacheService.isConnected){
+
+            const cacheData = await RedisCacheService.get(cacheKey);
+
+            if(cacheData){
+                return res.status(200).json(cacheData);
+            }
+        }
+
         const results = await AddressRepository.getAddressByCoordinatesRadius(lat, long, radius, santiParams);
 
         if (!results) return res.status(404).json({ error: 'Addresses not found' });
 
         const dal = AddressDal.fromDto(results);
+
+        if(RedisCacheService.isConnected){
+
+            await RedisCacheService.set(cacheKey, dal, { EX: 15 * 60 })
+        }
 
         return res.status(200).json(dal);
 

@@ -37,14 +37,14 @@ class BookingModel extends Model {
 
         return {
             ID :'id',
-            LISTINGID :'listingId',
-            HOSTID:'hostId',
-            GUESTID:'guestId',
-            STARTDATE:'startDate',
-            ENDDATE:'endDate',
-            CREATEDAT:'createdAt',
-            STATUSID:'statusId',
-            ADDITIONALINFO:'additionalInfo',
+            LISTING_ID :'listingId',
+            HOST_ID:'hostId',
+            GUEST_ID:'guestId',
+            START_DATE:'startDate',
+            END_DATE:'endDate',
+            CREATED_AT:'createdAt',
+            STATUS_ID:'statusId',
+            ADDITIONAL_INFO:'additionalInfo',
         }
     }
 
@@ -52,22 +52,22 @@ class BookingModel extends Model {
         return {
             type: 'object',
             required: [ 
-                BookingModel.Fields.LISTINGID, 
-                BookingModel.Fields.HOSTID, 
-                BookingModel.Fields.GUESTID, 
-                BookingModel.Fields.STARTDATE,
-                BookingModel.Fields.ENDDATE,
+                BookingModel.Fields.LISTING_ID, 
+                BookingModel.Fields.HOST_ID, 
+                BookingModel.Fields.GUEST_ID, 
+                BookingModel.Fields.START_DATE,
+                BookingModel.Fields.END_DATE,
             ],
             properties: {
                 [BookingModel.Fields.ID]: { type: 'string', maxLength: 21 },
-                [BookingModel.Fields.LISTINGID]: { type: 'string', maxLength: 21 },
-                [BookingModel.Fields.HOSTID]: { type: 'string', maxLength: 21 },
-                [BookingModel.Fields.GUESTID]: { type: 'string', maxLength: 21 },
-                [BookingModel.Fields.STARTDATE]: { type: 'string', format: 'date' },
-                [BookingModel.Fields.ENDDATE]: { type: 'string', format: 'date' },
-                [BookingModel.Fields.CREATEDAT]: { type: 'string', format: 'date-time' },
-                [BookingModel.Fields.STATUSID]: { type: 'integer', default: 6 },
-                [BookingModel.Fields.ADDITIONALINFO]: { type: 'string', maxLength: 21 },
+                [BookingModel.Fields.LISTING_ID]: { type: 'string', maxLength: 21 },
+                [BookingModel.Fields.HOST_ID]: { type: 'string', maxLength: 21 },
+                [BookingModel.Fields.GUEST_ID]: { type: 'string', maxLength: 21 },
+                [BookingModel.Fields.START_DATE]: { type: 'string', format: 'date' },
+                [BookingModel.Fields.END_DATE]: { type: 'string', format: 'date' },
+                [BookingModel.Fields.CREATED_AT]: { type: 'string', format: 'date-time' },
+                [BookingModel.Fields.STATUS_ID]: { type: 'integer', default: 6 },
+                [BookingModel.Fields.ADDITIONAL_INFO]: { type: 'string', maxLength: 21 },
             },
         };
     }
@@ -96,11 +96,13 @@ class BookingModel extends Model {
 
         json = super.$parseDatabaseJson(json);
 
-        json[BookingModel.Fields.STARTDATE] = moment(json[BookingModel.Fields.STARTDATE]).format('YYYY-MM-DD');
-        json[BookingModel.Fields.ENDDATE] = moment(json[BookingModel.Fields.ENDDATE]).format('YYYY-MM-DD');
-        json[BookingModel.Fields.CREATEDAT] = moment(json[BookingModel.Fields.CREATEDAT]).format('YYYY-MM-DD');
-        json.startDateMiliSeconds = moment(json[BookingModel.Fields.STARTDATE]).valueOf();
-        json.endDateMiliSeconds = moment(json[BookingModel.Fields.ENDDATE]).valueOf();
+        json[BookingModel.Fields.START_DATE] = moment(json[BookingModel.Fields.START_DATE]).format('YYYY-MM-DD');
+        json[BookingModel.Fields.END_DATE] = moment(json[BookingModel.Fields.END_DATE]).format('YYYY-MM-DD');
+        json[BookingModel.Fields.CREATED_AT] = moment(json[BookingModel.Fields.CREATED_AT]).format('YYYY-MM-DD');
+        json.startDateMiliSeconds = moment(json[BookingModel.Fields.START_DATE]).valueOf();
+        json.endDateMiliSeconds = moment(json[BookingModel.Fields.END_DATE]).valueOf();
+
+        console.log(json)
 
         return json;
     }

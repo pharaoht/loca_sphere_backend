@@ -5,9 +5,10 @@ const HostModel = require('./host/host.model');
 const UserModel = require('../users/users.model');
 const ImagesModel = require('./images/images.model');
 const UtilityModel = require('./utility/utility.model');
+const BookingModel = require('../booking/booking.model');
 const CurrencyModel = require('./currency/currency.model');
-const { HouseRulesMap } = require('./house_rules/houseRules.model');
 const AmenityMapModel = require('./amenity_map/amenitymap.model');
+const { HouseRulesMap } = require('./house_rules/houseRules.model');
 const ListingTypeModel = require('./listing_type/listingtype.model');
 const BedroomAmenityMapModel = require('./bedroom_amenity_map/bedroommap.model');
 
@@ -55,7 +56,7 @@ class ListingsModel extends Model {
         return {
             type: 'object',
             required: [
-                // ListingsModel.Fields.USER_ID,
+                ListingsModel.Fields.USER_ID,
                 ListingsModel.Fields.TITLE,
                 ListingsModel.Fields.MONTHLY_RENT,
                 ListingsModel.Fields.LISTING_TYPE_ID,
@@ -128,6 +129,15 @@ class ListingsModel extends Model {
 
             formattedJson.utilityMap.securityDeposit = Math.floor(Utility.calculateSecurityDeposit(formattedJson.monthlyRent));
 
+            if( ( formattedJson.utilityMap.waterIncluded ) &&
+                ( formattedJson.utilityMap.electricIncluded ) &&
+                ( formattedJson.utilityMap.gasIncluded ) &&
+                ( formattedJson.utilityMap.internetIncluded )
+            ) {
+                formattedJson.utilityMap.areBillsIncluded = true;        
+            }
+            else formattedJson.utilityMap.areBillsIncluded = false;
+
             if(formattedJson.hasOwnProperty('currency')) {
                 formattedJson.utilityMap.currency = formattedJson.currency.symbol;
             }
@@ -169,7 +179,10 @@ class ListingsModel extends Model {
         const d = `${AmenityMapModel.tableName}.${AmenityMapModel.Fields.LISTING_ID}`;
 
         const q = `${ImagesModel.tableName}.${ImagesModel.Fields.LISTING_ID}`;
+
+        const v = `${BookingModel.tableName}.${BookingModel.Fields.LISTING_ID}`
        
+        //add booking relation
         return {
             users: {
                 relation: Model.HasOneRelation,
@@ -249,6 +262,14 @@ class ListingsModel extends Model {
                 join: { 
                     from: y,
                     to: q
+                }
+            },
+            bookings: {
+                relation: Model.HasManyRelation,
+                modelClass: BookingModel,
+                join: {
+                    from: y,
+                    to: v
                 }
             }
         }
