@@ -80,7 +80,7 @@ async function httpGetListingOptions(req, res){
 
         const results = await ListingsRepository.repoGetOptions(model);
 
-        await RedisCacheService.set(redisKey, results, { EX: 7 * 24 * 60 * 60 * 1000 });
+        await RedisCacheService.set(redisKey, results, { EX: 15 * 60 });
 
         return successResponse(res, results, 'success');
 

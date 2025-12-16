@@ -9,7 +9,7 @@ class BookingRepository {
         let column;
 
         if(id.startsWith('bk')) column = BookingModel.Fields.ID;
-        else if(id.startsWith('ls')) column = BookingModel.Fields.LISTINGID;
+        else if(id.startsWith('ls')) column = BookingModel.Fields.LISTING_ID;
         // else if(id.startsWith('us')) column = BookingModel.Fields.HOSTID;
         else return false;
 
@@ -33,7 +33,7 @@ class BookingRepository {
         if(!bookingId || typeof bookingId !== 'string' || !status || typeof status !== 'number') return false;
 
         const updatedRecord = await BookingModel.query()
-            .patch({ [BookingModel.Fields.STATUSID]: status })
+            .patch({ [BookingModel.Fields.STATUS_ID]: status })
             .where(BookingModel.Fields.ID, bookingId)
 
         return updatedRecord
@@ -44,10 +44,10 @@ class BookingRepository {
         if(!listingId || !requestEndDate || !requestStartDate) return false;
     
         const hasConflict = await BookingModel.query()
-            .where(BookingModel.Fields.LISTINGID, listingId)    
+            .where(BookingModel.Fields.LISTING_ID, listingId)    
             .where(builder => 
-                builder.where(BookingModel.Fields.STARTDATE, '<', requestEndDate)
-                .andWhere(BookingModel.Fields.ENDDATE, '>', requestStartDate)
+                builder.where(BookingModel.Fields.START_DATE, '<=', requestEndDate)
+                .andWhere(BookingModel.Fields.END_DATE, '>=', requestStartDate)
             ).first();
 
         return !!hasConflict;
@@ -62,8 +62,8 @@ class BookingRepository {
         const yearStart = new Date(currentYear, 0, 1);
  
         const bookings = await BookingModel.query()
-        .where(BookingModel.Fields.LISTINGID, listingId)
-        .where(BookingModel.Fields.STARTDATE, '>=', yearStart.toISOString())
+        .where(BookingModel.Fields.LISTING_ID, listingId)
+        .where(BookingModel.Fields.START_DATE, '>=', yearStart.toISOString())
 
         return bookings;
     }

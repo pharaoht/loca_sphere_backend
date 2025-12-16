@@ -2,6 +2,7 @@ const AddressModel = require('./address.model');
 const ListingsModel = require('../listings.model');
 const CurrencyModel = require('../currency/currency.model');
 const moment = require('moment');
+const UtilityModel = require('../utility/utility.model');
 
 class AddressDal {
 
@@ -53,11 +54,39 @@ class AddressDal {
                         [CurrencyModel.Fields.SYMBOL]: address[CurrencyModel.Fields.SYMBOL],
 
                     },
+                    utilityMap : {
+                        [UtilityModel.Fields.WATER_INCLUDED]: Boolean(address[UtilityModel.Fields.WATER_INCLUDED]) ,
+                        [UtilityModel.Fields.ELECTRIC_INCLUDED]: Boolean(address[UtilityModel.Fields.ELECTRIC_INCLUDED]),
+                        [UtilityModel.Fields.INTERNET_INCLUDED]: Boolean(address[UtilityModel.Fields.INTERNET_INCLUDED]),
+                        [UtilityModel.Fields.GAS_INCLUDED]: Boolean(address[UtilityModel.Fields.GAS_INCLUDED]),
+                        allBillsIncluded: address[UtilityModel.Fields.WATER_INCLUDED] && 
+                                        address[UtilityModel.Fields.ELECTRIC_INCLUDED] &&
+                                        address[UtilityModel.Fields.INTERNET_INCLUDED] &&
+                                        address[UtilityModel.Fields.GAS_INCLUDED] ? true : false
+                    },
+
                     images: address.listing.images
                 }
             }
         })
 
+    }
+
+    static normalizeCoordinatesParams(value = undefined, precision = 2){
+
+        if(!value) return false;
+
+        return Number(value).toFixed(precision);
+    }
+
+    static buildAddressCoorCacheKey({ lat, long, radius, santiParams}){
+        return [
+            'addr-radius',
+            this.normalizeCoordinatesParams(lat),
+            this.normalizeCoordinatesParams(long),
+            radius,
+            JSON.stringify(santiParams)
+        ].join(':')
     }
 };
 

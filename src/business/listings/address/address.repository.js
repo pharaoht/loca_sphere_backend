@@ -4,6 +4,7 @@ const ListingsModel = require('../listings.model');
 const CurrencyModel = require('../currency/currency.model');
 const HostModel = require('../host/host.model');
 const AmenityMapModel = require('../amenity_map/amenitymap.model');
+const UtilityModel = require('../utility/utility.model');
 
 class AddressRepository {
 
@@ -53,6 +54,7 @@ class AddressRepository {
             .joinRelated('listing as l')
             .joinRaw('JOIN "Currencies" as c ON c.id = l.currencyId')
             .joinRaw('JOIN "ListingHostInfo" as h ON h.listingId = l.id')
+            .joinRaw('JOIN "Utility" as u ON u.listingId = l.id')
             .whereIn('l.id', AddressModel.raw('SELECT id FROM filtered_listings')) 
             .whereIn('l.id', AddressModel.raw('SELECT id FROM filtered_listings_two'))
             .select(
@@ -79,6 +81,10 @@ class AddressRepository {
                 `h.${HostModel.Fields.LIVES_IN_PROP}`,
                 `h.${HostModel.Fields.IS_VERIFIED}`,
                 `h.${HostModel.Fields.GENDER_ALLOWED_ID}`,
+                `u.${UtilityModel.Fields.WATER_INCLUDED}`,
+                `u.${UtilityModel.Fields.ELECTRIC_INCLUDED}`,
+                `u.${UtilityModel.Fields.GAS_INCLUDED}`,
+                `u.${UtilityModel.Fields.INTERNET_INCLUDED}`
                 // `amenity.${AmenityMapModel.Fields.AMENITY_ID}`,
             )
             .select(
