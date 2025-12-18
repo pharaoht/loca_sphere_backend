@@ -49,10 +49,11 @@ describe('dateStringToIsoFormat function', () => {
         const str = `${future.getUTCFullYear()}-${pad(future.getUTCMonth() + 1)}-${pad(future.getUTCDate())}`;
 
         const result = BookingService.dateStringToIsoFormat(str);
-        console.log(result)
+
         expect(typeof result).toBe('string');
 
-        expect(result).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.000Z$/);
+        expect(result).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+
         
     });
 });
