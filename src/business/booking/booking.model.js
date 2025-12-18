@@ -102,8 +102,6 @@ class BookingModel extends Model {
         json.startDateMiliSeconds = moment(json[BookingModel.Fields.START_DATE]).valueOf();
         json.endDateMiliSeconds = moment(json[BookingModel.Fields.END_DATE]).valueOf();
 
-        console.log(json)
-
         return json;
     }
 

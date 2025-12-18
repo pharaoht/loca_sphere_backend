@@ -4,34 +4,47 @@ const ListingsRepository = require("../listings/listings.repository");
 const UserRepository = require('../users/users.repository');
 const { bookingEvents, EVENT_TYPES } = require("../../events/booking.events");
 const { errorResponse, successResponse } = require('../../responses/responses');
+const BookingService = require('./booking.service');
 
 async function httpCreateBooking(req, res){
 
     try {
         
         const body = req.body;
-
         const userId = req.user.id;
 
-        if(!body?.listingId || !body?.startDate || !body.endDate) return res.status(400);
+        if(!body?.listingId || !body?.startDate || !body?.endDate) return errorResponse(res, 'Unable to process request: Require fields were not provided', 400);
 
-        const hasConflict = await BookingRepository.repoDateConflictCheck(body.listingId, body.startDate, body.endDate);
+        const sanitizeStartDate = BookingService.dateStringToIsoFormat(body.startDate);
+        const santizeEndDate = BookingService.dateStringToIsoFormat(body.endDate);
+
+        if(!sanitizeStartDate || !santizeEndDate) return errorResponse(res, 'startDate and endDate are not valid params: yyyy-mm-dd or yyyy/mm/dd are accepted', 400)
+
+        const isEndDateGreaterThanStartDate = BookingService.isEndDateGreaterThanStartDate(sanitizeStartDate, santizeEndDate);
+
+        if(!isEndDateGreaterThanStartDate) return errorResponse(res, 'Desired check-out date is before check-in date', 400);
+
+        const hasConflict = await BookingRepository.repoDateConflictCheck(body.listingId, sanitizeStartDate, santizeEndDate);
 
         if(hasConflict) return errorResponse(res, 'Conflicting date times with another booking.', 400);
         
         const hostListing = await ListingsRepository.repoGetListingById(body.listingId);
+
+        if(userId === hostListing.userId) return errorResponse(res, 'Hosts cannot book their own listings.', 400);
         
         body.guestId = userId;
         body.hostId = hostListing.userId;
+        body.startDate = sanitizeStartDate;
+        body.endDate = santizeEndDate
 
         //check if payment details are complete
-        const isPaymentComplete = '';
+        const isPaymentComplete = false;
         //check if personal details are complete
         const isProfileComplete = await UserRepository.repoIsUserProfileComplete(userId);
 
         if(!isProfileComplete) return errorResponse(res, 'Your personal details arent complete. Please complete to request booking', 400);
 
-        const success = await BookingRepository.repoCreateBooking(req.body);
+        const success = await BookingRepository.repoCreateBooking(body);
 
         if(!success) return errorResponse(res, 'Could not complete your booking request. You were not charged.', 400)
     
@@ -51,7 +64,7 @@ async function httpCreateBooking(req, res){
 
         console.error(error);
 
-        return res.status(500).json({ error: error.message })
+        return errorResponse(res, error?.message || 'internal server error', error?.message ? 404 : 500);
     }
 };
 

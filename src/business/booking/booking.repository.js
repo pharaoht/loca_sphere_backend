@@ -19,13 +19,48 @@ class BookingRepository {
 
     };
 
-    static async repoCreateBooking(bookingBody){
+    static async repoCreateBooking(bookingBody = undefined){
  
         if(!bookingBody) return false;
+
+        return await BookingModel.transaction(async trx => {
+
+            const conflicts = await BookingModel.query(trx)
+                .where(BookingModel.Fields.LISTING_ID, bookingBody.listingId)    
+                .where(builder => 
+                    builder.where(BookingModel.Fields.START_DATE, '<=', bookingBody.endDate)
+                    .andWhere(BookingModel.Fields.END_DATE, '>=', bookingBody.startDate)
+                ).forUpdate().first();
+
+            if(conflicts){
+                return false
+            }
+
+            try {
+                const record = await BookingModel.query(trx).insert(bookingBody);
+               
+                return record;
+            }
+            catch (err) {
     
-        const record = await BookingModel.query().insert(bookingBody);
-       
-        return record;
+                if (err.code === 'ER_NO_REFERENCED_ROW_2') {
+    
+                    if (err.message.includes(BookingModel.Fields.LISTING_ID)) {
+                        throw new Error('Invalid listingId: no such listing exists');
+                    }
+                    if (err.message.includes(BookingModel.Fields.HOST_ID)) {
+                        throw new Error('Invalid hostId: no such user exists');
+                    }
+                    if (err.message.includes(BookingModel.Fields.GUEST_ID)) {
+                        throw new Error('Invalid guestId: no such user exists');
+                    }
+                }
+    
+                throw err;
+            }
+        })
+
+    
     }
 
     static async repoUpdateBookingStatus(bookingId, status){
@@ -59,11 +94,11 @@ class BookingRepository {
 
         const currentYear = new Date().getUTCFullYear();
 
-        const yearStart = new Date(currentYear, 0, 1);
+        const yearStart = new Date(Date.UTC(currentYear, 0, 1, 0, 0, 0, 0));
  
         const bookings = await BookingModel.query()
         .where(BookingModel.Fields.LISTING_ID, listingId)
-        .where(BookingModel.Fields.START_DATE, '>=', yearStart.toISOString())
+        .where(BookingModel.Fields.END_DATE, '>=', yearStart.toISOString())
 
         return bookings;
     }

@@ -58,7 +58,22 @@ describe('BOOKING.CONTROLLER GET - api/bookings/check-availability/:listingId', 
 
 describe('BOOKING.CONTROLLER POST - /api/bookings/create', () => {
 
-    it('', () => {})
+    it('should return 400 when params "listingId", "startDate", "endDate" are undefined', () => {});
+
+    it('should return 400 when params "startDate" and "endDate" are not valid', () => {});
+
+    it('should return 400 when param "endDate" is before param "startDate', () => {});
+
+    it('should return 400 when params are conflicting with existing bookings', () => {});
+
+    it('should return 400 when hostId is the same as guestId', () => {});
+
+    it('should return 400 when profile is not complete', () => {});
+
+    it('should return 400 when booking could not be completed', () => {});
+
+    it('should return 200 when booking passes all validity checks', () => {});
+
 });
 
 describe('BOOKING.CONTROLLER PATCH - /api/bookings/update-status', () => {
