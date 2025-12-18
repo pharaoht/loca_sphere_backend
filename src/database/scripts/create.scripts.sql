@@ -190,8 +190,8 @@ CREATE TABLE IF NOT EXISTS BookingStatuses (
 CREATE TABLE IF NOT EXISTS Bookings (
     id CHAR(21) PRIMARY KEY,
     listingId CHAR(21) NOT NULL,
-    hostId CHAR(21) NOT NULL, --add
-    guestId CHAR(21) NOT NULL, --add
+    hostId CHAR(21) NOT NULL,
+    guestId CHAR(21) NOT NULL,
     startDate DATE NOT NULL,
     endDate DATE NOT NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
