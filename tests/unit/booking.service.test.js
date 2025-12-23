@@ -43,9 +43,13 @@ describe('dateStringToIsoFormat function', () => {
     })
 
     it('should return string when "dateString" parameter is valid', () => {
+
         const future = new Date();
+
         future.setUTCFullYear(future.getUTCFullYear() + 1);
+
         const pad = n => n < 10 ? '0' + n : n;
+
         const str = `${future.getUTCFullYear()}-${pad(future.getUTCMonth() + 1)}-${pad(future.getUTCDate())}`;
 
         const result = BookingService.dateStringToIsoFormat(str);
@@ -54,10 +58,8 @@ describe('dateStringToIsoFormat function', () => {
 
         expect(result).toMatch(/^\d{4}-\d{2}-\d{2}$/);
 
-        
     });
 });
-
 
 describe('isEndDateGreaterThanStartDate function', () => {
 

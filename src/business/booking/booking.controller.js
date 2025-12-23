@@ -1,17 +1,18 @@
 const Utility = require('../../utility');
+const BookingService = require('./booking.service');
 const BookingRepository = require("./booking.repository");
-const ListingsRepository = require("../listings/listings.repository");
 const UserRepository = require('../users/users.repository');
+const ListingsRepository = require("../listings/listings.repository");
 const { bookingEvents, EVENT_TYPES } = require("../../events/booking.events");
 const { errorResponse, successResponse } = require('../../responses/responses');
-const BookingService = require('./booking.service');
 
 async function httpCreateBooking(req, res){
 
     try {
-        
+
         const body = req.body;
         const userId = req.user.id;
+        const bookingStatus = 6;
 
         if(!body?.listingId || !body?.startDate || !body?.endDate) return errorResponse(res, 'Unable to process request: Require fields were not provided', 400);
 
@@ -27,15 +28,16 @@ async function httpCreateBooking(req, res){
         const hasConflict = await BookingRepository.repoDateConflictCheck(body.listingId, sanitizeStartDate, santizeEndDate);
 
         if(hasConflict) return errorResponse(res, 'Conflicting date times with another booking.', 400);
-        
+
         const hostListing = await ListingsRepository.repoGetListingById(body.listingId);
 
-        if(userId === hostListing.userId) return errorResponse(res, 'Hosts cannot book their own listings.', 400);
-        
+        if(userId === hostListing?.userId) return errorResponse(res, 'Hosts cannot book their own listings.', 400);
+
         body.guestId = userId;
         body.hostId = hostListing.userId;
         body.startDate = sanitizeStartDate;
-        body.endDate = santizeEndDate
+        body.endDate = santizeEndDate;
+        body.statusId = bookingStatus;
 
         //check if payment details are complete
         const isPaymentComplete = false;
@@ -46,19 +48,21 @@ async function httpCreateBooking(req, res){
 
         const success = await BookingRepository.repoCreateBooking(body);
 
-        if(!success) return errorResponse(res, 'Could not complete your booking request. You were not charged.', 400)
+        if(!success) return errorResponse(res, 'Could not complete your booking request. You were not charged.', 400);
     
         //emit event
-        bookingEvents.emit(EVENT_TYPES.BOOKING.STATUS_UPDATED, 
+        bookingEvents.emit(
+            EVENT_TYPES.BOOKING.STATUS_UPDATED, 
             { 
                 bookingId: success.id,
-                statusId: 6,
+                statusId: bookingStatus,
                 hostId: hostListing.userId,
                 guestId: userId
             }
         );
 
-        return successResponse(res, null, 'Your booking request was sent to the landlord. You will be charged once its approved', 201)
+        return successResponse(res, null, 'Your booking request was sent to the landlord. You will be charged once its approved', 201);
+
     } 
     catch (error) {
 

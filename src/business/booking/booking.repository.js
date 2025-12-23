@@ -99,6 +99,7 @@ class BookingRepository {
         const bookings = await BookingModel.query()
         .where(BookingModel.Fields.LISTING_ID, listingId)
         .where(BookingModel.Fields.END_DATE, '>=', yearStart.toISOString())
+        .where(BookingModel.Fields.STATUS_ID, 2)
 
         return bookings;
     }
