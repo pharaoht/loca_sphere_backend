@@ -12,7 +12,7 @@ async function httpCreateBooking(req, res){
 
         const body = req.body;
         const userId = req.user.id;
-        const bookingStatus = 6;
+        const bookingStatus = EVENT_TYPES.BOOKING_STATUS_ID.CREATED;
 
         if(!body?.listingId || !body?.startDate || !body?.endDate) return errorResponse(res, 'Unable to process request: Require fields were not provided', 400);
 
@@ -38,6 +38,7 @@ async function httpCreateBooking(req, res){
         body.startDate = sanitizeStartDate;
         body.endDate = santizeEndDate;
         body.statusId = bookingStatus;
+        body.guests = +body.guests;
 
         //check if payment details are complete
         const isPaymentComplete = false;
@@ -81,12 +82,17 @@ async function httpUpdateBookingStatus(req, res){
 
         const bookingDetails = await BookingRepository.repoGetBookingById(body.bookingId);
 
-        if(bookingDetails.hostId === userId && [2,5].includes(body.statusId)){
+        if(bookingDetails.hostId === userId && 
+            [   
+                EVENT_TYPES.BOOKING_STATUS_ID.CONFIRMED, 
+                EVENT_TYPES.BOOKING_STATUS_ID.DECLINED
+            ].includes(body.statusId)
+        ){
 
             await BookingRepository.repoUpdateBookingStatus(bookingDetails.id, body.statusId)
             //emit event
         }
-        else if(bookingDetails.guestId === userId && body.statusId === 3) {
+        else if(bookingDetails.guestId === userId && body.statusId === EVENT_TYPES.BOOKING_STATUS_ID.CANCELLED) {
 
             await BookingRepository.repoUpdateBookingStatus(bookingDetails.id, body.statusId)
             //emit event

@@ -21,7 +21,7 @@ class BookingService {
         if(mm < 0 || mm > 12) return false;
         if(dd < 1 || dd > 31) return false;
         if(yyyy < currentYear) return false;
-        if(yyyy > currentYear + 2) return false;
+        if(yyyy > currentYear + 3) return false;
 
         const santizeDate = new Date(Date.UTC(yyyy, mm - 1, dd, 0, 0, 0, 0));
 

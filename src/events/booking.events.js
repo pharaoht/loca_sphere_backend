@@ -13,6 +13,15 @@ const EVENT_TYPES = {
         COMPLETED: 'payment.completed',
         FAILED: 'payment.failed',
     },
+    BOOKING_STATUS_ID: {
+        PENDING: 1,
+        CONFIRMED: 2,
+        CANCELLED: 3,
+        COMPLETED: 4,
+        DECLINED: 5,
+        CREATED: 6,
+        ONGOING: 7
+    }
 };
 
 module.exports = {

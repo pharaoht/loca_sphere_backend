@@ -10,27 +10,27 @@ bookingEvents.on(EVENT_TYPES.BOOKING.STATUS_UPDATED, async ({ bookingId, statusI
 
         switch (statusId) {
 
-            case 1: //pending
+            case EVENT_TYPES.BOOKING_STATUS_ID.PENDING: //pending
                 break;
             
-            case 2: // Confirmed
+            case EVENT_TYPES.BOOKING_STATUS_ID.CONFIRMED: // Confirmed
                 
                 break;
 
-            case 3: //cancelled
+            case EVENT_TYPES.BOOKING_STATUS_ID.CANCELLED: //cancelled
                 break;
 
-            case 4: //completed
+            case EVENT_TYPES.BOOKING_STATUS_ID.COMPLETED: //completed
                 break;
 
-            case 5: //declined
+            case EVENT_TYPES.BOOKING_STATUS_ID.DECLINED: //declined
                 // await NotificationService.sendCancellationEmail(guestId, bookingId);
                 break;
             
-            case 6: //created
+            case EVENT_TYPES.BOOKING_STATUS_ID.CREATED: //created
                 break;
 
-            case 7: //ongoing
+            case EVENT_TYPES.BOOKING_STATUS_ID.ONGOING: //ongoing
                 break;
 
             default:

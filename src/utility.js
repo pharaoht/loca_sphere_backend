@@ -19,7 +19,7 @@ class Utility {
         return  Number(price) * Number(percentage);
     }
 
-    static calculateAdminFee(price, percentage = 0.05) {
+    static calculateAdminFee(price, percentage = .9) {
 
         if (isNaN(price) || price < 0) {
             throw new Error('Invalid input: price must be a non-negative number');

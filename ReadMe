@@ -1,1 +1,17 @@
+Todos:
+Listings
+-> Contract type "day-to-day" or "Fortnight"
+-> Make cleaning dynamic
+-> Make Utilites included up to certain amount
+-> Promo code
 
+
+Bookings
+-> Payment service
+-> Notification service
+    - Notify users when booking is accepted
+    - Notify user when booking is canceled
+    -
+
+Auth
+-> When user logins redirect them to their last page, not home
