@@ -15,6 +15,7 @@ const up = async (knex) => {
 			t.date('startDate').notNullable();
 			t.date('endDate').notNullable();
 			t.timestamp('createdAt').defaultTo(knex.fn.now());
+			t.integer('guests').notNullable();
 			t.integer('statusId').unsigned().defaultTo(6)
 				.references('id').inTable('BookingStatuses').onDelete('SET NULL');
 			t.text('additionalInfo');
