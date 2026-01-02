@@ -4,20 +4,37 @@ class UserRepository {
 
     static async repoGetUserDetailsById(id = ''){
 
-        if(!id) return false;
+        try {
 
-        const data = await UserModel.query().findById(id);
+            if(!id) return false;
 
-        return data;
+            const data = await UserModel.query().findById(id);
+
+            return data;
+        }
+        catch(error){
+
+            return false;
+        }
     }
 
     static async repoUpdateUserDetails(userId = '', userData = undefined){
 
+        try{
+
+        
         if(!userId || !userData) return false;
 
-        const didUserUpdate = await UserModel.query().patchAndFetchById(userId, userData);
- 
-        return didUserUpdate;
+            const didUserUpdate = await UserModel.query().patchAndFetchById(userId, userData);
+            
+            return didUserUpdate;
+        }
+        catch(error){
+
+            console.error(error, '**************');
+            
+            return false
+        }
     }
 
     /**
@@ -34,12 +51,17 @@ class UserRepository {
     static async repoIsUserProfileComplete(userId = undefined){
 
         if(!userId) return false;
-        //get user from id
+    
         const userDetails = await UserModel.query().findById(userId);
 
-        console.log(userDetails)
-        //check if all user.fields are not null
-        //profile complete
+        for(const key in userDetails){
+
+            if(key !== UserModel.Fields.SECOND_SURNAME && !userDetails[key]){
+                return false
+            }
+        }
+
+        return true;
     }
 };
 

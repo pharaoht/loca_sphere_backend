@@ -1,3 +1,4 @@
+const { EVENT_TYPES } = require("../../events/booking.events");
 const BookingModel = require("./booking.model");
 
 class BookingRepository {
@@ -26,7 +27,8 @@ class BookingRepository {
         return await BookingModel.transaction(async trx => {
 
             const conflicts = await BookingModel.query(trx)
-                .where(BookingModel.Fields.LISTING_ID, bookingBody.listingId)    
+                .where(BookingModel.Fields.LISTING_ID, bookingBody.listingId)   
+                .where(BookingModel.Fields.GUEST_ID, bookingBody.guestId) 
                 .where(builder => 
                     builder.where(BookingModel.Fields.START_DATE, '<=', bookingBody.endDate)
                     .andWhere(BookingModel.Fields.END_DATE, '>=', bookingBody.startDate)
@@ -80,6 +82,7 @@ class BookingRepository {
     
         const hasConflict = await BookingModel.query()
             .where(BookingModel.Fields.LISTING_ID, listingId)    
+            .where(BookingModel.Fields.STATUS_ID, EVENT_TYPES.BOOKING_STATUS_ID.CONFIRMED)
             .where(builder => 
                 builder.where(BookingModel.Fields.START_DATE, '<=', requestEndDate)
                 .andWhere(BookingModel.Fields.END_DATE, '>=', requestStartDate)

@@ -127,7 +127,9 @@ class ListingsModel extends Model {
 
         if(formattedJson.hasOwnProperty('utilityMap') && formattedJson.utilityMap != null) {
 
-            formattedJson.utilityMap.securityDeposit = Math.floor(Utility.calculateSecurityDeposit(formattedJson.monthlyRent));
+            formattedJson.utilityMap.securityDeposit = Math.floor(Utility.calculateSecurityDeposit(+formattedJson.monthlyRent));
+            formattedJson.utilityMap.adminFee = Math.floor(Utility.calculateAdminFee(+formattedJson.monthlyRent));
+            formattedJson.utilityMap.dueAtBooking = formattedJson.utilityMap.adminFee + +formattedJson.monthlyRent;
 
             if( ( formattedJson.utilityMap.waterIncluded ) &&
                 ( formattedJson.utilityMap.electricIncluded ) &&

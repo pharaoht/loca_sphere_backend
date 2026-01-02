@@ -1,4 +1,5 @@
 const { Model } = require("objection");
+const moment = require('moment')
 
 const nanoid = async () => {
   const { nanoid } = await import('nanoid');
@@ -83,9 +84,11 @@ class UserModel extends Model {
     }
 
 	$formatJson(json) {
+
 		json = super.$formatJson(json);
         json.displayName = `${json.givenName} ${json.surName}`
-		
+		json.birthday = json?.birthday ? moment(json.birthday).format('YYYY-MM-DD') : json.birthday;
+        
 		delete json.googleId;
 		return json;
 	}

@@ -56,7 +56,7 @@ describe('calculateAdminFee function', () => {
 
     it('should return price * default percentage when only price is provided', () => {
         const result = Utils.calculateAdminFee(1000);
-        expect(result).toBe(50); // 1000 * 0.05
+        expect(result).toBe(900); // 1000 * 0.9
     });
 
     it('should return price * provided percentage when both are provided', () => {

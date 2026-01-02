@@ -44,6 +44,7 @@ class BookingModel extends Model {
             END_DATE:'endDate',
             CREATED_AT:'createdAt',
             STATUS_ID:'statusId',
+            GUESTS: 'guests',
             ADDITIONAL_INFO:'additionalInfo',
         }
     }
@@ -57,6 +58,7 @@ class BookingModel extends Model {
                 BookingModel.Fields.GUEST_ID, 
                 BookingModel.Fields.START_DATE,
                 BookingModel.Fields.END_DATE,
+                BookingModel.Fields.GUESTS,
             ],
             properties: {
                 [BookingModel.Fields.ID]: { type: 'string', maxLength: 21 },
@@ -67,6 +69,7 @@ class BookingModel extends Model {
                 [BookingModel.Fields.END_DATE]: { type: 'string', format: 'date' },
                 [BookingModel.Fields.CREATED_AT]: { type: 'string', format: 'date-time' },
                 [BookingModel.Fields.STATUS_ID]: { type: 'integer', default: 6 },
+                [BookingModel.Fields.GUESTS]: { type: 'integer' },
                 [BookingModel.Fields.ADDITIONAL_INFO]: { type: 'string', maxLength: 21 },
             },
         };

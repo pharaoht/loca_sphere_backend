@@ -28,7 +28,7 @@ describe('dateStringToIsoFormat function', () => {
     });
 
     it('should return false when "dateString" parameter invalid year', () => {
-        const result = BookingService.dateStringToIsoFormat('2029-11-02');
+        const result = BookingService.dateStringToIsoFormat('2030-11-02');
         expect(result).toBe(false);
         const result2 = BookingService.dateStringToIsoFormat('2002-11-02');
         expect(result2).toBe(false);

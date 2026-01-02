@@ -578,7 +578,8 @@ exports.seed = async function (knex) {
 			startDate: moment(new Date()).format('YYYY-MM-DD'),
 			endDate: moment(new Date()).add(13, 'days').format('YYYY-MM-DD'),
 			createdAt: knex.fn.now(),
-			statusId: 1,
+			statusId: 2,
+			guests: 1,
 			additionalInfo: 'Test, test, testing'
 		},
 	])
