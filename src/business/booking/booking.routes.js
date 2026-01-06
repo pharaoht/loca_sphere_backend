@@ -1,5 +1,7 @@
 const express = require('express');
 
+const { idempotencyMiddleware } = require('../../middleware/idempotency/idempotency.middleware');
+
 const { httpCreateBooking, httpUpdateBookingStatus, httpGetBookingById, httpDeleteBookingById, httpCheckAvailability, httpGetAvailabilityForListing } = require('./booking.controller');
 
 const authenticateJWT = require('../../middleware/authenticate/auth.middleware');
@@ -14,9 +16,9 @@ bookingRouter.get(`${resource}/get-availability/:listingId`, httpGetAvailability
 
 bookingRouter.get(`${resource}/:id`, authenticateJWT, httpGetBookingById);
 
-bookingRouter.post(`${resource}/create`, authenticateJWT, httpCreateBooking);
+bookingRouter.post(`${resource}/create`, authenticateJWT, idempotencyMiddleware, httpCreateBooking);
 
-bookingRouter.patch(`${resource}/update-status`, authenticateJWT, httpUpdateBookingStatus);
+bookingRouter.patch(`${resource}/update-status`, authenticateJWT, idempotencyMiddleware, httpUpdateBookingStatus);
 
 bookingRouter.delete(`${resource}/:bkId`, authenticateJWT, httpDeleteBookingById)
 
