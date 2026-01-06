@@ -74,7 +74,23 @@ async function httpCreateBooking(req, res){
 };
 
 async function httpUpdateBookingStatus(req, res){
+    //landlord and guest both have ability to update the status of the booking
+    //landlord actions can effect status to confirmed, or declined
+    //guest actions effect status cancelled, created
+    //pending, ongoing, completed are status affected by time
+    //each status change should update the status column in booking table
+    //each status change should prompt an email to the guest or landlord
+    //both the landlord and guest will use this endpoint
+    //fields in body, userId to determine if guest or landlord.
+    //incoming statusId to be updated
+    //bookingId in body 
 
+    //edge cases
+    //invalid bookingId
+    //userId doesnt match either on booking
+    //once a booking is completed, it cannot be updated
+    //if user is host and tries to update statuses he/she shouldnt be able to
+    //same with guest
     try {
         
         const body = req.body;

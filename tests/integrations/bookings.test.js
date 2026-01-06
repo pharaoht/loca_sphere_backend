@@ -68,6 +68,8 @@ describe('BOOKING.CONTROLLER POST - /api/bookings/create', () => {
 
     it('should return 400 when hostId is the same as guestId', () => {});
 
+    it('should return 400 when payment is not complete', () => {});
+
     it('should return 400 when profile is not complete', () => {});
 
     it('should return 400 when booking could not be completed', () => {});

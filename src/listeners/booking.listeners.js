@@ -28,6 +28,9 @@ bookingEvents.on(EVENT_TYPES.BOOKING.STATUS_UPDATED, async ({ bookingId, statusI
                 break;
             
             case EVENT_TYPES.BOOKING_STATUS_ID.CREATED: //created
+                //notify landlord by email that a new request was created
+                //notify the guest by email of their booking
+                
                 break;
 
             case EVENT_TYPES.BOOKING_STATUS_ID.ONGOING: //ongoing
