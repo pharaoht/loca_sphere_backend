@@ -1,7 +1,11 @@
 const request = require('supertest');
 const app = require('../../src/app');
 const moment = require('moment');
-const { TEST_LISTING_ID } = require('../constants/tests.constants');
+const { TEST_LISTING_ID, TEST_USER_GUEST_ID, TEST_USER_HOST_ID, TEST_BOOKING_ID } = require('../constants/tests.constants');
+const { generateTestToken } = require('../helpers/helpers');
+
+const hostId = generateTestToken(TEST_USER_HOST_ID);
+const guestId = generateTestToken(TEST_USER_GUEST_ID);
 
 describe('BOOKING.CONTROLLER GET - /api/bookings/:id', () => {
 
@@ -80,7 +84,73 @@ describe('BOOKING.CONTROLLER POST - /api/bookings/create', () => {
 
 describe('BOOKING.CONTROLLER PATCH - /api/bookings/update-status', () => {
 
-    it('', () => {})
+    const url = '/api/bookings/update-status';
+
+    it('should return 400 when bookingId or statusChangeId is missing', async () => {
+
+        const res = await request(app)
+            .patch(url)
+            .set('Authorization', `Bearer ${hostId}`)
+            .send({ bookingId: null, statusChangeId: null });
+
+        expect(res.statusCode).toBe(400)
+    });
+
+    it('should return 400 when statusChangeId is invalid', async () => {
+
+        const res = await request(app)
+            .patch(url)
+            .set('Authorization', `Bearer ${hostId}`)
+            .send({ bookingId: TEST_BOOKING_ID, statusChangeId: 9 });
+
+        expect(res.statusCode).toBe(400)
+    });
+
+    it('should return 404 when booking does not exist', async () => {
+
+        const res = await request(app)
+            .patch(url)
+            .set('Authorization', `Bearer ${hostId}`)
+            .send({ bookingId: '123234567', statusChangeId: 1 });
+
+        expect(res.statusCode).toBe(404)
+    });
+
+    it('should return 403 when user is not authorized to update booking', async () => {
+
+        const res = await request(app)
+            .patch(url)
+            .set('Authorization', `Bearer ${hostId}`)
+            .send({ bookingId: TEST_BOOKING_ID, statusChangeId: 1 });
+
+        expect(res.statusCode).toBe(403)
+    });
+
+    it('should return 400 if trying to confirm booking with conflicting dates', async () => {
+
+    });
+
+    it('should successfully update booking status for authorized user', async () => {
+        // TODO: call PATCH as host on a booking that can be confirmed
+        // expect status 200 and correct response message
+        // optionally, check DB that statusId changed
+    });
+
+    // ================================
+    // Placeholders for event tests
+    // ================================
+    it('should emit STATUS_UPDATED event on successful booking update', async () => {
+        // TODO: listen for event and verify emitted payload
+    });
+
+    it('should trigger side effects for CONFIRMED status', async () => {
+        // TODO: test that bookingEvents listener side effects would run
+    });
+
+    it('should trigger side effects for DECLINED status', async () => {
+        // TODO: test that bookingEvents listener side effects would run
+    });
+
 });
 
 describe('BOOKING.CONTROLLER DELETE - /api/bookings/:bkid', () => {

@@ -5,6 +5,7 @@ const UserRepository = require('../users/users.repository');
 const ListingsRepository = require("../listings/listings.repository");
 const { bookingEvents, EVENT_TYPES } = require("../../events/booking.events");
 const { errorResponse, successResponse } = require('../../responses/responses');
+const BookingModel = require('./booking.model');
 
 async function httpCreateBooking(req, res){
 
@@ -69,60 +70,84 @@ async function httpCreateBooking(req, res){
 
         console.error(error);
 
-        return errorResponse(res, error?.message || 'internal server error', error?.message ? 404 : 500);
+        return errorResponse(res, 'internal server error', 500);
     }
 };
 
 async function httpUpdateBookingStatus(req, res){
-    //landlord and guest both have ability to update the status of the booking
-    //landlord actions can effect status to confirmed, or declined
-    //guest actions effect status cancelled, created
-    //pending, ongoing, completed are status affected by time
-    //each status change should update the status column in booking table
-    //each status change should prompt an email to the guest or landlord
-    //both the landlord and guest will use this endpoint
-    //fields in body, userId to determine if guest or landlord.
-    //incoming statusId to be updated
-    //bookingId in body 
 
-    //edge cases
-    //invalid bookingId
-    //userId doesnt match either on booking
-    //once a booking is completed, it cannot be updated
-    //if user is host and tries to update statuses he/she shouldnt be able to
-    //same with guest
     try {
-        
-        const body = req.body;
+
+        const { bookingId, statusChangeId } = req.body;
+
+        if(!bookingId || !statusChangeId) return errorResponse(res, 'booking id or status id was not provided', 400);
+
+        const statusChangeIdNum = Number(statusChangeId);
+
+        if(Number.isNaN(statusChangeIdNum)) return errorResponse(res, 'Not a valid status id', 400);
+
         const userId = req.user.id;
 
-        const bookingDetails = await BookingRepository.repoGetBookingById(body.bookingId);
+        const isValidStatus = Object.values(EVENT_TYPES.BOOKING_STATUS_ID).includes(statusChangeIdNum);
 
-        if(bookingDetails.hostId === userId && 
-            [   
-                EVENT_TYPES.BOOKING_STATUS_ID.CONFIRMED, 
-                EVENT_TYPES.BOOKING_STATUS_ID.DECLINED
-            ].includes(body.statusId)
+        if(!isValidStatus) return errorResponse(res, 'Not a valid action', 400);
+        
+        const bookingRecord = await BookingRepository.repoGetBookingById(bookingId);
+
+        if(!bookingRecord) return errorResponse(res, 'Unable to find that booking record', 404);
+
+        const currentBookingStatusId = bookingRecord[BookingModel.Fields.STATUS_ID];
+
+        const finalizedStatuses = {
+            [EVENT_TYPES.BOOKING_STATUS_ID.COMPLETED]: 'Booking is complete, cannot update',
+            [EVENT_TYPES.BOOKING_STATUS_ID.DECLINED]: 'Booking has been denied, cannot update',
+            [EVENT_TYPES.BOOKING_STATUS_ID.CANCELLED]: 'Booking has been cancelled, cannot update.',
+        };
+
+        if (finalizedStatuses[currentBookingStatusId]) {
+            return errorResponse(res, finalizedStatuses[currentBookingStatusId], 400);
+        }
+
+        if(
+            userId === bookingRecord[BookingModel.Fields.HOST_ID] && 
+            statusChangeIdNum === EVENT_TYPES.BOOKING_STATUS_ID.CONFIRMED
         ){
+            const sd = bookingRecord[BookingModel.Fields.START_DATE];
+            const ed = bookingRecord[BookingModel.Fields.END_DATE];
+            const listId = bookingRecord[BookingModel.Fields.LISTING_ID];
 
-            await BookingRepository.repoUpdateBookingStatus(bookingDetails.id, body.statusId)
-            //emit event
+            const hasConflict = await BookingRepository.repoDateConflictCheck(listId, sd, ed);
+
+            if(hasConflict) return errorResponse(res, 'Conflicting date times with another booking.', 400);
+
         }
-        else if(bookingDetails.guestId === userId && body.statusId === EVENT_TYPES.BOOKING_STATUS_ID.CANCELLED) {
 
-            await BookingRepository.repoUpdateBookingStatus(bookingDetails.id, body.statusId)
-            //emit event
-        }
-        else return errorResponse(res, 'Not authorized', 404, {});
+        const bookingStatusPolicy = BookingService.createBookingStatusPolicy({
+            userId: userId,
+            bookingStatusId: statusChangeIdNum,
+            bookingEventTypes: EVENT_TYPES,
+            bookingRecord: bookingRecord,
+            bookingEventObj: bookingEvents
+        });
 
-        return successResponse(res, {}, 'booking updated', 200)
-    } 
+        if(!bookingStatusPolicy.isAuthorized) return errorResponse(res, 'You are not authorize to make this change', 403);
+
+        const wasAbleToUpdate = await BookingRepository.repoUpdateBookingStatus(bookingId, statusChangeIdNum, currentBookingStatusId);
+
+        if(!wasAbleToUpdate) return errorResponse(res, 'Unable to update booking status, try again later', 400);
+
+        bookingStatusPolicy.emitBookingStatusUpdateEvent();
+
+        return successResponse(res, {}, 'booking updated successfully', 200);
+        
+    }
     catch (error) {
 
         console.error(error);
 
-        return errorResponse(res, error.message, 500, {})
+        return errorResponse(res, 'internal server error', 500);
     }
+
 };
 
 async function httpGetBookingById(req, res) {
@@ -215,3 +240,37 @@ module.exports = {
     httpCheckAvailability,
     httpGetAvailabilityForListing
 }
+
+
+
+// You run a scheduler (cron-like) that periodically:
+
+// Finds bookings where:
+
+// now >= startDate AND status is confirmed → mark as ongoing
+
+// now >= endDate AND status is ongoing → mark as completed
+
+// Updates status
+
+// Triggers email notifications
+
+// This job:
+
+// Runs every minute / 5 minutes / hour (depending on precision)
+
+// Calls domain logic, NOT your HTTP route
+
+
+//Think abouts for Once host confirms one booking
+// action: host confirms a booking statusId 2 (confirmed)
+// effect: all other bookings with statusId 1 (pending) should be turned to statusId 5 (declined)
+// (we should also check what bookings are in conflict with the one accepted, then keep the rest pending)
+// ( should we use web sockets to return the most up to date bookings? )
+// ( in the updateBooking controller we need to add logic preventing accepting a booking in conflict with another )
+// ( we already have a onConflict method in our booking Repository. Bookings have start date and end date on them, so itll be straight forward to implement)
+// ( but guests and host will be using this endpoint, we should only check if the user is host and requestedStatusId is 2)
+// then: email users with effected bookings that their request was declined and not charged
+// if user who's booking was accepted has other pending bookings, then set those status to 3 (CANCELLED)
+// where should be put this logic?
+// -> what we know: when a booking is updated a event is emitted, can we just put the logic for it in the listening switch statement?

@@ -1,3 +1,5 @@
+const BookingModel = require("./booking.model");
+
 class BookingService {
 
     static dateStringToIsoFormat(dateString = undefined){
@@ -54,6 +56,61 @@ class BookingService {
         const startDateMs = Date.UTC(sy, sm - 1, sd, 0, 0, 0, 0);
 
         return endDateMs > startDateMs;
+    }
+
+    /**
+     * @param {{
+     *   userId: string,
+     *   bookingStatusId: number,
+     *   bookingRecord: Object,
+     *   bookingEventTypes: Object,
+     *   bookingEventObj: { emit: Function }
+     * }} params
+        * @returns {{
+        *   role?: 'host' | 'guest',
+        *   isAuthorized: boolean,
+        *   emitBookingStatusUpdateEvent: () => void
+        * }}
+        */
+    static createBookingStatusPolicy(
+        {
+            userId,
+            bookingStatusId,
+            bookingRecord,
+            bookingEventTypes,
+            bookingEventObj
+        }
+    ){
+
+        const permissions = {
+            host: new Set([ bookingEventTypes.BOOKING_STATUS_ID.DECLINED, bookingEventTypes.BOOKING_STATUS_ID.CONFIRMED ]),
+            guest: new Set([ bookingEventTypes.BOOKING_STATUS_ID.CANCELLED, ])
+        }
+
+        const roleType = userId === bookingRecord[BookingModel.Fields.HOST_ID] ? 'host' 
+            : userId === bookingRecord[BookingModel.Fields.GUEST_ID] ? 'guest' 
+            : undefined;
+
+        return {
+            role: roleType,
+            get isAuthorized(){
+                if(!this.role) return false;
+                return permissions[this.role].has(bookingStatusId)
+            },
+            emitBookingStatusUpdateEvent: () => {
+                console.log(bookingEventTypes)
+                console.log(bookingEventObj)
+                bookingEventObj.emit(
+                    bookingEventTypes.BOOKING.STATUS_UPDATED,
+                    {
+                        bookingId: bookingRecord[BookingModel.Fields.ID],
+                        statusId: bookingStatusId,
+                        hostId: bookingRecord[BookingModel.Fields.HOST_ID],
+                        guestId: bookingRecord[BookingModel.Fields.GUEST_ID]
+                    }
+                );
+            }
+        }
     }
 };
 
