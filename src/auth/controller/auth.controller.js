@@ -89,7 +89,7 @@ async function httpRefreshToken(req, res){
 		const newRefreshToken = await nanoid();
 
 		console.log('** issuing new refresh token **');
-	
+
 		await instance.set(`refresh:${newRefreshToken}`,
 			userId,
 			//EX redis deletes this automatically

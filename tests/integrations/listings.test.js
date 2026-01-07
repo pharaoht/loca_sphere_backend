@@ -89,7 +89,6 @@ describe('LISTINGS.CONTROLLER GET - /api/listings/options/:option', () => {
         const res = await request(app)
             .get('/api/listings/options/currency');
 
-        console.log(res.body)
         expect(res.body.statusCode).toBe(500);
     })
 

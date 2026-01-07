@@ -65,15 +65,23 @@ class BookingRepository {
     
     }
 
-    static async repoUpdateBookingStatus(bookingId, status){
+    static async repoUpdateBookingStatus(bookingId, status, expectatedStatus){
 
-        if(!bookingId || typeof bookingId !== 'string' || !status || typeof status !== 'number') return false;
+        if( 
+            !status || 
+            !bookingId || 
+            !expectatedStatus ||
+            typeof status !== 'number' ||
+            typeof bookingId !== 'string' 
+        ) return false;
 
-        const updatedRecord = await BookingModel.query()
+        const updatedCount = await BookingModel.query()
             .patch({ [BookingModel.Fields.STATUS_ID]: status })
             .where(BookingModel.Fields.ID, bookingId)
+            .andWhere(BookingModel.Fields.STATUS_ID, expectatedStatus);
 
-        return updatedRecord
+        // If no rows were updated, another process/user likely changed the status
+        return updatedCount > 0;
     }
 
     static async repoDateConflictCheck(listingId = '', requestStartDate, requestEndDate){

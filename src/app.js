@@ -2,6 +2,8 @@ require('dotenv').config();
 
 require('./database/db.connect.js');
 
+require('./listeners/booking.listeners.js');
+
 require('./middleware/passport/passport.middleware.js');
 
 const path = require('path');
