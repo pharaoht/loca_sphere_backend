@@ -38,10 +38,7 @@ const bookingRouter = require('./business/booking/booking.routes.js');
 
 app.set('trust proxy', 1);
 
-app.use(helmet({
-    crossOriginResourcePolicy: false,
-    crossOriginEmbedderPolicy: false,
-}));
+app.use(helmet());
 
 app.use(hpp());
 
@@ -53,7 +50,9 @@ app.use(cookieParser());
 
 app.use(express.urlencoded({ extended: true }));
 
-app.use(cors({ origin: [ process.env.LOCAL_DOMAIN, process.env.PROD_DOMAIN, process.env.PROD_DOMAIN_2 ], credentials: true }));
+app.use(cors({ origin: [ process.env.LOCAL_DOMAIN, process.env.PROD_DOMAIN ], credentials: true }));
+
+app.use(express.static('public'));
 
 app.use('/api', apiRouter);
 

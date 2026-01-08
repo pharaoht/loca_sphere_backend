@@ -1,20 +1,145 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta name="google-site-verification" content="yUXLg8glPFuozWw0Xn7CPVgUyUDAgNngYNLQvMbkO_s" />
-        <title>Google Verify Page</title>
-        <!-- Other meta tags, stylesheets, or scripts -->
-    </head>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="google-site-verification" content="yUXLg8glPFuozWw0Xn7CPVgUyUDAgNngYNLQvMbkO_s" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/images/logo2.avif">
+    <title>Google Verify Page</title>
+    <style>
+        /* Reset some default styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    <body>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #121212;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .watermark {
+            position: fixed;
+            left: 7%;
+            top: -5%;
+            width: 90vw;           /* adjust size */
+            height: 175vh;
+            background-image: url('/images/logo2.avif'); /* your logo */
+            background-repeat: no-repeat;
+            background-size: contain;
+            opacity: .1;          /* very faint */
+            pointer-events: none;   /* allow clicks through */
+            z-index: 0;             /* behind everything */
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        /* Stripe behind logo */
+        .stripe {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            height: 40px;
+            background: linear-gradient(90deg, #4CAF50, #81C784);
+            transform: translateY(-50%);
+            z-index: 1;
+        }
+
+        /* Floating logo card */
+        .logo-card {
+            position: relative;
+            width: 250px;
+            height: 190px;
+            background-color: #1E1E1E;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 20px;
+            color: #4CAF50;
+            z-index: 2;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        header, main {
+            position: relative;
+            z-index: 1;
+        }
+
+
+        main {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            background-color: #1E1E1E;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            color:#E5E7EB;
+        }
+
+        h3 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+
+        a {
+            color: #2196F3;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        ul {
+            margin-top: 20px;
+            list-style-type: disc;
+            text-align: left;
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="watermark"></div>
+    <header>
+        <div class="stripe"></div>
+        <div class="logo-card">
+            <img src="/images/logo2.avif" alt="Logo" style="width: 100%; height: 100%; object-fit: contain; border-radius: 12px;">
+        </div>
+    </header>
+
+    <main>
         <p>To login go to <a href="/api/auth/google">/api/auth/google</a></p>
         <p>This page is for verification only</p>
-        <p>
-            <h3>This is a backend api for the Loca-Sphere service.</h3>
-            <ul>
-                <li>More coming soon</li>
-            </ul>
-        </p>
-        <!-- Other HTML content -->
-    </body>
+        <h3>This is a backend API for the Loca-Sphere service.</h3>
+        <ul>
+            <li>Find listings by city <a href="https://loca-sphere.vercel.app/accommodations?long=-0.131200&lat=51.513400&cityName=London&radius=10">click here</a></li>
+            
+        </ul>
+    </main>
+
+</body>
 </html>

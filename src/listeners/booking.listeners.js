@@ -14,6 +14,12 @@ bookingEvents.on(EVENT_TYPES.BOOKING.STATUS_UPDATED, async ({ bookingId, statusI
             
             case EVENT_TYPES.BOOKING_STATUS_ID.CONFIRMED: // Confirmed
                 console.log('testing: Confirmed Event')
+                //notify user of confirmed booking by email
+                //execute payment
+
+                //for bookings that didnt get confirmed/in conflict of one accepted
+                //update to denied
+                
                 break;
 
             case EVENT_TYPES.BOOKING_STATUS_ID.CANCELLED: //cancelled
