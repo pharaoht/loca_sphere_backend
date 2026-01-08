@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS Users (
     pfp VARCHAR(255) NULL,
     gender INT,
     birthday DATE,
-    countryCode VARCHAR(10),
+    countryCode INT,
     phoneNumber VARCHAR(20),
     nationality INT,
     occupation INT,
@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS Users (
     FOREIGN KEY (gender) REFERENCES Gender(id) ON DELETE CASCADE,
     FOREIGN KEY (nationality) REFERENCES Nationality(id) ON DELETE CASCADE,
     FOREIGN KEY (occupation) REFERENCES Occupation(id) ON DELETE CASCADE,
+    FOREIGN KEY (countryCode) REFERENCES CountryCallingCodes(id) ON DELETE CASCADE,
 );
 
 CREATE TABLE Nationality (

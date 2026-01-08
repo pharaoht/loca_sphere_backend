@@ -1,3 +1,4 @@
+const CountryCallingCode = require("./countryCode/countryCode.model");
 const Nationality = require("./nationality/nationality.model");
 const Occupation = require("./occupation/occupation.model");
 
@@ -7,7 +8,8 @@ class UserService {
 
         return {
             nationality: Nationality,
-            occupation: Occupation
+            occupation: Occupation,
+            countryCode: CountryCallingCode
         }
     }
 
