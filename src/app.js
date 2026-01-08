@@ -38,7 +38,10 @@ const bookingRouter = require('./business/booking/booking.routes.js');
 
 app.set('trust proxy', 1);
 
-app.use(helmet());
+app.use(helmet({
+    crossOriginResourcePolicy: false,
+    crossOriginEmbedderPolicy: false,
+}));
 
 app.use(hpp());
 
