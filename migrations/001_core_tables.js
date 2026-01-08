@@ -43,7 +43,8 @@ const down = async (knex) => {
 		.dropTableIfExists('Users')
 		.dropTableIfExists('Occupation')
 		.dropTableIfExists('Nationality')
-		.dropTableIfExists('Gender');
+		.dropTableIfExists('Gender')
+		.dropTableIfExists('CountryCallingCodes');
 }
 
 module.exports = {
