@@ -40,6 +40,8 @@ async function httpCreateBooking(req, res){
         body.endDate = santizeEndDate;
         body.statusId = bookingStatus;
         body.guests = +body.guests;
+        delete body.updateViaEmail;
+        delete body.updateViaText;
 
         //check if payment details are complete
         const isPaymentComplete = false;
