@@ -30,6 +30,14 @@ CREATE TABLE IF NOT EXISTS Occupation (
     occupationName VARCHAR(100) NOT NULL UNIQUE
 );
 
+CREATE TABLE CountryCallingCodes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    countryName VARCHAR(100) NOT NULL,
+    callingCode VARCHAR(5) NOT NULL,
+    UNIQUE KEY uniq_country_code (countryName, callingCode)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
 CREATE TABLE IF NOT EXISTS Gender (
     id INT AUTO_INCREMENT PRIMARY KEY,
     sex CHAR(36) NOT NULL

@@ -29,6 +29,12 @@ const up = async (knex) => {
 			table.string('placeOfWork');
 			table.timestamp('createdAt').defaultTo(knex.fn.now());
 			table.timestamp('updatedAt').defaultTo(knex.fn.now());
+		})
+		.createTable('CountryCallingCodes', (table) => {
+			table.increments('id').primary();           // Auto-increment primary key
+			table.string('countryName', 100).notNullable();
+			table.string('callingCode', 5).notNullable();
+			table.unique(['countryName', 'callingCode']); // Unique constraint on combination
 		});
 }
 
@@ -37,7 +43,8 @@ const down = async (knex) => {
 		.dropTableIfExists('Users')
 		.dropTableIfExists('Occupation')
 		.dropTableIfExists('Nationality')
-		.dropTableIfExists('Gender');
+		.dropTableIfExists('Gender')
+		.dropTableIfExists('CountryCallingCodes');
 }
 
 module.exports = {

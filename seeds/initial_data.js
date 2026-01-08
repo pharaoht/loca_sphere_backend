@@ -129,6 +129,16 @@ exports.seed = async function (knex) {
 		{ name: 'Shared Room' },
 	]);
 
+	await knex('CountryCallingCodes').insert([
+		{ countryName: 'Sint Maarte', callingCode: '+1' },
+		{ countryName: 'Grenada', callingCode: '+1' },
+		{ countryName: 'Dominican Republic', callingCode: '+1' },
+		{ countryName: 'Spain', callingCode: '+34' },
+		{ countryName: 'Hungary', callingCode: '+36' },
+		{ countryName: 'Italy', callingCode: '+39' },
+		{ countryName: 'Austria', callingCode: '+43' },
+	])
+
 	await knex('Nationality').insert([
 		{ countryName: 'Afghanistan' },
 		{ countryName: 'Åland Islands' },
