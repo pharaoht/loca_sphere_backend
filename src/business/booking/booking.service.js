@@ -98,8 +98,7 @@ class BookingService {
                 return permissions[this.role].has(bookingStatusId)
             },
             emitBookingStatusUpdateEvent: () => {
-                console.log(bookingEventTypes)
-                console.log(bookingEventObj)
+
                 bookingEventObj.emit(
                     bookingEventTypes.BOOKING.STATUS_UPDATED,
                     {
@@ -112,6 +111,7 @@ class BookingService {
             }
         }
     }
+
 };
 
 module.exports = BookingService;

@@ -6,6 +6,7 @@ const ListingsRepository = require("../listings/listings.repository");
 const { bookingEvents, EVENT_TYPES } = require("../../events/booking.events");
 const { errorResponse, successResponse } = require('../../responses/responses');
 const BookingModel = require('./booking.model');
+const ListingsModel = require('../listings/listings.model');
 
 async function httpCreateBooking(req, res){
 
@@ -29,6 +30,8 @@ async function httpCreateBooking(req, res){
         const hasConflict = await BookingRepository.repoDateConflictCheck(body.listingId, sanitizeStartDate, santizeEndDate);
 
         if(hasConflict) return errorResponse(res, 'Conflicting date times with another booking.', 400);
+
+        //add check if the requested booking is a potential duplicate from user with the exact same dates
 
         const hostListing = await ListingsRepository.repoGetListingById(body.listingId);
 
@@ -65,7 +68,7 @@ async function httpCreateBooking(req, res){
             }
         );
 
-        return successResponse(res, null, 'Your booking request was sent to the landlord. You will be charged once its approved', 201);
+        return successResponse(res, success, 'Your booking request was sent to the landlord. You will be charged once its approved', 201);
 
     } 
     catch (error) {
@@ -95,7 +98,7 @@ async function httpUpdateBookingStatus(req, res){
         if(!isValidStatus) return errorResponse(res, 'Not a valid action', 400);
         
         const bookingRecord = await BookingRepository.repoGetBookingById(bookingId);
-
+        console.log(bookingRecord)
         if(!bookingRecord) return errorResponse(res, 'Unable to find that booking record', 404);
 
         const currentBookingStatusId = bookingRecord[BookingModel.Fields.STATUS_ID];
@@ -154,17 +157,73 @@ async function httpUpdateBookingStatus(req, res){
 
 async function httpGetBookingById(req, res) {
 
+    //queries
+    //bookingId
+    //listingId
+    //to think about
+    //limit, page, statusId, 
+
+    const notFound = (message) => errorResponse(res, message, 404, {});
+    const unauthorized = (message) => errorResponse(res, message, 403, {});
+    
     try {
-        //check the type of id
+        //“If the request can only ever mean one thing, handle it immediately.”
+        const userId = req.user.id;
+        const { bookingId, listingId } = req.query;
 
-        //if its a listingId
-        //check if user is the owner,
+        if(!bookingId && !listingId){
 
-        //if its a userId
-        //check if userId is the same
+            const data = await BookingRepository.repoGetGuestBookingsByUserId(userId);
+
+            if(!data) return notFound('could not find a booking.');
+
+            return successResponse(res, data, 'success', 200);
+        }
+
+        else if(bookingId){
+
+            const bookingRecord = await BookingRepository.repoGetBookingById(bookingId);
+
+            const isGuest = bookingRecord[BookingModel.Fields.GUEST_ID] === userId;
+            const isHost = bookingRecord[BookingModel.Fields.HOST_ID] === userId;
+
+            if(!isGuest && !isHost) return unauthorized('unauthorized');
+            
+            return successResponse(res, bookingRecord, 'success', 200);
+        }
+
+        else if (listingId){
+            
+            const listing = await ListingsRepository.repoGetListingById(listingId);
+
+            if(!listing) return notFound('no listing found.');
+    
+            const isHost = listing[ListingsModel.Fields.USER_ID] === userId;
+            
+            if(isHost){
+
+                const records = await BookingRepository.repoGetHostBookingsByListingId(listingId, userId);
+
+                if(!records) return notFound('currently no bookings for that listing');
+
+                return successResponse(res, records, 'success', 200);
+            }
+            else {
+
+                const record = await BookingRepository.repoGetGuestBookingByListingId(listingId, userId);
+
+                if(!record) return notFound('you havent booked this yet');
+
+                return successResponse(res, record, 'you have a booking.', 200);
+            }
+        }
+        else return notFound('nothing here.');
+
     } 
     catch (error) {
-        
+
+        console.error(error);
+        return errorResponse(res, 'Server error', 500, {});
     }
 }
 
@@ -276,3 +335,6 @@ module.exports = {
 // if user who's booking was accepted has other pending bookings, then set those status to 3 (CANCELLED)
 // where should be put this logic?
 // -> what we know: when a booking is updated a event is emitted, can we just put the logic for it in the listening switch statement?
+
+
+//“When a request shape has only one valid business interpretation, handle it directly; otherwise, resolve intent by validating the user’s relationship to the referenced resource.”

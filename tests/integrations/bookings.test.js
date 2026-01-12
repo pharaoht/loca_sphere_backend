@@ -9,7 +9,9 @@ const guestId = generateTestToken(TEST_USER_GUEST_ID);
 
 describe('BOOKING.CONTROLLER GET - /api/bookings/:id', () => {
 
-    it('', () => {})
+    it('should return 404 when user doesnt have a booking and both params are null', () => {})
+
+    it('should return 200 when user has a booking and both params are null', () => {});
 });
 
 describe('BOOKING.CONTROLLER GET - api/bookings/check-availability/:listingId', () => { 
@@ -123,6 +125,7 @@ describe('BOOKING.CONTROLLER PATCH - /api/bookings/update-status', () => {
             .set('Authorization', `Bearer ${hostId}`)
             .send({ bookingId: TEST_BOOKING_ID, statusChangeId: 1 });
 
+        console.log(res.body)
         expect(res.statusCode).toBe(403)
     });
 
