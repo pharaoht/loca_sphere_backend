@@ -3,21 +3,53 @@ const BookingModel = require("./booking.model");
 
 class BookingRepository {
 
-    static async repoGetBookingById(id){
+    static _returnOrFalse(records) {
+        return records && records.length ? records : false;
+    }
 
-        if(!id || typeof id !== 'string') return false;
 
-        let column;
+    static async repoGetGuestBookingsByUserId(userId){
 
-        if(id.startsWith('bk')) column = BookingModel.Fields.ID;
-        else if(id.startsWith('ls')) column = BookingModel.Fields.LISTING_ID;
-        // else if(id.startsWith('us')) column = BookingModel.Fields.HOSTID;
-        else return false;
+        if(!userId) return false;
 
-        const record = await BookingModel.query().findOne({ [column]: id});
+        const bookingRecords = await BookingModel.query()
+            .where(BookingModel.Fields.GUEST_ID, userId)
+    
+        return this._returnOrFalse(bookingRecords);
+    };
 
-        return record;
+    static async repoGetBookingById(bkId){
 
+        if(!bkId) return false;
+        
+        const booking = await BookingModel.query()
+            .where(BookingModel.Fields.ID, bkId)
+            .first()
+
+        return this._returnOrFalse(booking)
+    };
+
+    static async repoGetHostBookingsByListingId(listingId, userId){
+
+        if(!listingId || !userId) return false;
+
+        const bookingRecords = await BookingModel.query()
+            .where(BookingModel.Fields.HOST_ID, userId)
+            .where(BookingModel.Fields.LISTING_ID, listingId)
+
+        return this._returnOrFalse(bookingRecords)
+    };
+
+    static async repoGetGuestBookingByListingId(listingId, userId){
+
+        if(!listingId || !userId) return false;
+
+        const bookingRecord = await BookingModel.query()
+            .where(BookingModel.Fields.LISTING_ID, listingId)
+            .where(BookingModel.Fields.GUEST_ID, userId)
+            .findOne();
+
+        return this._returnOrFalse(bookingRecord)
     };
 
     static async repoCreateBooking(bookingBody = undefined){
@@ -32,7 +64,8 @@ class BookingRepository {
                 .where(builder => 
                     builder.where(BookingModel.Fields.START_DATE, '<=', bookingBody.endDate)
                     .andWhere(BookingModel.Fields.END_DATE, '>=', bookingBody.startDate)
-                ).forUpdate().first();
+                )
+                .forUpdate().first();
 
             if(conflicts){
                 return false
@@ -108,11 +141,11 @@ class BookingRepository {
         const yearStart = new Date(Date.UTC(currentYear, 0, 1, 0, 0, 0, 0));
  
         const bookings = await BookingModel.query()
-        .where(BookingModel.Fields.LISTING_ID, listingId)
-        .where(BookingModel.Fields.END_DATE, '>=', yearStart.toISOString())
-        .where(BookingModel.Fields.STATUS_ID, 2)
+            .where(BookingModel.Fields.LISTING_ID, listingId)
+            .where(BookingModel.Fields.END_DATE, '>=', yearStart.toISOString())
+            .where(BookingModel.Fields.STATUS_ID, 2)
 
-        return bookings;
+        return this._returnOrFalse(bookings)
     }
 };
 

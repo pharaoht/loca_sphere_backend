@@ -77,12 +77,17 @@ class BookingModel extends Model {
 
     static get relationMappings() {
         
+        const x = `${BookingModel.tableName}.${BookingModel.Fields.ID}`;
+        const xx = `${BookingStatus.tableName}.${BookingStatus.Fields.ID}`;
+
         return {
-            status: Model.HasOneRelation,
-            modelClass: BookingStatus,
-            join: {
-                from: '',
-                to: ''
+            statusMap: {
+                relation: Model.HasOneRelation,
+                modelClass: BookingStatus,
+                join: {
+                    from: x,
+                    to: xx
+                }
             }
         }
     }

@@ -14,7 +14,7 @@ bookingRouter.get(`${resource}/check-availability/:listingId`, httpCheckAvailabi
 
 bookingRouter.get(`${resource}/get-availability/:listingId`, httpGetAvailabilityForListing);
 
-bookingRouter.get(`${resource}/:id`, authenticateJWT, httpGetBookingById);
+bookingRouter.get(`${resource}/get-bookings`, authenticateJWT, httpGetBookingById);
 
 bookingRouter.post(`${resource}/create`, authenticateJWT, idempotencyMiddleware, httpCreateBooking);
 
