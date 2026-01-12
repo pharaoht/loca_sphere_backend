@@ -26,7 +26,9 @@ class BookingRepository {
             .where(BookingModel.Fields.ID, bkId)
             .first()
 
-        return this._returnOrFalse(booking)
+        if(!booking) return false
+
+        return booking;
     };
 
     static async repoGetHostBookingsByListingId(listingId, userId){

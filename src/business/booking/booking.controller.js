@@ -98,7 +98,7 @@ async function httpUpdateBookingStatus(req, res){
         if(!isValidStatus) return errorResponse(res, 'Not a valid action', 400);
         
         const bookingRecord = await BookingRepository.repoGetBookingById(bookingId);
-
+        console.log(bookingRecord)
         if(!bookingRecord) return errorResponse(res, 'Unable to find that booking record', 404);
 
         const currentBookingStatusId = bookingRecord[BookingModel.Fields.STATUS_ID];
