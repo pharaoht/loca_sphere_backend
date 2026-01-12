@@ -125,6 +125,7 @@ describe('BOOKING.CONTROLLER PATCH - /api/bookings/update-status', () => {
             .set('Authorization', `Bearer ${hostId}`)
             .send({ bookingId: TEST_BOOKING_ID, statusChangeId: 1 });
 
+        console.log(res.message)
         expect(res.statusCode).toBe(403)
     });
 
