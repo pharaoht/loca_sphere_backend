@@ -1,5 +1,7 @@
 const express = require('express');
 
+const { idempotencyMiddleware } = require('../../middleware/idempotency/idempotency.middleware');
+
 const authenticateJWT = require('../../middleware/authenticate/auth.middleware');
 
 const { httpGetUserInfo, httpPatchUserDetails, httpGetUserOptions } = require('./user.controller');
@@ -12,6 +14,6 @@ usersRouter.get(`${resource}/me`, authenticateJWT, httpGetUserInfo);
 
 usersRouter.get(`${resource}/options/:option`, httpGetUserOptions);
 
-usersRouter.patch(`${resource}`, authenticateJWT, httpPatchUserDetails);
+usersRouter.patch(`${resource}`, authenticateJWT, idempotencyMiddleware, httpPatchUserDetails);
 
 module.exports = usersRouter;

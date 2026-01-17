@@ -98,7 +98,7 @@ async function httpUpdateBookingStatus(req, res){
         if(!isValidStatus) return errorResponse(res, 'Not a valid action', 400);
         
         const bookingRecord = await BookingRepository.repoGetBookingById(bookingId);
-        console.log(bookingRecord)
+
         if(!bookingRecord) return errorResponse(res, 'Unable to find that booking record', 404);
 
         const currentBookingStatusId = bookingRecord[BookingModel.Fields.STATUS_ID];
@@ -169,7 +169,7 @@ async function httpGetBookingById(req, res) {
     try {
         //“If the request can only ever mean one thing, handle it immediately.”
         const userId = req.user.id;
-        const { bookingId, listingId } = req.query;
+        const { bookingId, listingId, limit, page, statusId } = req.query;
 
         if(!bookingId && !listingId){
 
@@ -231,10 +231,6 @@ async function httpDeleteBookingById(req, res){
     
 }
 
-/**
- * @param {Request} req
- * @param {Response} res
- */
 async function httpCheckAvailability(req, res){
 
     try {
@@ -279,9 +275,9 @@ async function httpGetAvailabilityForListing(req, res, next) {
         //listid param
         const { listingId } = req.params;
 
-        const results = await BookingRepository.repoGetAvailabityByListingId(listingId);
+        if(!listingId) return errorResponse(res, 'no listingId provided', 400, [])
 
-        if(!results) return errorResponse(res, 'ListingId was not received', 400, {});
+        const results = await BookingRepository.repoGetAvailabityByListingId(listingId);
 
         return successResponse(res, results, 'success', 200);
     }
@@ -289,7 +285,7 @@ async function httpGetAvailabilityForListing(req, res, next) {
 
         console.error(error);
 
-        return errorResponse(res, 'Internal server error', 500, {})
+        return errorResponse(res, 'Internal server error', 500, [])
     }
 }
 
