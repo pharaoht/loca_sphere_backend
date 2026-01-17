@@ -147,7 +147,8 @@ class BookingRepository {
             .where(BookingModel.Fields.END_DATE, '>=', yearStart.toISOString())
             .where(BookingModel.Fields.STATUS_ID, 2)
 
-        return this._returnOrFalse(bookings)
+
+        return bookings;
     }
 };
 
