@@ -36,6 +36,8 @@ const usersRouter = require('./business/users/users.routes.js');
 
 const bookingRouter = require('./business/booking/booking.routes.js');
 
+const favoritesRouter = require('./business/favorites/favorites.routes.js');
+
 app.set('trust proxy', 1);
 
 app.use(helmet({
@@ -68,6 +70,8 @@ apiRouter.use(authRouter);
 apiRouter.use(usersRouter);
 
 apiRouter.use(bookingRouter);
+
+apiRouter.use(favoritesRouter);
 
 // app.use(errorHandler);
 
