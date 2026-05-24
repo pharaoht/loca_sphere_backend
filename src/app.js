@@ -73,8 +73,6 @@ apiRouter.use(bookingRouter);
 
 apiRouter.use(favoritesRouter);
 
-// app.use(errorHandler);
-
 app.get('/' , (req, res) => res.sendFile(path.join(__dirname, 'templates', 'default.html')));
 
 module.exports = app;
