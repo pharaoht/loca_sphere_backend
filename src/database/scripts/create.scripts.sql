@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS Users (
     FOREIGN KEY (gender) REFERENCES Gender(id) ON DELETE CASCADE,
     FOREIGN KEY (nationality) REFERENCES Nationality(id) ON DELETE CASCADE,
     FOREIGN KEY (occupation) REFERENCES Occupation(id) ON DELETE CASCADE,
-    FOREIGN KEY (countryCode) REFERENCES CountryCallingCodes(id) ON DELETE CASCADE,
+    FOREIGN KEY (countryCode) REFERENCES CountryCallingCodes(id) ON DELETE CASCADE
 );
 
 CREATE TABLE Nationality (
@@ -205,7 +205,7 @@ CREATE TABLE IF NOT EXISTS Bookings (
     endDate DATE NOT NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     statusId TINYINT DEFAULT 6,
-    guests INT UNSIGNED 1,
+    guests INT UNSIGNED NOT NULL DEFAULT 1,
     additionalInfo TEXT, 
     FOREIGN KEY (listingId) REFERENCES Listing(id) ON DELETE CASCADE,
     FOREIGN KEY (hostId) REFERENCES Users(id) ON DELETE CASCADE,
