@@ -28,20 +28,20 @@ async function httpOAuthCallback(req, res, next) {
 	passport.authenticate('google', { session: false }, async (err, user) => {
 
 		const redirect = process.env.NODE_ENV === 'dev' ? process.env.LOCAL_DOMAIN : process.env.PROD_DOMAIN;
-
+		console.log(process.env.NODE_ENV)
 		if (err || !user) {
 			return res.redirect('/api/auth/failure');
 		}
 
 		//save token in redis
-		await instance.set(`refresh:${refreshToken}`, user.id, { EX: 7 * 24 * 60 * 60 * 1000  });
+		await instance.set(`refresh:${refreshToken}`, user.id, { EX: 7 * 24 * 60 * 60  });
 
 		// //store refresh token in cookie
 		res.cookie('refresh_token', refreshToken, {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === 'PROD',
 			sameSite: process.env.NODE_ENV === 'PROD' ? 'none' : 'lax',
-			maxAge: 7 * 24 * 60 * 60 * 1000,
+			maxAge: 7 * 24 * 60 * 60,
 		})
 		
 		return res.redirect(`${redirect}/`)
@@ -93,7 +93,7 @@ async function httpRefreshToken(req, res){
 		await instance.set(`refresh:${newRefreshToken}`,
 			userId,
 			//EX redis deletes this automatically
-			{ EX :7 * 24 * 60 * 60 * 1000 }
+			{ EX :7 * 24 * 60 * 60 }
 		)
 
 		console.log('** removing old refresh token from redis **');
@@ -105,7 +105,7 @@ async function httpRefreshToken(req, res){
 			httpOnly: true,
 			secure: process.env.NODE_ENV === 'PROD',
 			sameSite: process.env.NODE_ENV === 'PROD' ? 'none' : 'lax',
-			maxAge: 7 * 24 * 60 * 60 * 1000, 
+			maxAge: 7 * 24 * 60 * 60, 
 		})
 
 		console.log('** issuing success **');

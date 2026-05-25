@@ -59,6 +59,8 @@ app.use(cors({ origin: [ process.env.LOCAL_DOMAIN, process.env.PROD_DOMAIN ], cr
 
 app.use(express.static('public'));
 
+console.log(process.env.NODE_ENV)
+
 app.use('/api', apiRouter);
 
 apiRouter.use(cityRouter);
