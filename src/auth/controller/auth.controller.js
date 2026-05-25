@@ -10,6 +10,8 @@ const nanoid = async () => {
   return nanoid();
 };
 
+const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000;
+const sevenDaysInSeconds = sevenDaysInMs / 1000;
 
 async function httpOAuthLogin(req, res, next) {
 
@@ -28,20 +30,21 @@ async function httpOAuthCallback(req, res, next) {
 	passport.authenticate('google', { session: false }, async (err, user) => {
 
 		const redirect = process.env.NODE_ENV === 'dev' ? process.env.LOCAL_DOMAIN : process.env.PROD_DOMAIN;
-		console.log(process.env.NODE_ENV)
+
 		if (err || !user) {
 			return res.redirect('/api/auth/failure');
 		}
 
 		//save token in redis
-		await instance.set(`refresh:${refreshToken}`, user.id, { EX: 7 * 24 * 60 * 60  });
+		await instance.set(`refresh:${refreshToken}`, user.id, { EX: sevenDaysInSeconds});
 
 		// //store refresh token in cookie
 		res.cookie('refresh_token', refreshToken, {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === 'PROD',
-			sameSite: process.env.NODE_ENV === 'PROD' ? 'none' : 'lax',
-			maxAge: 7 * 24 * 60 * 60,
+			sameSite: 'lax',
+			domain: process.env.NODE_ENV === 'PROD' ? '.loca-sphere.dev' : 'localhost',
+			maxAge: sevenDaysInMs,
 		})
 		
 		return res.redirect(`${redirect}/`)
@@ -53,7 +56,10 @@ async function httpLogout(req, res){
 
     req.logout();
 
-    res.clearCookie('refresh_token');
+	res.clearCookie('refresh_token', {
+		domain: '.loca-sphere.dev',
+		path: '/'
+	});
 
     return res.redirect('/')
 }
@@ -93,7 +99,7 @@ async function httpRefreshToken(req, res){
 		await instance.set(`refresh:${newRefreshToken}`,
 			userId,
 			//EX redis deletes this automatically
-			{ EX :7 * 24 * 60 * 60 }
+			{ EX : sevenDaysInSeconds }
 		)
 
 		console.log('** removing old refresh token from redis **');
@@ -104,8 +110,8 @@ async function httpRefreshToken(req, res){
 		res.cookie('refresh_token', newRefreshToken, {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === 'PROD',
-			sameSite: process.env.NODE_ENV === 'PROD' ? 'none' : 'lax',
-			maxAge: 7 * 24 * 60 * 60, 
+			sameSite: 'lax',
+			maxAge: sevenDaysInMs, 
 		})
 
 		console.log('** issuing success **');
