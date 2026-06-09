@@ -1,10 +1,46 @@
+const moment = require('moment');
 const { EVENT_TYPES } = require("../../events/booking.events");
+const ListingsModel = require("../listings/listings.model");
+const ListingsRepository = require("../listings/listings.repository");
 const BookingModel = require("./booking.model");
 
 class BookingRepository {
 
     static _returnOrFalse(records) {
         return records && records.length ? records : false;
+    }
+
+    static async _computeNextAvailableDateForListing(listingId, bookingObjArr) {
+
+        let nextAvailableDate = '';
+
+        const listing = await ListingsRepository.repoGetListingById(listingId);
+        const minimumStayForListing = listing[ListingsModel.Fields.MINIMUM_STAY_DAYS];
+
+        bookingObjArr.forEach((itm, idx) => {
+            
+            const isLastBooking = idx + 1 >= bookingObjArr.length;
+            const bookingStartDate = moment(itm[BookingModel.Fields.START_DATE]);
+            const bookingEndDate = moment(itm[BookingModel.Fields.END_DATE]);
+            const nextBooking = isLastBooking ? null : bookingObjArr[idx + 1];
+            const nextBookingStartDate = nextBooking !== null && moment(nextBooking[BookingModel.Fields.START_DATE]);
+            const nextBookingEndDate = nextBooking !== null && moment(nextBooking[BookingModel.Fields.END_DATE]);
+
+            if(nextAvailableDate == '') {
+
+                if(nextBooking) {
+
+                    const gap = nextBookingStartDate.diff(bookingEndDate, 'd')
+
+                    if(gap > minimumStayForListing){
+                        nextAvailableDate = bookingEndDate;
+                    }
+                }
+                else nextAvailableDate = bookingEndDate;
+            }
+        })
+
+        return nextAvailableDate;
     }
 
 
@@ -134,9 +170,9 @@ class BookingRepository {
         return !!hasConflict;
     }
 
-    static async repoGetAvailabityByListingId(listingId = undefined){
+    static async repoGetRelevantBookingsByListingId(listingId = undefined){
 
-        if(!listingId) return false;
+        if(!listingId) return [];
 
         const currentYear = new Date().getUTCFullYear();
 
@@ -145,8 +181,7 @@ class BookingRepository {
         const bookings = await BookingModel.query()
             .where(BookingModel.Fields.LISTING_ID, listingId)
             .where(BookingModel.Fields.END_DATE, '>=', yearStart.toISOString())
-            .where(BookingModel.Fields.STATUS_ID, 2)
-
+            .where(BookingModel.Fields.STATUS_ID, EVENT_TYPES.BOOKING_STATUS_ID.CONFIRMED)
 
         return bookings;
     }

@@ -277,7 +277,7 @@ async function httpGetAvailabilityForListing(req, res, next) {
 
         if(!listingId) return errorResponse(res, 'no listingId provided', 400, [])
 
-        const results = await BookingRepository.repoGetAvailabityByListingId(listingId);
+        const results = await BookingRepository.repoGetRelevantBookingsByListingId(listingId);
 
         return successResponse(res, results, 'success', 200);
     }
