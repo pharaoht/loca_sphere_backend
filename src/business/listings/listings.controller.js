@@ -32,12 +32,14 @@ async function httpDynamicGetListingDetails(req, res){
     */
 
     try {
-
+     
         const { listId } = req.params;
 
         const { includes } = req.query;
 
         const includeOptions = ListingService.MapParamsToGraph(includes);
+
+        if(!listId) return errorResponse(res, 'Listing ID is required', 400);
 
         const [ result ] = await ListingsRepository.repoGetListingDeets(listId, includeOptions);
 
