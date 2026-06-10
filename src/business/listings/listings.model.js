@@ -51,6 +51,16 @@ class ListingsModel extends Model {
         };
     };
 
+    static get virtualAttributes() {
+        // exposed API field (computed from internal value)
+        return ['nextAvailableDate'];
+    }
+
+    get nextAvailableDate() {
+        // Internal value injected by repository (not from DB)
+        return moment(this._nextAvailableDate).format('YYYY MMM DD');
+    }
+
     static get jsonSchema() {
 
         return {

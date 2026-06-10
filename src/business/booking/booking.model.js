@@ -49,6 +49,22 @@ class BookingModel extends Model {
         }
     }
 
+    static get virtualAttributes() {
+        // exposed API field (computed from internal value)
+        return [
+            'startDateMiliSeconds', 
+            'endDateMiliSeconds', 
+        ];
+    }
+
+    get startDateMiliSeconds() {
+        return moment(this[BookingModel.Fields.START_DATE]).valueOf();
+    }
+
+    get endDateMiliSeconds() {
+        return moment(this[BookingModel.Fields.END_DATE]).valueOf();
+    }
+
     static get jsonSchema() {
         return {
             type: 'object',
@@ -101,21 +117,22 @@ class BookingModel extends Model {
     }
 
     $parseDatabaseJson(json){
-
+        //raw row
+        //   ↓
+        //$parseDatabaseJson()
+        //   ↓
+        //Model instance
         json = super.$parseDatabaseJson(json);
-
         json[BookingModel.Fields.START_DATE] = moment(json[BookingModel.Fields.START_DATE]).format('YYYY-MM-DD');
         json[BookingModel.Fields.END_DATE] = moment(json[BookingModel.Fields.END_DATE]).format('YYYY-MM-DD');
         json[BookingModel.Fields.CREATED_AT] = moment(json[BookingModel.Fields.CREATED_AT]).format('YYYY-MM-DD');
-        json.startDateMiliSeconds = moment(json[BookingModel.Fields.START_DATE]).valueOf();
-        json.endDateMiliSeconds = moment(json[BookingModel.Fields.END_DATE]).valueOf();
-
         return json;
     }
 
     $formatJson(json) {
         //to client
         const formattedJson = super.$formatJson(json);
+
 
         return formattedJson;
     }

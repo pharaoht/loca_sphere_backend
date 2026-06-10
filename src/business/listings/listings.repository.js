@@ -1,5 +1,6 @@
 const ImagesModel = require('./images/images.model');
 const ListingsModel = require('./listings.model');
+const ListingService = require('./listings.service');
 
 class ListingsRepository{
 
@@ -60,6 +61,12 @@ class ListingsRepository{
         if(!listingId) return false;
 
         const listing = await ListingsModel.query().findById(listingId);
+
+        if(!listing) return false;
+
+        const nextAvail = await ListingService._computeNextAvailableDateForListing(listing);
+        
+        listing._nextAvailableDate = nextAvail;
 
         return listing;
     }

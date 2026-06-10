@@ -1,3 +1,4 @@
+const moment = require('moment');
 const { EVENT_TYPES } = require("../../events/booking.events");
 const BookingModel = require("./booking.model");
 
@@ -6,7 +7,6 @@ class BookingRepository {
     static _returnOrFalse(records) {
         return records && records.length ? records : false;
     }
-
 
     static async repoGetGuestBookingsByUserId(userId){
 
@@ -134,9 +134,9 @@ class BookingRepository {
         return !!hasConflict;
     }
 
-    static async repoGetAvailabityByListingId(listingId = undefined){
+    static async repoGetRelevantBookingsByListingId(listingId = undefined){
 
-        if(!listingId) return false;
+        if(!listingId) return [];
 
         const currentYear = new Date().getUTCFullYear();
 
@@ -145,8 +145,7 @@ class BookingRepository {
         const bookings = await BookingModel.query()
             .where(BookingModel.Fields.LISTING_ID, listingId)
             .where(BookingModel.Fields.END_DATE, '>=', yearStart.toISOString())
-            .where(BookingModel.Fields.STATUS_ID, 2)
-
+            .where(BookingModel.Fields.STATUS_ID, EVENT_TYPES.BOOKING_STATUS_ID.CONFIRMED)
 
         return bookings;
     }

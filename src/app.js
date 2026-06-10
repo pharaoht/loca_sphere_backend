@@ -40,10 +40,7 @@ const favoritesRouter = require('./business/favorites/favorites.routes.js');
 
 app.set('trust proxy', 1);
 
-app.use(helmet({
-    crossOriginResourcePolicy: false,
-    crossOriginEmbedderPolicy: false,
-}));
+app.use(helmet());
 
 app.use(hpp());
 
@@ -58,8 +55,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors({ origin: [ process.env.LOCAL_DOMAIN, process.env.PROD_DOMAIN ], credentials: true }));
 
 app.use(express.static('public'));
-
-console.log(process.env.NODE_ENV)
 
 app.use('/api', apiRouter);
 
