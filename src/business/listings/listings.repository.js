@@ -1,6 +1,6 @@
 const ImagesModel = require('./images/images.model');
 const ListingsModel = require('./listings.model');
-const bookingRepository = require('../booking/booking.repository');
+const BookingRepository = require('../booking/booking.repository');
 
 class ListingsRepository{
 
@@ -62,9 +62,9 @@ class ListingsRepository{
 
         const listing = await ListingsModel.query().findById(listingId);
 
-        const bookings = await bookingRepository.repoGetBookingsByListingId(listingId);
+        const bookings = await BookingRepository.repoGetRelevantBookingsByListingId(listingId);
 
-        const nextAvail = await bookingRepository._computeNextAvailableDateForListing(listingId, bookings);
+        const nextAvail = await BookingRepository._computeNextAvailableDateForListing(listingId, bookings);
         
         listing._nextAvailableDate = nextAvail;
 
