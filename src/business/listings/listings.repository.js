@@ -11,7 +11,11 @@ class ListingsRepository{
         const result = await ListingsModel.query()
             .where(ListingsModel.Fields.ID, listingId)
             .withGraphFetched(`[${options}]`)
-    
+
+        const nextAvail = await ListingService._computeNextAvailableDateForListing(result[0]);
+   
+        result[0]._nextAvailableDate = nextAvail;
+
         return result;
     }
 
@@ -65,7 +69,7 @@ class ListingsRepository{
         if(!listing) return false;
 
         const nextAvail = await ListingService._computeNextAvailableDateForListing(listing);
-        
+  
         listing._nextAvailableDate = nextAvail;
 
         return listing;

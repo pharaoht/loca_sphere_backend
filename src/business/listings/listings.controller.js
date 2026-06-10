@@ -32,7 +32,7 @@ async function httpDynamicGetListingDetails(req, res){
     */
 
     try {
-
+     
         const { listId } = req.params;
 
         const { includes } = req.query;

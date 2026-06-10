@@ -49,7 +49,7 @@ class BookingRepository {
         const bookingRecord = await BookingModel.query()
             .where(BookingModel.Fields.LISTING_ID, listingId)
             .where(BookingModel.Fields.GUEST_ID, userId)
-            .findOne();
+            .first();
 
         return this._returnOrFalse(bookingRecord)
     };
