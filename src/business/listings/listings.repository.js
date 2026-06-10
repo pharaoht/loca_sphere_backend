@@ -62,6 +62,8 @@ class ListingsRepository{
 
         const listing = await ListingsModel.query().findById(listingId);
 
+        if(!listing) return false;
+
         const nextAvail = await ListingService._computeNextAvailableDateForListing(listing);
         
         listing._nextAvailableDate = nextAvail;
