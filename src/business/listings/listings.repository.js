@@ -12,6 +12,8 @@ class ListingsRepository{
             .where(ListingsModel.Fields.ID, listingId)
             .withGraphFetched(`[${options}]`)
 
+        if(!result || result.length === 0) return false;
+    
         const nextAvail = await ListingService._computeNextAvailableDateForListing(result[0]);
    
         result[0]._nextAvailableDate = nextAvail;
