@@ -39,6 +39,8 @@ async function httpDynamicGetListingDetails(req, res){
 
         const includeOptions = ListingService.MapParamsToGraph(includes);
 
+        if(!listId) return errorResponse(res, 'Listing ID is required', 400);
+
         const [ result ] = await ListingsRepository.repoGetListingDeets(listId, includeOptions);
 
         if(!result) return errorResponse(res, 'Unable to process your request', 404)

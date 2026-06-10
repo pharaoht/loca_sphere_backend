@@ -5,15 +5,13 @@ const ListingService = require('./listings.service');
 class ListingsRepository{
 
     static async repoGetListingDeets(listingId = '', options = '',){
-
-        if(listingId === '') return false;
     
         const result = await ListingsModel.query()
             .where(ListingsModel.Fields.ID, listingId)
             .withGraphFetched(`[${options}]`)
 
-        if(!result || result.length === 0) return false;
-    
+        if(result.length === 0) return [];
+
         const nextAvail = await ListingService._computeNextAvailableDateForListing(result[0]);
    
         result[0]._nextAvailableDate = nextAvail;
