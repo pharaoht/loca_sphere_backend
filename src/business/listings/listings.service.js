@@ -12,6 +12,10 @@ const UtilityModel = require("./utility/utility.model");
 const ListingBedroomAmenities = require('./bedroom_amenity_map/bedroommap.model');
 const ImagesModel = require("./images/images.model");
 const AmenityMapModel = require("./amenity_map/amenitymap.model");
+const BookingModel = require("../booking/booking.model");
+const moment = require('moment');
+const ListingRepository = require("./listings.repository");
+const BookingRepository = require("../booking/booking.repository");
 
 class ListingService {
 
@@ -157,6 +161,41 @@ class ListingService {
 
         return ListingService.ModelMap[param];
     }
+
+    static async _computeNextAvailableDateForListing(listing) {
+    
+        let nextAvailableDate = '';
+     
+        const minimumStayForListing = listing[ListingsModel.Fields.MINIMUM_STAY_DAYS];
+
+        const bookingObjArr = await BookingRepository.repoGetRelevantBookingsByListingId(listing[ListingsModel.Fields.ID]);
+
+        bookingObjArr.forEach((itm, idx) => {
+            
+            const isLastBooking = idx + 1 >= bookingObjArr.length;
+            const bookingStartDate = moment(itm[BookingModel.Fields.START_DATE]);
+            const bookingEndDate = moment(itm[BookingModel.Fields.END_DATE]);
+            const nextBooking = isLastBooking ? null : bookingObjArr[idx + 1];
+            const nextBookingStartDate = nextBooking !== null && moment(nextBooking[BookingModel.Fields.START_DATE]);
+            const nextBookingEndDate = nextBooking !== null && moment(nextBooking[BookingModel.Fields.END_DATE]);
+
+            if(nextAvailableDate == '') {
+
+                if(nextBooking) {
+
+                    const gap = nextBookingStartDate.diff(bookingEndDate, 'd')
+
+                    if(gap > minimumStayForListing){
+                        nextAvailableDate = bookingEndDate;
+                    }
+                }
+                else nextAvailableDate = bookingEndDate;
+            }
+        })
+
+        return nextAvailableDate;
+    }
+    
 };
 
 module.exports = ListingService;
