@@ -169,6 +169,8 @@ class ListingService {
         const minimumStayForListing = listing[ListingsModel.Fields.MINIMUM_STAY_DAYS];
 
         const bookingObjArr = await BookingRepository.repoGetRelevantBookingsByListingId(listing[ListingsModel.Fields.ID]);
+        
+        if(bookingObjArr.length === 0) return moment();
 
         bookingObjArr.forEach((itm, idx) => {
             
@@ -192,7 +194,7 @@ class ListingService {
                 else nextAvailableDate = bookingEndDate;
             }
         })
-
+  
         return nextAvailableDate;
     }
     
