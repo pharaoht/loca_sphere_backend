@@ -164,13 +164,16 @@ class ListingService {
 
     static async _computeNextAvailableDateForListing(listing) {
     
-        let nextAvailableDate = '';
+        let nextAvailableDate = null;
      
         const minimumStayForListing = listing[ListingsModel.Fields.MINIMUM_STAY_DAYS];
 
         const bookingObjArr = await BookingRepository.repoGetRelevantBookingsByListingId(listing[ListingsModel.Fields.ID]);
-        
-        if(bookingObjArr.length === 0) return moment();
+
+        if(bookingObjArr.length === 0){
+            nextAvailableDate = moment().startOf('day');
+            return nextAvailableDate;
+        } 
 
         bookingObjArr.forEach((itm, idx) => {
             
@@ -181,11 +184,12 @@ class ListingService {
             const nextBookingStartDate = nextBooking !== null && moment(nextBooking[BookingModel.Fields.START_DATE]);
             const nextBookingEndDate = nextBooking !== null && moment(nextBooking[BookingModel.Fields.END_DATE]);
 
-            if(nextAvailableDate == '') {
+            if(nextAvailableDate == null) {
 
                 if(nextBooking) {
 
-                    const gap = nextBookingStartDate.diff(bookingEndDate, 'd')
+                    const gap = nextBookingStartDate.startOf('day')
+                        .diff(bookingEndDate.startOf('day'), 'days');
 
                     if(gap > minimumStayForListing){
                         nextAvailableDate = bookingEndDate;
