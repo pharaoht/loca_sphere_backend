@@ -164,42 +164,35 @@ class ListingService {
 
     static async _computeNextAvailableDateForListing(listing) {
     
-        let nextAvailableDate = null;
-     
         const minimumStayForListing = listing[ListingsModel.Fields.MINIMUM_STAY_DAYS];
 
         const bookingObjArr = await BookingRepository.repoGetRelevantBookingsByListingId(listing[ListingsModel.Fields.ID]);
 
-        if(bookingObjArr.length === 0){
-            nextAvailableDate = moment().startOf('day');
-            return nextAvailableDate;
-        } 
+        if(bookingObjArr.length === 0) return moment().startOf('day').add(1, 'days');
 
-        bookingObjArr.forEach((itm, idx) => {
+        for(let i = 0; i < bookingObjArr.length; i++) {
+
+            const bookingEndDate = moment(bookingObjArr[i][BookingModel.Fields.END_DATE]);
+            const nextBooking = bookingObjArr[i + 1];
+
+            if(!nextBooking) return bookingEndDate.clone().startOf('day').add(1, 'days');
             
-            const isLastBooking = idx + 1 >= bookingObjArr.length;
-            const bookingStartDate = moment(itm[BookingModel.Fields.START_DATE]);
-            const bookingEndDate = moment(itm[BookingModel.Fields.END_DATE]);
-            const nextBooking = isLastBooking ? null : bookingObjArr[idx + 1];
-            const nextBookingStartDate = nextBooking !== null && moment(nextBooking[BookingModel.Fields.START_DATE]);
-            const nextBookingEndDate = nextBooking !== null && moment(nextBooking[BookingModel.Fields.END_DATE]);
+            const newBookingStartDate = moment(nextBooking[BookingModel.Fields.START_DATE]);
+            
+            const gapDays = newBookingStartDate         
+                .clone()
+                .startOf('day')
+                .diff(
+                    bookingEndDate.clone().startOf('day'),
+                    'days'
+                );
 
-            if(nextAvailableDate == null) {
-
-                if(nextBooking) {
-
-                    const gap = nextBookingStartDate.startOf('day')
-                        .diff(bookingEndDate.startOf('day'), 'days');
-
-                    if(gap > minimumStayForListing){
-                        nextAvailableDate = bookingEndDate;
-                    }
-                }
-                else nextAvailableDate = bookingEndDate;
+            if(gapDays >= minimumStayForListing){
+                return bookingEndDate.clone().startOf('day').add(1, 'days');
             }
-        })
-  
-        return nextAvailableDate;
+        }
+
+        return null;
     }
     
 };
