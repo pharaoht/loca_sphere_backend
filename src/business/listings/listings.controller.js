@@ -195,11 +195,7 @@ async function httpGetListingsByUserId(req, res){
 
     try {
 
-        const listingData = req.body;
-
-        const model = ListingService.ModelMap(listingData.step);
-
-        const listing = ListingsRepository.repoCreateListing(listingData, model);
+        const userId = req.user.id;
 
     }
     catch(error){
