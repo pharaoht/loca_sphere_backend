@@ -44,9 +44,9 @@ class AddressDal {
                     [ListingsModel.Fields.CREATED_AT]: address[ListingsModel.Fields.CREATED_AT],
                     [ListingsModel.Fields.UPDATED_AT]: address[ListingsModel.Fields.UPDATED_AT],
                     nextAvailableDate:{
-                        tz: address.nextAvailableDate,
-                        milliseconds: moment(address.nextAvailableDate).valueOf(),
-                        yymmdd: moment(address.nextAvailableDate).format('YYYY MMM DD')
+                        tz: address.listing._nextAvailableDate,
+                        milliseconds: moment(address.listing_nextAvailableDate).valueOf(),
+                        yymmdd: moment(address.listing._nextAvailableDate).format('YYYY MMM DD')
                     }, 
                     currency: {
                         [CurrencyModel.Fields.ID]: address[CurrencyModel.Fields.ID],

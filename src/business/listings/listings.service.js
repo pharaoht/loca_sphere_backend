@@ -162,37 +162,156 @@ class ListingService {
         return ListingService.ModelMap[param];
     }
 
+    static _isDateInPast(date){
+                    
+        const today = moment().startOf('day');
+        const inputDate = moment(date).startOf('day');
+        return inputDate.isBefore(today);
+    }
+
+    static async _computeNextAvailableDateForMultipleListings(listings) {
+        
+        if(!Array.isArray(listings) || listings.length == 0) return []
+
+        const listingIds = listings.map((itm, idx) => itm[ListingsModel.Fields.ID]);
+
+        const bookingObjArr = await BookingRepository.repoGetRelevantBookingsByListingIds(listingIds);
+
+        const reduceArr = combineBookings(bookingObjArr);
+
+        const updatedListings = computeDateAvailability(reduceArr, listings);
+
+        return updatedListings;
+
+        function combineBookings(bookings){
+
+            return bookings.reduce((accumulator, currentValue) => {
+                
+                const listingId = currentValue[BookingModel.Fields.LISTING_ID];
+
+                accumulator[listingId] = accumulator[listingId] || [];
+
+                accumulator[listingId].push(currentValue)
+
+                return accumulator;
+            }, {});
+        };
+
+        function computeDateAvailability(bookings, listingsArr){
+
+            const updatedListings = listingsArr.map((itm, idx) => {
+                
+                const listing = itm.listing;
+                const minimumStayDays = listing[ListingsModel.Fields.MINIMUM_STAY_DAYS];
+                const listingId = listing[ListingsModel.Fields.ID];
+                const bookingsForListing = bookings[listingId];
+                const tomorrow = moment().startOf('day').add(1, 'days');
+
+                //if there are no bookings for the listing, the next available date is tomorrow
+                if(!bookingsForListing){
+                    listing._nextAvailableDate = tomorrow;
+                    return itm;
+                } 
+
+                for(let i = 0; i < bookingsForListing.length; i++) {
+
+                    const book = bookingsForListing[i];
+                    const bookingEndDate = book[BookingModel.Fields.END_DATE];
+                    const nextBooking = bookingsForListing[i + 1];
+  
+                    //if there is no next booking, we assume the next available date 
+                    if(!nextBooking) {
+
+                        const baseDate = ListingService._isDateInPast(bookingEndDate) ?
+                            tomorrow
+                        :
+                            moment(bookingEndDate)
+                            .clone()
+                            .startOf('day')
+                            .add(1, 'days');
+
+                        listing._nextAvailableDate = baseDate;
+                       
+                        return itm;
+                    }
+
+                    const nextBookingStartDate = nextBooking[BookingModel.Fields.START_DATE];
+                    const nextAvailableDate = computationsOfDates(bookingEndDate, nextBookingStartDate, minimumStayDays);
+
+                    if(nextAvailableDate){
+                        
+                        listing._nextAvailableDate = nextAvailableDate;
+                        return itm;
+                    }
+                }
+   
+                return itm;
+            });
+
+            return updatedListings;
+
+            function computationsOfDates(endDateOfFirstBooking, startDateOfNextBooking, minimumStay){
+
+                if(!endDateOfFirstBooking || !startDateOfNextBooking || !minimumStay || isNaN(minimumStay)) return null;
+
+                const formatEndDate = moment(endDateOfFirstBooking).clone().startOf('day');
+                const formatStartDate = moment(startDateOfNextBooking).clone().startOf('day');
+
+                const gapDays = formatStartDate.diff(formatEndDate,'days');
+                
+                if(gapDays >= Number(minimumStay)){
+                    return formatEndDate.add(1, 'days')
+                }
+
+                return null;
+            };
+        }
+    }
+
     static async _computeNextAvailableDateForListing(listing) {
     
         const minimumStayForListing = listing[ListingsModel.Fields.MINIMUM_STAY_DAYS];
 
         const bookingObjArr = await BookingRepository.repoGetRelevantBookingsByListingId(listing[ListingsModel.Fields.ID]);
 
-        if(bookingObjArr.length === 0) return moment().startOf('day').add(1, 'days');
+        const tomorrow = moment().startOf('day').add(1, 'days');
 
-        for(let i = 0; i < bookingObjArr.length; i++) {
+        if(bookingObjArr.length === 0) return tomorrow;
 
-            const bookingEndDate = moment(bookingObjArr[i][BookingModel.Fields.END_DATE]);
-            const nextBooking = bookingObjArr[i + 1];
+        const availableDate = findNextAvailableDate(bookingObjArr, minimumStayForListing);
 
-            if(!nextBooking) return bookingEndDate.clone().startOf('day').add(1, 'days');
-            
-            const newBookingStartDate = moment(nextBooking[BookingModel.Fields.START_DATE]);
-            
-            const gapDays = newBookingStartDate         
-                .clone()
-                .startOf('day')
-                .diff(
-                    bookingEndDate.clone().startOf('day'),
-                    'days'
-                );
+        return availableDate ?? tomorrow;
 
-            if(gapDays >= minimumStayForListing){
-                return bookingEndDate.clone().startOf('day').add(1, 'days');
+        function findNextAvailableDate(bookingsForListing, minimumStay){
+
+            for(let i = 0; i < bookingsForListing.length; i++) {
+
+                const bookingEndDate = moment(bookingsForListing[i][BookingModel.Fields.END_DATE]);
+                const theDayAfterBookingEndDate = bookingEndDate.clone().startOf('day').add(1, 'days');
+                const nextBooking = bookingsForListing[i + 1];
+
+                if(!nextBooking){
+
+                    if(ListingService._isDateInPast(bookingEndDate)){
+                        return tomorrow;
+                    }
+
+                    return theDayAfterBookingEndDate;
+                } 
+                
+                const nextBookingStartDate = moment(nextBooking[BookingModel.Fields.START_DATE]);
+                
+                const gapDays = nextBookingStartDate         
+                    .clone()
+                    .startOf('day')
+                    .diff(
+                        bookingEndDate.clone().startOf('day'),
+                        'days'
+                    );
+
+                if(gapDays >= minimumStay) return theDayAfterBookingEndDate;
             }
         }
-
-        return null;
     }
     
 };

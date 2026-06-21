@@ -1,6 +1,7 @@
 const moment = require('moment');
 const { EVENT_TYPES } = require("../../events/booking.events");
 const BookingModel = require("./booking.model");
+const ListingsModel = require('../listings/listings.model');
 
 class BookingRepository {
 
@@ -148,6 +149,23 @@ class BookingRepository {
             .where(BookingModel.Fields.STATUS_ID, EVENT_TYPES.BOOKING_STATUS_ID.CONFIRMED)
 
         return bookings;
+    }
+
+    static async repoGetRelevantBookingsByListingIds(listingIds){
+
+        if(!Array.isArray(listingIds) || listingIds.length == 0) return [];
+
+        const currentYear = new Date().getFullYear();
+
+        const yearStart = new Date(Date.UTC(currentYear, 0, 1, 0, 0, 0, 0));
+    
+        const bookings = await BookingModel.query()
+            .whereIn(BookingModel.Fields.LISTING_ID, listingIds)
+            .where(BookingModel.Fields.END_DATE, '>=', yearStart.toISOString())
+            .where(BookingModel.Fields.STATUS_ID, EVENT_TYPES.BOOKING_STATUS_ID.CONFIRMED)
+            
+        return bookings;
+
     }
 };
 
