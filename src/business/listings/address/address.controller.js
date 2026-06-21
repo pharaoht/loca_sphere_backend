@@ -48,11 +48,13 @@ async function httpgetAddressesByCoordinatesRadius(req, res) {
         }
 
         const results = await AddressRepository.getAddressByCoordinatesRadius(lat, long, radius, santiParams);
-
+        
         if (!results) return res.status(404).json({ error: 'Addresses not found' });
 
-        const dal = AddressDal.fromDto(results);
-
+        const x = await ListingService._computeNextAvailableDateForMultipleListings(results)
+   
+        const dal = AddressDal.fromDto(x);
+        
         if(RedisCacheService.isConnected){
 
             await RedisCacheService.set(cacheKey, dal, { EX: 15 * 60 })
