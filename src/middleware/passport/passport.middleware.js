@@ -35,7 +35,9 @@ async function verifyCallback(accesToken, refreshToken, profile, done){
 };
 
 const opts = {
-    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+    jwtFromRequest: ExtractJwt.fromExtractors([
+        (req) => req?.cookies?.access_token
+    ]),
     secretOrKey: process.env.JWT_SECRET
 }
 
@@ -52,9 +54,9 @@ passport.use(new GoogleStrategy(
 passport.use(new JWTStrategy(opts, async (jwtPayload, done) => {
 
     try {
-
+    
         const user = await UserModel.query().findById(jwtPayload.id);
-
+        
         if(user) return done(null, user);
 
         else return done(null, false);

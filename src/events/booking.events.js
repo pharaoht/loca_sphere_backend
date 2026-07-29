@@ -22,6 +22,10 @@ const EVENT_TYPES = {
         DECLINED: 5,
         CREATED: 6,
         ONGOING: 7,
+    }),
+
+    BOOKING_STATUS_PARAM: Object.freeze({
+        requests: 1, //pending
     })
 };
 

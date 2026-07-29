@@ -112,6 +112,10 @@ class BookingService {
         }
     }
 
+    static confirmBooking(){
+        
+    }
+
 };
 
 module.exports = BookingService;

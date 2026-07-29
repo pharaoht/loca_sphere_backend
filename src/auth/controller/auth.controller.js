@@ -1,17 +1,9 @@
 require('dotenv').config();
 const passport = require('passport');
-const jwt = require('jsonwebtoken');
 const instance = require('../../services/cache/redis.cache');
 const ListingsRepository = require('../../business/listings/listings.repository');
 const { successResponse, errorResponse } = require('../../responses/responses');
-
-const nanoid = async () => {
-  const { nanoid } = await import('nanoid');
-  return nanoid();
-};
-
-const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000;
-const sevenDaysInSeconds = sevenDaysInMs / 1000;
+const AuthService = require('../service/auth.service');
 
 async function httpOAuthLogin(req, res, next) {
 
@@ -21,10 +13,8 @@ async function httpOAuthLogin(req, res, next) {
 	})(req, res, next);
 }
 
-//when user signs in for first time with google oauth this runs
 async function httpOAuthCallback(req, res, next) {
-	
-	const refreshToken = await nanoid();
+	//when user signs in for first time with google oauth this runs
 
 	//session: false, means its stateless, not stored in db, change to redis?
 	passport.authenticate('google', { session: false }, async (err, user) => {
@@ -35,18 +25,24 @@ async function httpOAuthCallback(req, res, next) {
 			return res.redirect('/api/auth/failure');
 		}
 
-		//save token in redis
-		await instance.set(`refresh:${refreshToken}`, user.id, { EX: sevenDaysInSeconds});
+		const sessionId = AuthService.generateSessionId()
+		const rfTk = AuthService.signRefreshToken(user.id, sessionId);
+		const accessToken = AuthService.signAccessToken(user.id);
 
-		// //store refresh token in cookie
-		res.cookie('refresh_token', refreshToken, {
-			httpOnly: true,
-			secure: process.env.NODE_ENV === 'PROD',
-			sameSite: 'lax',
-			domain: process.env.NODE_ENV === 'PROD' ? '.loca-sphere.dev' : 'localhost',
-			maxAge: sevenDaysInMs,
-		})
+		await instance.set(
+			`refresh:${sessionId}`,
+			JSON.stringify(
+				{ 
+					userId: user.id, 
+					tokenHash: AuthService.hash(rfTk) 
+				}
+			),
+			{ EX: AuthService.sevenDaysInSeconds }
+		)
 		
+		res.cookie('access_token', accessToken, AuthService.cookieOptionsObj);
+		res.cookie('refresh_token', rfTk, AuthService.cookieOptionsObj);
+
 		return res.redirect(`${redirect}/`)
 
 	})(req, res, next);
@@ -54,14 +50,57 @@ async function httpOAuthCallback(req, res, next) {
 
 async function httpLogout(req, res){
 
-    req.logout();
+	try {
+		const refreshToken = req?.cookies?.refresh_token;
 
-	res.clearCookie('refresh_token', {
-		domain: '.loca-sphere.dev',
-		path: '/'
-	});
+		// If a refresh token exists, invalidate its session
+		if (refreshToken) {
 
-    return res.redirect('/')
+			try {
+
+				const payload = jwt.verify(
+					refreshToken,
+					process.env.REFRESH_SECRET
+				);
+
+				await instance.clearOneCluster(
+					`refresh:${payload.sid}`
+				);
+
+			}
+			catch (err) {
+				// Ignore invalid/expired refresh token.
+				// We still want to clear cookies.
+				console.warn("Logout: invalid refresh token");
+			}
+
+		}
+
+		// Remove cookies
+		res.clearCookie(
+			"access_token",
+			getAccessCookieOptions()
+		);
+
+		res.clearCookie(
+			"refresh_token",
+			getRefreshCookieOptions()
+		);
+
+		return res.status(200).json({
+			success: true
+		});
+
+	}
+	catch (error) {
+
+		console.error(error);
+
+		return res.status(500).json({
+			error: error.message
+		});
+
+	}
 }
 
 async function httpOAuthFailure(req, res){
@@ -74,49 +113,74 @@ async function httpOAuthFailure(req, res){
 async function httpRefreshToken(req, res){
 
 	try {
-
-		console.log('** refresh endpoint init **');
-
-		const oldrefreshToken = req?.cookies?.refresh_token;
 		
+		console.log('** refresh endpoint init **');
+		
+		const oldrefreshToken = req?.cookies?.refresh_token;
+
 		if(!oldrefreshToken) return errorResponse(res, 'No token was provided', 401);
 		
-		const userId = await instance.get(`refresh:${oldrefreshToken}`);
+		let payload;
 
-		if(!userId){
+		try {
 
-			console.warn('** Refresh token did not resolve to a valid user. **');
+			payload = AuthService.verifyToken(oldrefreshToken);
+		}
+		catch(error){
+
+			console.error('** refresh token verification failed **', error);
+
+			return errorResponse(res, 'invalid refresh token', 401);	
+		}
+
+		const { sub: userId, sid: sessionId } = payload;
+
+		const session = await instance.get(`refresh:${sessionId}`);
+
+		if(!session) {
+			console.warn('** refresh session not found **');
+			return errorResponse(res, 'refresh session not found', 401);
+		}
+
+		const parsedSession = JSON.parse(session);
+
+		if(parsedSession.tokenHash !== AuthService.hash(oldrefreshToken)){
+
+			await instance.clearOneCluster(`refresh:${sessionId}`);
+
+			console.warn('** refresh token does not match session **');
 			
-			return errorResponse(res, 'not logged in or invalid request', 403)
+			return errorResponse(res, 'refresh token does not match session', 401);
 		} 
 		
-		const newAccessToken = jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: '15m' });
+		const newSessionId = AuthService.generateSessionId()
 
-		const newRefreshToken = await nanoid();
+		const newAccessToken = AuthService.signAccessToken(userId);
 
-		console.log('** issuing new refresh token **');
-
-		await instance.set(`refresh:${newRefreshToken}`,
+		const newRefreshToken = AuthService.signRefreshToken(
 			userId,
-			//EX redis deletes this automatically
-			{ EX : sevenDaysInSeconds }
-		)
+			newSessionId
+		);
 
-		console.log('** removing old refresh token from redis **');
-	
-		await instance.clearOneCluster(`refresh:${oldrefreshToken}`)
+		await instance.set(
+			`refresh:${newSessionId}`,
+			JSON.stringify({
+				userId,
+				tokenHash: AuthService.hash(newRefreshToken)
+			}),
+			{
+				EX: AuthService.sevenDaysInSeconds
+			}
+		);
 
-		//store refresh token in cookie
-		res.cookie('refresh_token', newRefreshToken, {
-			httpOnly: true,
-			secure: process.env.NODE_ENV === 'PROD',
-			sameSite: 'lax',
-			maxAge: sevenDaysInMs, 
-		})
+		await instance.clearOneCluster(`refresh:${sessionId}`);
 
-		console.log('** issuing success **');
+		// Set cookies
+		res.cookie("access_token", newAccessToken, AuthService.cookieOptionsObj);
 
-		return successResponse(res, { accessToken: newAccessToken }, 'successful auth', 200)
+		res.cookie("refresh_token", newRefreshToken, AuthService.cookieOptionsObj);
+
+		return successResponse(res,null,"successful auth",200);
 	
 	}
 	catch(error){
@@ -132,30 +196,41 @@ async function httpRefreshToken(req, res){
  * Uses the HTTP-only refresh_token cookie as a session reference.
  * Safe because this endpoint is only called server-to-server (SSR fetch).
  */
-
 async function httpOwnership(req, res){
 	//todo, check if listing is already cached in redis
 	try {
 
 		console.log('** checking ownership **', req?.cookies?.refresh_token);
 
-		const currentRefreshToken = req?.cookies?.refresh_token;
-		
-		if(!currentRefreshToken) return  errorResponse(res, 'no refresh token found', 401)
-
 		const { listingId } = req.params;
 
-		if(!listingId) return res.status(400).json({ success: false, message: 'no listing id was passed' });
-		
+		if (!listingId) {
+			return res.status(400).json({
+				success: false,
+				message: "No listing id was passed"
+			});
+		}
+
 		const listing = await ListingsRepository.repoGetListingById(listingId);
 
-		if(!listing) return res.status(404).json({ success: false, message: 'no listing found with that id' });
-	
-		const userId = await instance.get(`refresh:${currentRefreshToken}`);
+		if (!listing) {
+			return res.status(404).json({
+				success: false,
+				message: "Listing not found"
+			});
+		}
 
-		if(!userId) return res.status(404).json({ success: false, messge: 'no user found with that id' });
+		// Passport populated this for us
+		if (String(req.user.id) === String(listing.userId)) {
+			return res.status(200).json({
+				success: true
+			});
+		}
 
-		if(String(userId) == String(listing.userId)) return res.status(200).json({ success: true })
+		return res.status(403).json({
+			success: false,
+			message: "Not allowed"
+		});
 	
 		return res.status(403).json({ success: false, message: 'not allowed' });
 

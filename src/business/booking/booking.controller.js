@@ -141,6 +141,13 @@ async function httpUpdateBookingStatus(req, res){
 
         if(!wasAbleToUpdate) return errorResponse(res, 'Unable to update booking status, try again later', 400);
 
+        if(statusChangeIdNum === EVENT_TYPES.BOOKING_STATUS_ID.CONFIRMED){
+            //get listingId
+            //find bookings with statusId of Requested and same listingId
+            //update the status of those bookings to declined
+            //send out emails
+        }
+
         bookingStatusPolicy.emitBookingStatusUpdateEvent();
 
         return successResponse(res, {}, 'booking updated successfully', 200);
@@ -289,13 +296,38 @@ async function httpGetAvailabilityForListing(req, res, next) {
     }
 }
 
+async function httpGetHostBookingsByStatus(req, res) {
+
+    try {
+
+        const userId = req.user.id;
+        const status = req.query.status;
+
+        if(!status) return errorResponse(res, 'no statusId provided', 400, [])
+
+        if(!Object.hasOwn(EVENT_TYPES.BOOKING_STATUS_PARAM, status)) return erorResponse(res, 'invalid statusId provided', 400, [])
+
+        const result = await BookingRepository.repoGetHostBookingsByStatus(userId, EVENT_TYPES.BOOKING_STATUS_PARAM[status]);
+
+        return successResponse(res, result, 'success', 200);
+
+    }
+    catch(error){
+
+        console.error(error);
+        
+        return errorResponse(res, 'Internal server error', 500, [])
+    }
+}
+
 module.exports = {
     httpCreateBooking,
     httpUpdateBookingStatus,
     httpGetBookingById,
     httpDeleteBookingById,
     httpCheckAvailability,
-    httpGetAvailabilityForListing
+    httpGetAvailabilityForListing,
+    httpGetHostBookingsByStatus
 }
 
 
