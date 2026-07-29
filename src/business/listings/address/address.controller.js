@@ -1,4 +1,4 @@
-const AxiosService = require("../../../services/axios/axios.service");
+const HttpService = require("../../../services/axios/axios.service");
 const ListingService = require("../listings.service");
 const AddressDal = require("./address.dal");
 const AddressRepository = require("./address.repository");
@@ -77,9 +77,9 @@ async function httpGeoCodingSearch(req, res){
 
         const { q, type } = req?.query;
 
-        const options = await AxiosService.genMapboxApiReqObj(q, type)
+        const options = await HttpService.genMapboxApiReqObj(q, type)
 
-        const response = await AxiosService.externalRequest(options);        
+        const response = await HttpService.externalRequest(options);        
        
         return res.status(200).json(response);
     }
