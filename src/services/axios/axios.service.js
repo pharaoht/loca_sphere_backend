@@ -1,58 +1,67 @@
-const axios = require('axios');
 require('dotenv').config();
 
-class AxiosService {
+class HttpService {
 
-    static genMapboxApiReqObj(query = '', type = 'suggest'){
-        //retrieve or suggest
-        if(query === '' || type == '') return {};
+    static genMapboxApiReqObj(query = '', type = 'suggest') {
 
-        const url = type === 'retrieve' ? `${type}/${query}?` : `${type}?q=${query}`
+        if (query === '' || type === '') return '';
 
-        const options = {
-            method: 'GET',
-            url: `https://api.mapbox.com/search/searchbox/v1/${url}`,
-            params: {
-                access_token: process.env.MAPBOX_ACCESS_TOKEN,
-                session_token: process.env.MAPBOX_SESSION_TOKEN,               
-                types: 'address'
-            }
-        }
+        const url =
+            type === 'retrieve'
+                ? `${type}/${query}?`
+                : `${type}?q=${encodeURIComponent(query)}`;
 
-        return options;
+        const params = new URLSearchParams({
+            access_token: process.env.MAPBOX_ACCESS_TOKEN,
+            session_token: process.env.MAPBOX_SESSION_TOKEN,
+            types: 'address'
+        });
+
+        return `https://api.mapbox.com/search/searchbox/v1/${url}&${params.toString()}`;
     }
 
-    static genRapidApiReqObj(cityName){
+    static genRapidApiReqObj(cityName) {
 
-        const options = {
-            method: 'GET',
-            url: `https://${process.env.RAPID_API_HOST}/v1/geo/cities`,
-            params: {
-                types: 'CITY',
-                namePrefix: cityName,
-                sort: '-population',
-                countryIds: 'AL,AD,AM,AT,AZ,BY,BE,BA,BG,HR,CY,CZ,DK,EE,FI,FR,GE,DE,GR,HU,IS,IE,IT,KZ,LV,LI,LT,LU,MT,MD,MC,ME,NL,MK,NO,PL,PT,RO,RU,SM,RS,SK,SI,ES,SE,CH,TR,UA,GB,VA,US'
-            },
-            headers: {
-              'x-rapidapi-key': process.env.RAPID_API_KEY,
-              'x-rapidapi-host': process.env.RAPID_API_HOST
+        const params = new URLSearchParams({
+            types: 'CITY',
+            namePrefix: cityName,
+            sort: '-population',
+            countryIds:
+                'AL,AD,AM,AT,AZ,BY,BE,BA,BG,HR,CY,CZ,DK,EE,FI,FR,GE,DE,GR,HU,IS,IE,IT,KZ,LV,LI,LT,LU,MT,MD,MC,ME,NL,MK,NO,PL,PT,RO,RU,SM,RS,SK,SI,ES,SE,CH,TR,UA,GB,VA,US'
+        });
+
+        return {
+            url: `https://${process.env.RAPID_API_HOST}/v1/geo/cities?${params.toString()}`,
+            options: {
+                method: 'GET',
+                headers: {
+                    'x-rapidapi-key': process.env.RAPID_API_KEY,
+                    'x-rapidapi-host': process.env.RAPID_API_HOST
+                }
             }
         };
-
-        return options
     }
 
-    static async externalRequest(options){
+    static async externalRequest(request) {
 
         console.log('making external request...');
 
-        const response = await axios.request(options);
-        
-        if(response.status === 200) return response.data;
+        const url = typeof request === 'string'
+            ? request
+            : request.url;
 
-        else throw new Error(`Unexpected response status: ${response.status}`);
+        const options = typeof request === 'string'
+            ? {}
+            : request.options;
 
+        const response = await fetch(url, options);
+
+        if (!response.ok) {
+            throw new Error(`Unexpected response status: ${response.status}`);
+        }
+
+        return await response.json();
     }
 };
 
-module.exports = AxiosService;
+module.exports = HttpService;

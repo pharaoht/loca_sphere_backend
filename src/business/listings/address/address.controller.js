@@ -1,4 +1,4 @@
-const AxiosService = require("../../../services/axios/axios.service");
+const HttpService = require("../../../services/axios/axios.service");
 const ListingService = require("../listings.service");
 const AddressDal = require("./address.dal");
 const AddressRepository = require("./address.repository");
@@ -35,20 +35,15 @@ async function httpgetAddressesByCoordinatesRadius(req, res) {
         const { lat, long, radius } = req?.query;
 
         const santiParams = ListingService.santizeParams(req.query);
-
+  
         const cacheKey = AddressDal.buildAddressCoorCacheKey({ lat, long, radius, santiParams });
 
-        if(RedisCacheService.isConnected){
-
-            const cacheData = await RedisCacheService.get(cacheKey);
-
-            if(cacheData){
-                return res.status(200).json(cacheData);
-            }
-        }
-
-        const results = await AddressRepository.getAddressByCoordinatesRadius(lat, long, radius, santiParams);
+        const cacheData = RedisCacheService.isConnected ? await RedisCacheService.get(cacheKey) : null;
         
+        if(cacheData && cacheData !== null) return res.status(200).json(cacheData);
+        
+        const results = await AddressRepository.getAddressByCoordinatesRadius(lat, long, radius, santiParams);
+  
         if (!results) return res.status(404).json({ error: 'Addresses not found' });
 
         const x = await ListingService._computeNextAvailableDateForMultipleListings(results)
@@ -77,9 +72,9 @@ async function httpGeoCodingSearch(req, res){
 
         const { q, type } = req?.query;
 
-        const options = await AxiosService.genMapboxApiReqObj(q, type)
+        const options = await HttpService.genMapboxApiReqObj(q, type)
 
-        const response = await AxiosService.externalRequest(options);        
+        const response = await HttpService.externalRequest(options);        
        
         return res.status(200).json(response);
     }

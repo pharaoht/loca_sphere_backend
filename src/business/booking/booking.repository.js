@@ -104,9 +104,9 @@ class BookingRepository {
     static async repoUpdateBookingStatus(bookingId, status, expectatedStatus){
 
         if( 
-            !status || 
-            !bookingId || 
-            !expectatedStatus ||
+            status == null || 
+            bookingId == null || 
+            expectatedStatus == null ||
             typeof status !== 'number' ||
             typeof bookingId !== 'string' 
         ) return false;
@@ -166,6 +166,17 @@ class BookingRepository {
             
         return bookings;
 
+    }
+
+    static async repoGetHostBookingsByStatus(userId, status){
+
+        if(!userId || !status) return false;
+
+        const bookingRecords = await BookingModel.query()
+            .where(BookingModel.Fields.HOST_ID, userId)
+            .where(BookingModel.Fields.STATUS_ID, status)
+
+        return bookingRecords;
     }
 };
 

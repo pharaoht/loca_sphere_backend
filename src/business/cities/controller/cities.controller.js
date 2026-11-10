@@ -1,4 +1,4 @@
-const AxiosService = require('../../../services/axios/axios.service');
+const HttpService = require('../../../services/axios/axios.service');
 
 async function httpQueryCities(req, res, next){
 
@@ -10,9 +10,9 @@ async function httpQueryCities(req, res, next){
 
         if(!location) return res.status(404).json('provide a location')
 
-        const options = AxiosService.genRapidApiReqObj(location);
+        const options = HttpService.genRapidApiReqObj(location);
 
-        const response = await AxiosService.externalRequest(options);
+        const response = await HttpService.externalRequest(options);
 
         return res.status(200).json(response.data)
     }

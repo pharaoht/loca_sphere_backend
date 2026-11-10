@@ -6,12 +6,6 @@ const UserService = require('./user.service');
 const RedisCacheService = require('../../services/cache/redis.cache');
 
 /**
- * @typedef {import('express').Request} Request
- * @typedef {import('express').Response} Response
-*/
-
-
-/**
  * @param {Request} req
  * @param {Response} res
  */
@@ -19,29 +13,19 @@ async function httpGetUserInfo(req, res, next) {
     
     try{
 
-        const authHeader = req?.headers?.authorization;
+        console.log("*** httpGetUserInfo running ***");
 
-	    if (!authHeader){
+        const user = await UserRepository.repoGetUserDetailsById(req.user.id);
 
-            console.warn('** auth header not set. User verification failed **');
-    
-            return res.status(401).json({ error: "Missing token" });
-        } 
+        if (!user) {
 
-        const token = authHeader.split(" ")[1];
+            console.warn("** User not found **");
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            return errorResponse(res, 'User not found', 404, {});
+        }
 
-        const user = await UserRepository.repoGetUserDetailsById(decoded.id);
+        return successResponse(res, user, 'success', 200);
 
-        if (!user){
-
-            console.warn('** User not found from token **');
-    
-            return res.status(404).json({ error: "User not found" });
-        } 
-        
-		res.status(200).json(user.toJSON());
     }
     catch(error){
 
