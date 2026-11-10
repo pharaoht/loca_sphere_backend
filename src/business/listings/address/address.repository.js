@@ -52,9 +52,9 @@ class AddressRepository {
             .alias('a')
             .withGraphFetched('listing.images')
             .joinRelated('listing as l')
-            .joinRaw('JOIN "Currencies" as c ON c.id = l.currencyId')
-            .joinRaw('JOIN "ListingHostInfo" as h ON h.listingId = l.id')
-            .joinRaw('JOIN "Utility" as u ON u.listingId = l.id')
+            .join('Currencies as c', 'c.id', 'l.currencyId')
+            .join('ListingHostInfo as h', 'h.listingId', 'l.id')
+            .join('Utility as u', 'u.listingId', 'l.id')
             .whereIn('l.id', AddressModel.raw('SELECT id FROM filtered_listings')) 
             .whereIn('l.id', AddressModel.raw('SELECT id FROM filtered_listings_two'))
             .select(
@@ -90,9 +90,9 @@ class AddressRepository {
             .select(
                 AddressModel.raw(`
                     (6371 * acos(
-                        cos(radians(?)) * cos(radians(latitude)) *
-                        cos(radians(longitude) - radians(?)) +
-                        sin(radians(?)) * sin(radians(latitude))
+                        cos(radians(?)) * cos(radians(a.latitude)) *
+                        cos(radians(a.longitude) - radians(?)) +
+                        sin(radians(?)) * sin(radians(a.latitude))
                     )) AS distance
                     `, [latitude, longitude, latitude]
                 )
@@ -112,9 +112,12 @@ class AddressRepository {
                 }
                 if(filters.listingType){
 
-                    const opts = String(filters.listingType).split(',').map(t => !isNaN(t) && t.trim());
+                    const opts = String(filters.listingType)
+                        .split(',')
+                        .map(t => t.trim())
+                        .filter(t => !isNaN(Number(t)) && t !== '');
 
-                    builder.whereIn(`l.${ListingsModel.Fields.LISTING_TYPE_ID}`, opts)
+                    builder.whereIn(`l.${ListingsModel.Fields.LISTING_TYPE_ID}`, opts);
                 }
                 if(filters.isVerified && typeof filters.isVerified === 'boolean') {
 
@@ -132,11 +135,18 @@ class AddressRepository {
                     builder.whereNotExists(
                         AddressModel.raw(`
                             SELECT 1
-                            FROM "Bookings" b
-                            WHERE b."listingId" = l.id
-                            AND b."startDate" <= ?
-                            AND b."endDate" >= ?
-                        `, [filters.moveIn, filters.moveOut])
+                            FROM ?? AS b
+                            WHERE b.?? = l.id
+                            AND b.?? <= ?
+                            AND b.?? >= ?
+                        `, [
+                            'Bookings',
+                            'b.listingId',
+                            'b.startDate',
+                            'b.endDate',
+                            filters.moveIn,
+                            filters.moveOut
+                        ])
                     );
                 }
 

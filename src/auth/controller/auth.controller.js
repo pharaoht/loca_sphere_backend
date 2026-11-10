@@ -231,8 +231,6 @@ async function httpOwnership(req, res){
 			success: false,
 			message: "Not allowed"
 		});
-	
-		return res.status(403).json({ success: false, message: 'not allowed' });
 
 	}
 	catch(error){

@@ -6,6 +6,7 @@ const { generateTestToken } = require('../helpers/helpers');
 
 const hostId = generateTestToken(TEST_USER_HOST_ID);
 const guestId = generateTestToken(TEST_USER_GUEST_ID);
+const hostIdRefreshToken = generateTestToken(Test_USER_HOST_ID);
 
 describe('BOOKING.CONTROLLER GET - /api/bookings/:id', () => {
 
@@ -92,7 +93,7 @@ describe('BOOKING.CONTROLLER PATCH - /api/bookings/update-status', () => {
 
         const res = await request(app)
             .patch(url)
-            .set('Authorization', `Bearer ${hostId}`)
+            .set('Cookie', [`refreshToken=${hostIdRefreshToken}`, `accessToken=${hostId}`])
             .send({ bookingId: null, statusChangeId: null });
 
         expect(res.statusCode).toBe(400)
