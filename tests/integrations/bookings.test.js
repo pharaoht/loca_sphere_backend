@@ -6,7 +6,7 @@ const { generateTestToken } = require('../helpers/helpers');
 
 const hostId = generateTestToken(TEST_USER_HOST_ID);
 const guestId = generateTestToken(TEST_USER_GUEST_ID);
-const hostIdRefreshToken = generateTestToken(Test_USER_HOST_ID);
+const hostIdRefreshToken = generateTestToken(TEST_USER_HOST_ID);
 
 describe('BOOKING.CONTROLLER GET - /api/bookings/:id', () => {
 
